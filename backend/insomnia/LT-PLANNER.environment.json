@@ -1,0 +1,81 @@
+{
+  "_type": "export",
+  "__export_format": 4,
+  "__export_date": "2026-01-19T00:00:00.000Z",
+  "__export_source": "insomnia.desktop.app:v2026.1.0",
+  "resources": [
+    {
+      "_id": "env_lt_planner_base",
+      "_type": "environment",
+      "parentId": null,
+      "name": "LT-PLANNER Base",
+      "data": {
+        "baseUrl": "http://localhost:3000",
+        "accessToken": "",
+        "userEmail": "",
+        "userPassword": "123456",
+        "userNewPassword": "1234567",
+        "userId": "",
+        "employeeId": "",
+        "equipmentId": "",
+        "teamId": "",
+        "foundationId": "",
+        "towerId": "",
+        "taskId": "",
+        "productionId": "",
+        "workId": ""
+      },
+      "dataPropertyOrder": {
+        "&": [
+          "baseUrl",
+          "accessToken",
+          "userEmail",
+          "userPassword",
+          "userNewPassword",
+          "userId",
+          "workId",
+          "employeeId",
+          "equipmentId",
+          "teamId",
+          "foundationId",
+          "towerId",
+          "taskId",
+          "productionId"
+        ]
+      },
+      "color": "#7d69cb",
+      "isPrivate": false
+    },
+    {
+      "_id": "env_lt_planner_local",
+      "_type": "environment",
+      "parentId": "env_lt_planner_base",
+      "name": "Local",
+      "data": {},
+      "color": "#50a14f",
+      "isPrivate": false
+    },
+    {
+      "_id": "env_lt_planner_dev",
+      "_type": "environment",
+      "parentId": "env_lt_planner_base",
+      "name": "Development",
+      "data": {
+        "baseUrl": "http://dev-api.lt-planner.com"
+      },
+      "color": "#e5a02f",
+      "isPrivate": false
+    },
+    {
+      "_id": "env_lt_planner_prod",
+      "_type": "environment",
+      "parentId": "env_lt_planner_base",
+      "name": "Production",
+      "data": {
+        "baseUrl": "https://api.lt-planner.com"
+      },
+      "color": "#e45649",
+      "isPrivate": false
+    }
+  ]
+}

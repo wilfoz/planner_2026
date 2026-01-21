@@ -1,0 +1,825 @@
+{
+  "_type": "export",
+  "__export_format": 4,
+  "__export_date": "2026-01-19T00:00:00.000Z",
+  "__export_source": "insomnia.desktop.app:v2026.1.0",
+  "resources": [
+    {
+      "_id": "wrk_lt_planner",
+      "_type": "workspace",
+      "parentId": null,
+      "name": "LT - PLANNER",
+      "description": "LT - PLANNER API requests",
+      "scope": "collection"
+    },
+    {
+      "_id": "env_base_lt_planner",
+      "_type": "environment",
+      "parentId": "wrk_lt_planner",
+      "name": "Base Environment",
+      "data": {
+        "baseUrl": "http://localhost:3000",
+        "accessToken": "",
+        "userEmail": "",
+        "userPassword": "123456",
+        "userNewPassword": "1234567",
+        "userId": "",
+        "employeeId": "",
+        "equipmentId": "",
+        "teamId": "",
+        "foundationId": "",
+        "towerId": "",
+        "taskId": "",
+        "productionId": "",
+        "workId": ""
+      }
+    },
+    {
+      "_id": "env_local_lt_planner",
+      "_type": "environment",
+      "parentId": "env_base_lt_planner",
+      "name": "Local",
+      "data": {}
+    },
+
+    { "_id": "grp_users", "_type": "request_group", "parentId": "wrk_lt_planner", "name": "Users", "description": "", "environment": {} },
+    { "_id": "grp_employees", "_type": "request_group", "parentId": "wrk_lt_planner", "name": "Employees", "description": "", "environment": {} },
+    { "_id": "grp_equipments", "_type": "request_group", "parentId": "wrk_lt_planner", "name": "Equipments", "description": "", "environment": {} },
+    { "_id": "grp_teams", "_type": "request_group", "parentId": "wrk_lt_planner", "name": "Teams", "description": "", "environment": {} },
+    { "_id": "grp_foundations", "_type": "request_group", "parentId": "wrk_lt_planner", "name": "Foundations", "description": "", "environment": {} },
+    { "_id": "grp_towers", "_type": "request_group", "parentId": "wrk_lt_planner", "name": "Towers", "description": "", "environment": {} },
+    { "_id": "grp_task", "_type": "request_group", "parentId": "wrk_lt_planner", "name": "Task", "description": "", "environment": {} },
+    { "_id": "grp_production", "_type": "request_group", "parentId": "wrk_lt_planner", "name": "Production", "description": "", "environment": {} },
+    { "_id": "grp_works", "_type": "request_group", "parentId": "wrk_lt_planner", "name": "Works", "description": "", "environment": {} },
+    { "_id": "grp_cleanup", "_type": "request_group", "parentId": "wrk_lt_planner", "name": "Cleanup", "description": "", "environment": {} },
+
+    {
+      "_id": "req_users_signup",
+      "_type": "request",
+      "parentId": "grp_users",
+      "name": "Signup (POST /users)",
+      "method": "POST",
+      "url": "{{ baseUrl }}/users",
+      "headers": [{ "name": "Content-Type", "value": "application/json" }],
+      "parameters": [],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"John\",\n  \"email\": \"{{ userEmail }}\",\n  \"password\": \"{{ userPassword }}\"\n}"
+      },
+      "scripts": {
+        "preRequest": {
+          "type": "text/javascript",
+          "exec": "const email = insomnia.environment.get('userEmail');\nif (!email) {\n  insomnia.environment.set('userEmail', `john+${Date.now()}@example.com`);\n}\n// reset vars for a clean run\ninsomnia.environment.set('accessToken', '');\ninsomnia.environment.set('userId', '');\ninsomnia.environment.set('employeeId', '');\ninsomnia.environment.set('equipmentId', '');\ninsomnia.environment.set('teamId', '');\ninsomnia.environment.set('foundationId', '');\ninsomnia.environment.set('towerId', '');\ninsomnia.environment.set('taskId', '');\ninsomnia.environment.set('productionId', '');\ninsomnia.environment.set('workId', '');\n"
+        },
+        "afterResponse": {
+          "type": "text/javascript",
+          "exec": "insomnia.test('Status 201', () => {\n  insomnia.expect(insomnia.response.status).to.eql(201);\n});\n\nconst body = insomnia.response.json();\ninsomnia.environment.set('userId', body.data.id);\n"
+        }
+      }
+    },
+    {
+      "_id": "req_users_login",
+      "_type": "request",
+      "parentId": "grp_users",
+      "name": "Login (POST /users/login)",
+      "method": "POST",
+      "url": "{{ baseUrl }}/users/login",
+      "headers": [{ "name": "Content-Type", "value": "application/json" }],
+      "parameters": [],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"email\": \"{{ userEmail }}\",\n  \"password\": \"{{ userPassword }}\"\n}"
+      },
+      "scripts": {
+        "afterResponse": {
+          "type": "text/javascript",
+          "exec": "insomnia.test('Status 201', () => {\n  insomnia.expect(insomnia.response.status).to.eql(201);\n});\n\nconst body = insomnia.response.json();\ninsomnia.environment.set('accessToken', body.accessToken);\n"
+        }
+      }
+    },
+    {
+      "_id": "req_users_list",
+      "_type": "request",
+      "parentId": "grp_users",
+      "name": "List (GET /users)",
+      "method": "GET",
+      "url": "{{ baseUrl }}/users",
+      "headers": [{ "name": "Authorization", "value": "Bearer {{ accessToken }}" }],
+      "parameters": [
+        { "name": "page", "value": "1" },
+        { "name": "per_page", "value": "10" }
+      ],
+      "body": {},
+      "scripts": {
+        "afterResponse": {
+          "type": "text/javascript",
+          "exec": "insomnia.test('Status 200', () => {\n  insomnia.expect(insomnia.response.status).to.eql(200);\n});\n\nconst body = insomnia.response.json();\ninsomnia.test('Has meta', () => insomnia.expect(body).to.have.property('meta'));\ninsomnia.test('Has data array', () => insomnia.expect(body.data).to.be.an('array'));\n"
+        }
+      }
+    },
+    {
+      "_id": "req_users_get",
+      "_type": "request",
+      "parentId": "grp_users",
+      "name": "Get (GET /users/:id)",
+      "method": "GET",
+      "url": "{{ baseUrl }}/users/{{ userId }}",
+      "headers": [{ "name": "Authorization", "value": "Bearer {{ accessToken }}" }],
+      "parameters": [],
+      "body": {},
+      "scripts": {
+        "afterResponse": {
+          "type": "text/javascript",
+          "exec": "insomnia.test('Status 200', () => {\n  insomnia.expect(insomnia.response.status).to.eql(200);\n});\n\nconst body = insomnia.response.json();\ninsomnia.test('Has data.id', () => insomnia.expect(body.data).to.have.property('id'));\n"
+        }
+      }
+    },
+    {
+      "_id": "req_users_update",
+      "_type": "request",
+      "parentId": "grp_users",
+      "name": "Update (PUT /users/:id)",
+      "method": "PUT",
+      "url": "{{ baseUrl }}/users/{{ userId }}",
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Authorization", "value": "Bearer {{ accessToken }}" }
+      ],
+      "parameters": [],
+      "body": { "mimeType": "application/json", "text": "{\n  \"name\": \"John Updated\"\n}" },
+      "scripts": {
+        "afterResponse": { "type": "text/javascript", "exec": "insomnia.test('Status 200', () => insomnia.expect(insomnia.response.status).to.eql(200));\n" }
+      }
+    },
+    {
+      "_id": "req_users_password",
+      "_type": "request",
+      "parentId": "grp_users",
+      "name": "Update Password (PATCH /users/:id)",
+      "method": "PATCH",
+      "url": "{{ baseUrl }}/users/{{ userId }}",
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Authorization", "value": "Bearer {{ accessToken }}" }
+      ],
+      "parameters": [],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"old_password\": \"{{ userPassword }}\",\n  \"password\": \"{{ userNewPassword }}\"\n}"
+      },
+      "scripts": {
+        "afterResponse": { "type": "text/javascript", "exec": "insomnia.test('Status 200', () => insomnia.expect(insomnia.response.status).to.eql(200));\n" }
+      }
+    },
+
+    {
+      "_id": "req_employees_create",
+      "_type": "request",
+      "parentId": "grp_employees",
+      "name": "Create (POST /employees)",
+      "method": "POST",
+      "url": "{{ baseUrl }}/employees",
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Authorization", "value": "Bearer {{ accessToken }}" }
+      ],
+      "parameters": [],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"registration\": \"EMP-{{ uuid }}\",\n  \"full_name\": \"Employee {{ uuid }}\",\n  \"occupation\": \"Engineer\",\n  \"leadership\": true,\n  \"status\": \"ACTIVE\"\n}"
+      },
+      "scripts": {
+        "afterResponse": {
+          "type": "text/javascript",
+          "exec": "insomnia.test('Status 201', () => insomnia.expect(insomnia.response.status).to.eql(201));\nconst body = insomnia.response.json();\ninsomnia.environment.set('employeeId', body.data.id);\n"
+        }
+      }
+    },
+    {
+      "_id": "req_employees_list",
+      "_type": "request",
+      "parentId": "grp_employees",
+      "name": "List (GET /employees)",
+      "method": "GET",
+      "url": "{{ baseUrl }}/employees",
+      "headers": [{ "name": "Authorization", "value": "Bearer {{ accessToken }}" }],
+      "parameters": [
+        { "name": "page", "value": "1" },
+        { "name": "per_page", "value": "10" }
+      ],
+      "body": {},
+      "scripts": { "afterResponse": { "type": "text/javascript", "exec": "insomnia.test('Status 200', () => insomnia.expect(insomnia.response.status).to.eql(200));\n" } }
+    },
+    {
+      "_id": "req_employees_get",
+      "_type": "request",
+      "parentId": "grp_employees",
+      "name": "Get (GET /employees/:id)",
+      "method": "GET",
+      "url": "{{ baseUrl }}/employees/{{ employeeId }}",
+      "headers": [{ "name": "Authorization", "value": "Bearer {{ accessToken }}" }],
+      "parameters": [],
+      "body": {},
+      "scripts": { "afterResponse": { "type": "text/javascript", "exec": "insomnia.test('Status 200', () => insomnia.expect(insomnia.response.status).to.eql(200));\n" } }
+    },
+    {
+      "_id": "req_employees_update",
+      "_type": "request",
+      "parentId": "grp_employees",
+      "name": "Update (PUT /employees/:id)",
+      "method": "PUT",
+      "url": "{{ baseUrl }}/employees/{{ employeeId }}",
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Authorization", "value": "Bearer {{ accessToken }}" }
+      ],
+      "parameters": [],
+      "body": { "mimeType": "application/json", "text": "{\n  \"occupation\": \"Supervisor\"\n}" },
+      "scripts": { "afterResponse": { "type": "text/javascript", "exec": "insomnia.test('Status 200', () => insomnia.expect(insomnia.response.status).to.eql(200));\n" } }
+    },
+
+    {
+      "_id": "req_equipments_create",
+      "_type": "request",
+      "parentId": "grp_equipments",
+      "name": "Create (POST /equipments)",
+      "method": "POST",
+      "url": "{{ baseUrl }}/equipments",
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Authorization", "value": "Bearer {{ accessToken }}" }
+      ],
+      "parameters": [],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"registration\": \"EQ-{{ uuid }}\",\n  \"model\": \"Model X\",\n  \"manufacturer\": \"ACME\",\n  \"license_plate\": \"PLT-{{ uuid }}\",\n  \"provider\": \"Provider\",\n  \"status\": \"ACTIVE\"\n}"
+      },
+      "scripts": {
+        "afterResponse": {
+          "type": "text/javascript",
+          "exec": "insomnia.test('Status 201', () => insomnia.expect(insomnia.response.status).to.eql(201));\nconst body = insomnia.response.json();\ninsomnia.environment.set('equipmentId', body.data.id);\n"
+        }
+      }
+    },
+    {
+      "_id": "req_equipments_list",
+      "_type": "request",
+      "parentId": "grp_equipments",
+      "name": "List (GET /equipments)",
+      "method": "GET",
+      "url": "{{ baseUrl }}/equipments",
+      "headers": [{ "name": "Authorization", "value": "Bearer {{ accessToken }}" }],
+      "parameters": [
+        { "name": "page", "value": "1" },
+        { "name": "per_page", "value": "10" }
+      ],
+      "body": {},
+      "scripts": { "afterResponse": { "type": "text/javascript", "exec": "insomnia.test('Status 200', () => insomnia.expect(insomnia.response.status).to.eql(200));\n" } }
+    },
+    {
+      "_id": "req_equipments_get",
+      "_type": "request",
+      "parentId": "grp_equipments",
+      "name": "Get (GET /equipments/:id)",
+      "method": "GET",
+      "url": "{{ baseUrl }}/equipments/{{ equipmentId }}",
+      "headers": [{ "name": "Authorization", "value": "Bearer {{ accessToken }}" }],
+      "parameters": [],
+      "body": {},
+      "scripts": { "afterResponse": { "type": "text/javascript", "exec": "insomnia.test('Status 200', () => insomnia.expect(insomnia.response.status).to.eql(200));\n" } }
+    },
+    {
+      "_id": "req_equipments_update",
+      "_type": "request",
+      "parentId": "grp_equipments",
+      "name": "Update (PUT /equipments/:id)",
+      "method": "PUT",
+      "url": "{{ baseUrl }}/equipments/{{ equipmentId }}",
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Authorization", "value": "Bearer {{ accessToken }}" }
+      ],
+      "parameters": [],
+      "body": { "mimeType": "application/json", "text": "{\n  \"status\": \"MAINTENANCE\"\n}" },
+      "scripts": { "afterResponse": { "type": "text/javascript", "exec": "insomnia.test('Status 200', () => insomnia.expect(insomnia.response.status).to.eql(200));\n" } }
+    },
+
+    {
+      "_id": "req_teams_create",
+      "_type": "request",
+      "parentId": "grp_teams",
+      "name": "Create (POST /teams)",
+      "method": "POST",
+      "url": "{{ baseUrl }}/teams",
+      "headers": [{ "name": "Content-Type", "value": "application/json" }],
+      "parameters": [],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Team-{{ uuid }}\",\n  \"employees\": [\"{{ employeeId }}\"],\n  \"equipments\": [\"{{ equipmentId }}\"]\n}"
+      },
+      "scripts": {
+        "afterResponse": {
+          "type": "text/javascript",
+          "exec": "insomnia.test('Status 201', () => insomnia.expect(insomnia.response.status).to.eql(201));\nconst body = insomnia.response.json();\ninsomnia.environment.set('teamId', body.data.id);\n"
+        }
+      }
+    },
+    {
+      "_id": "req_teams_list",
+      "_type": "request",
+      "parentId": "grp_teams",
+      "name": "List (GET /teams)",
+      "method": "GET",
+      "url": "{{ baseUrl }}/teams",
+      "headers": [],
+      "parameters": [
+        { "name": "page", "value": "1" },
+        { "name": "per_page", "value": "10" }
+      ],
+      "body": {},
+      "scripts": { "afterResponse": { "type": "text/javascript", "exec": "insomnia.test('Status 200', () => insomnia.expect(insomnia.response.status).to.eql(200));\n" } }
+    },
+    {
+      "_id": "req_teams_get",
+      "_type": "request",
+      "parentId": "grp_teams",
+      "name": "Get (GET /teams/:id)",
+      "method": "GET",
+      "url": "{{ baseUrl }}/teams/{{ teamId }}",
+      "headers": [],
+      "parameters": [],
+      "body": {},
+      "scripts": { "afterResponse": { "type": "text/javascript", "exec": "insomnia.test('Status 200', () => insomnia.expect(insomnia.response.status).to.eql(200));\n" } }
+    },
+    {
+      "_id": "req_teams_update",
+      "_type": "request",
+      "parentId": "grp_teams",
+      "name": "Update (PUT /teams/:id)",
+      "method": "PUT",
+      "url": "{{ baseUrl }}/teams/{{ teamId }}",
+      "headers": [{ "name": "Content-Type", "value": "application/json" }],
+      "parameters": [],
+      "body": { "mimeType": "application/json", "text": "{\n  \"name\": \"Team Updated\"\n}" },
+      "scripts": { "afterResponse": { "type": "text/javascript", "exec": "insomnia.test('Status 200', () => insomnia.expect(insomnia.response.status).to.eql(200));\n" } }
+    },
+
+    {
+      "_id": "req_foundations_create",
+      "_type": "request",
+      "parentId": "grp_foundations",
+      "name": "Create (POST /foundation)",
+      "method": "POST",
+      "url": "{{ baseUrl }}/foundation",
+      "headers": [{ "name": "Content-Type", "value": "application/json" }],
+      "parameters": [],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"project\": \"P1\",\n  \"revision\": \"R1\",\n  \"description\": \"Foundation-{{ uuid }}\",\n  \"excavation_volume\": 1.1\n}"
+      },
+      "scripts": {
+        "afterResponse": {
+          "type": "text/javascript",
+          "exec": "insomnia.test('Status 201', () => insomnia.expect(insomnia.response.status).to.eql(201));\nconst body = insomnia.response.json();\ninsomnia.environment.set('foundationId', body.data.id);\n"
+        }
+      }
+    },
+    {
+      "_id": "req_foundations_list",
+      "_type": "request",
+      "parentId": "grp_foundations",
+      "name": "List (GET /foundation)",
+      "method": "GET",
+      "url": "{{ baseUrl }}/foundation",
+      "headers": [],
+      "parameters": [
+        { "name": "page", "value": "1" },
+        { "name": "per_page", "value": "10" }
+      ],
+      "body": {},
+      "scripts": { "afterResponse": { "type": "text/javascript", "exec": "insomnia.test('Status 200', () => insomnia.expect(insomnia.response.status).to.eql(200));\n" } }
+    },
+    {
+      "_id": "req_foundations_get",
+      "_type": "request",
+      "parentId": "grp_foundations",
+      "name": "Get (GET /foundation/:id)",
+      "method": "GET",
+      "url": "{{ baseUrl }}/foundation/{{ foundationId }}",
+      "headers": [],
+      "parameters": [],
+      "body": {},
+      "scripts": { "afterResponse": { "type": "text/javascript", "exec": "insomnia.test('Status 200', () => insomnia.expect(insomnia.response.status).to.eql(200));\n" } }
+    },
+    {
+      "_id": "req_foundations_update",
+      "_type": "request",
+      "parentId": "grp_foundations",
+      "name": "Update (PUT /foundation/:id)",
+      "method": "PUT",
+      "url": "{{ baseUrl }}/foundation/{{ foundationId }}",
+      "headers": [{ "name": "Content-Type", "value": "application/json" }],
+      "parameters": [],
+      "body": { "mimeType": "application/json", "text": "{\n  \"revision\": \"R2\"\n}" },
+      "scripts": { "afterResponse": { "type": "text/javascript", "exec": "insomnia.test('Status 200', () => insomnia.expect(insomnia.response.status).to.eql(200));\n" } }
+    },
+
+    {
+      "_id": "req_towers_create",
+      "_type": "request",
+      "parentId": "grp_towers",
+      "name": "Create (POST /tower)",
+      "method": "POST",
+      "url": "{{ baseUrl }}/tower",
+      "headers": [{ "name": "Content-Type", "value": "application/json" }],
+      "parameters": [],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"code\": 1,\n  \"tower\": \"T-{{ uuid }}\",\n  \"type\": \"TYPE-A\",\n  \"coordinates\": { \"lat\": 0, \"lng\": 0 },\n  \"foundations\": [\"{{ foundationId }}\"],\n  \"work_id\": \"{{ workId }}\"\n}"
+      },
+      "scripts": {
+        "afterResponse": {
+          "type": "text/javascript",
+          "exec": "insomnia.test('Status 201', () => insomnia.expect(insomnia.response.status).to.eql(201));\nconst body = insomnia.response.json();\ninsomnia.environment.set('towerId', body.data.id);\n"
+        }
+      }
+    },
+    {
+      "_id": "req_towers_list",
+      "_type": "request",
+      "parentId": "grp_towers",
+      "name": "List (GET /tower)",
+      "method": "GET",
+      "url": "{{ baseUrl }}/tower",
+      "headers": [],
+      "parameters": [
+        { "name": "page", "value": "1" },
+        { "name": "per_page", "value": "10" }
+      ],
+      "body": {},
+      "scripts": { "afterResponse": { "type": "text/javascript", "exec": "insomnia.test('Status 200', () => insomnia.expect(insomnia.response.status).to.eql(200));\n" } }
+    },
+    {
+      "_id": "req_towers_get",
+      "_type": "request",
+      "parentId": "grp_towers",
+      "name": "Get (GET /tower/:id)",
+      "method": "GET",
+      "url": "{{ baseUrl }}/tower/{{ towerId }}",
+      "headers": [],
+      "parameters": [],
+      "body": {},
+      "scripts": { "afterResponse": { "type": "text/javascript", "exec": "insomnia.test('Status 200', () => insomnia.expect(insomnia.response.status).to.eql(200));\n" } }
+    },
+    {
+      "_id": "req_towers_update",
+      "_type": "request",
+      "parentId": "grp_towers",
+      "name": "Update (PUT /tower/:id)",
+      "method": "PUT",
+      "url": "{{ baseUrl }}/tower/{{ towerId }}",
+      "headers": [{ "name": "Content-Type", "value": "application/json" }],
+      "parameters": [],
+      "body": { "mimeType": "application/json", "text": "{\n  \"type\": \"TYPE-B\"\n}" },
+      "scripts": { "afterResponse": { "type": "text/javascript", "exec": "insomnia.test('Status 200', () => insomnia.expect(insomnia.response.status).to.eql(200));\n" } }
+    },
+
+    {
+      "_id": "req_task_create",
+      "_type": "request",
+      "parentId": "grp_task",
+      "name": "Create (POST /task)",
+      "method": "POST",
+      "url": "{{ baseUrl }}/task",
+      "headers": [{ "name": "Content-Type", "value": "application/json" }],
+      "parameters": [],
+      "body": { "mimeType": "application/json", "text": "{\n  \"code\": 1,\n  \"stage\": \"S1\",\n  \"group\": \"G1\",\n  \"name\": \"Task {{ uuid }}\",\n  \"unit\": \"m\"\n}" },
+      "scripts": {
+        "afterResponse": {
+          "type": "text/javascript",
+          "exec": "insomnia.test('Status 201', () => insomnia.expect(insomnia.response.status).to.eql(201));\nconst body = insomnia.response.json();\ninsomnia.environment.set('taskId', body.data.id);\n"
+        }
+      }
+    },
+    {
+      "_id": "req_task_list",
+      "_type": "request",
+      "parentId": "grp_task",
+      "name": "List (GET /task)",
+      "method": "GET",
+      "url": "{{ baseUrl }}/task",
+      "headers": [],
+      "parameters": [
+        { "name": "page", "value": "1" },
+        { "name": "per_page", "value": "10" }
+      ],
+      "body": {},
+      "scripts": { "afterResponse": { "type": "text/javascript", "exec": "insomnia.test('Status 200', () => insomnia.expect(insomnia.response.status).to.eql(200));\n" } }
+    },
+    {
+      "_id": "req_task_get",
+      "_type": "request",
+      "parentId": "grp_task",
+      "name": "Get (GET /task/:id)",
+      "method": "GET",
+      "url": "{{ baseUrl }}/task/{{ taskId }}",
+      "headers": [],
+      "parameters": [],
+      "body": {},
+      "scripts": { "afterResponse": { "type": "text/javascript", "exec": "insomnia.test('Status 200', () => insomnia.expect(insomnia.response.status).to.eql(200));\n" } }
+    },
+    {
+      "_id": "req_task_update",
+      "_type": "request",
+      "parentId": "grp_task",
+      "name": "Update (PUT /task/:id)",
+      "method": "PUT",
+      "url": "{{ baseUrl }}/task/{{ taskId }}",
+      "headers": [{ "name": "Content-Type", "value": "application/json" }],
+      "parameters": [],
+      "body": { "mimeType": "application/json", "text": "{\n  \"unit\": \"km\"\n}" },
+      "scripts": { "afterResponse": { "type": "text/javascript", "exec": "insomnia.test('Status 200', () => insomnia.expect(insomnia.response.status).to.eql(200));\n" } }
+    },
+
+    {
+      "_id": "req_production_create",
+      "_type": "request",
+      "parentId": "grp_production",
+      "name": "Create (POST /production)",
+      "method": "POST",
+      "url": "{{ baseUrl }}/production",
+      "headers": [{ "name": "Content-Type", "value": "application/json" }],
+      "parameters": [],
+      "body": { "mimeType": "application/json", "text": "{\n  \"status\": \"EXECUTED\",\n  \"comments\": \"Created by Insomnia\",\n  \"task_id\": \"{{ taskId }}\",\n  \"work_id\": \"{{ workId }}\",\n  \"teams\": [],\n  \"towers\": []\n}" },
+      "scripts": {
+        "afterResponse": {
+          "type": "text/javascript",
+          "exec": "insomnia.test('Status 201', () => insomnia.expect(insomnia.response.status).to.eql(201));\nconst body = insomnia.response.json();\ninsomnia.environment.set('productionId', body.data.id);\n"
+        }
+      }
+    },
+    {
+      "_id": "req_production_list",
+      "_type": "request",
+      "parentId": "grp_production",
+      "name": "List (GET /production)",
+      "method": "GET",
+      "url": "{{ baseUrl }}/production",
+      "headers": [],
+      "parameters": [
+        { "name": "page", "value": "1" },
+        { "name": "per_page", "value": "10" }
+      ],
+      "body": {},
+      "scripts": { "afterResponse": { "type": "text/javascript", "exec": "insomnia.test('Status 200', () => insomnia.expect(insomnia.response.status).to.eql(200));\n" } }
+    },
+    {
+      "_id": "req_production_get",
+      "_type": "request",
+      "parentId": "grp_production",
+      "name": "Get (GET /production/:id)",
+      "method": "GET",
+      "url": "{{ baseUrl }}/production/{{ productionId }}",
+      "headers": [],
+      "parameters": [],
+      "body": {},
+      "scripts": { "afterResponse": { "type": "text/javascript", "exec": "insomnia.test('Status 200', () => insomnia.expect(insomnia.response.status).to.eql(200));\n" } }
+    },
+    {
+      "_id": "req_production_update",
+      "_type": "request",
+      "parentId": "grp_production",
+      "name": "Update (PUT /production/:id)",
+      "method": "PUT",
+      "url": "{{ baseUrl }}/production/{{ productionId }}",
+      "headers": [{ "name": "Content-Type", "value": "application/json" }],
+      "parameters": [],
+      "body": { "mimeType": "application/json", "text": "{\n  \"comments\": \"Updated by Insomnia\"\n}" },
+      "scripts": { "afterResponse": { "type": "text/javascript", "exec": "insomnia.test('Status 200', () => insomnia.expect(insomnia.response.status).to.eql(200));\n" } }
+    },
+    {
+      "_id": "req_production_add_team",
+      "_type": "request",
+      "parentId": "grp_production",
+      "name": "Add Team (PUT /production/add-team/:id)",
+      "method": "PUT",
+      "url": "{{ baseUrl }}/production/add-team/{{ teamId }}",
+      "headers": [{ "name": "Content-Type", "value": "application/json" }],
+      "parameters": [],
+      "body": { "mimeType": "application/json", "text": "{\n  \"id\": \"{{ productionId }}\"\n}" },
+      "scripts": { "afterResponse": { "type": "text/javascript", "exec": "insomnia.test('Status 200', () => insomnia.expect(insomnia.response.status).to.eql(200));\n" } }
+    },
+    {
+      "_id": "req_production_del_team",
+      "_type": "request",
+      "parentId": "grp_production",
+      "name": "Del Team (PUT /production/del-team/:id)",
+      "method": "PUT",
+      "url": "{{ baseUrl }}/production/del-team/{{ teamId }}",
+      "headers": [{ "name": "Content-Type", "value": "application/json" }],
+      "parameters": [],
+      "body": { "mimeType": "application/json", "text": "{\n  \"id\": \"{{ productionId }}\"\n}" },
+      "scripts": { "afterResponse": { "type": "text/javascript", "exec": "insomnia.test('Status 200', () => insomnia.expect(insomnia.response.status).to.eql(200));\n" } }
+    },
+    {
+      "_id": "req_production_add_tower",
+      "_type": "request",
+      "parentId": "grp_production",
+      "name": "Add Tower (PUT /production/add-tower/:id)",
+      "method": "PUT",
+      "url": "{{ baseUrl }}/production/add-tower/{{ towerId }}",
+      "headers": [{ "name": "Content-Type", "value": "application/json" }],
+      "parameters": [],
+      "body": { "mimeType": "application/json", "text": "{\n  \"id\": \"{{ productionId }}\"\n}" },
+      "scripts": { "afterResponse": { "type": "text/javascript", "exec": "insomnia.test('Status 200', () => insomnia.expect(insomnia.response.status).to.eql(200));\n" } }
+    },
+    {
+      "_id": "req_production_del_tower",
+      "_type": "request",
+      "parentId": "grp_production",
+      "name": "Del Tower (PUT /production/del-tower/:id)",
+      "method": "PUT",
+      "url": "{{ baseUrl }}/production/del-tower/{{ towerId }}",
+      "headers": [{ "name": "Content-Type", "value": "application/json" }],
+      "parameters": [],
+      "body": { "mimeType": "application/json", "text": "{\n  \"id\": \"{{ productionId }}\"\n}" },
+      "scripts": { "afterResponse": { "type": "text/javascript", "exec": "insomnia.test('Status 200', () => insomnia.expect(insomnia.response.status).to.eql(200));\n" } }
+    },
+
+    {
+      "_id": "req_works_create",
+      "_type": "request",
+      "parentId": "grp_works",
+      "name": "Create (POST /works)",
+      "method": "POST",
+      "url": "{{ baseUrl }}/works",
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Authorization", "value": "Bearer {{ accessToken }}" }
+      ],
+      "parameters": [],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Work-{{ uuid }}\",\n  \"description\": \"Work created by Insomnia\",\n  \"status\": \"ACTIVE\"\n}"
+      },
+      "scripts": {
+        "afterResponse": {
+          "type": "text/javascript",
+          "exec": "insomnia.test('Status 201', () => insomnia.expect(insomnia.response.status).to.eql(201));\nconst body = insomnia.response.json();\ninsomnia.environment.set('workId', body.data.id);\n"
+        }
+      }
+    },
+    {
+      "_id": "req_works_list",
+      "_type": "request",
+      "parentId": "grp_works",
+      "name": "List (GET /works)",
+      "method": "GET",
+      "url": "{{ baseUrl }}/works",
+      "headers": [{ "name": "Authorization", "value": "Bearer {{ accessToken }}" }],
+      "parameters": [
+        { "name": "page", "value": "1" },
+        { "name": "per_page", "value": "10" }
+      ],
+      "body": {},
+      "scripts": { "afterResponse": { "type": "text/javascript", "exec": "insomnia.test('Status 200', () => insomnia.expect(insomnia.response.status).to.eql(200));\n" } }
+    },
+    {
+      "_id": "req_works_get",
+      "_type": "request",
+      "parentId": "grp_works",
+      "name": "Get (GET /works/:id)",
+      "method": "GET",
+      "url": "{{ baseUrl }}/works/{{ workId }}",
+      "headers": [{ "name": "Authorization", "value": "Bearer {{ accessToken }}" }],
+      "parameters": [],
+      "body": {},
+      "scripts": { "afterResponse": { "type": "text/javascript", "exec": "insomnia.test('Status 200', () => insomnia.expect(insomnia.response.status).to.eql(200));\n" } }
+    },
+    {
+      "_id": "req_works_update",
+      "_type": "request",
+      "parentId": "grp_works",
+      "name": "Update (PUT /works/:id)",
+      "method": "PUT",
+      "url": "{{ baseUrl }}/works/{{ workId }}",
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Authorization", "value": "Bearer {{ accessToken }}" }
+      ],
+      "parameters": [],
+      "body": { "mimeType": "application/json", "text": "{\n  \"description\": \"Updated by Insomnia\"\n}" },
+      "scripts": { "afterResponse": { "type": "text/javascript", "exec": "insomnia.test('Status 200', () => insomnia.expect(insomnia.response.status).to.eql(200));\n" } }
+    },
+
+    {
+      "_id": "req_cleanup_delete_employee",
+      "_type": "request",
+      "parentId": "grp_cleanup",
+      "name": "Delete Employee (DELETE /employees/:id)",
+      "method": "DELETE",
+      "url": "{{ baseUrl }}/employees/{{ employeeId }}",
+      "headers": [{ "name": "Authorization", "value": "Bearer {{ accessToken }}" }],
+      "parameters": [],
+      "body": {},
+      "scripts": { "afterResponse": { "type": "text/javascript", "exec": "insomnia.test('Status 204', () => insomnia.expect(insomnia.response.status).to.eql(204));\n" } }
+    },
+    {
+      "_id": "req_cleanup_delete_equipment",
+      "_type": "request",
+      "parentId": "grp_cleanup",
+      "name": "Delete Equipment (DELETE /equipments/:id)",
+      "method": "DELETE",
+      "url": "{{ baseUrl }}/equipments/{{ equipmentId }}",
+      "headers": [{ "name": "Authorization", "value": "Bearer {{ accessToken }}" }],
+      "parameters": [],
+      "body": {},
+      "scripts": { "afterResponse": { "type": "text/javascript", "exec": "insomnia.test('Status 204', () => insomnia.expect(insomnia.response.status).to.eql(204));\n" } }
+    },
+    {
+      "_id": "req_cleanup_delete_team",
+      "_type": "request",
+      "parentId": "grp_cleanup",
+      "name": "Delete Team (DELETE /teams/:id)",
+      "method": "DELETE",
+      "url": "{{ baseUrl }}/teams/{{ teamId }}",
+      "headers": [],
+      "parameters": [],
+      "body": {},
+      "scripts": { "afterResponse": { "type": "text/javascript", "exec": "insomnia.test('Status 204', () => insomnia.expect(insomnia.response.status).to.eql(204));\n" } }
+    },
+    {
+      "_id": "req_cleanup_delete_tower",
+      "_type": "request",
+      "parentId": "grp_cleanup",
+      "name": "Delete Tower (DELETE /tower/:id)",
+      "method": "DELETE",
+      "url": "{{ baseUrl }}/tower/{{ towerId }}",
+      "headers": [],
+      "parameters": [],
+      "body": {},
+      "scripts": { "afterResponse": { "type": "text/javascript", "exec": "insomnia.test('Status 204', () => insomnia.expect(insomnia.response.status).to.eql(204));\n" } }
+    },
+    {
+      "_id": "req_cleanup_delete_foundation",
+      "_type": "request",
+      "parentId": "grp_cleanup",
+      "name": "Delete Foundation (DELETE /foundation/:id)",
+      "method": "DELETE",
+      "url": "{{ baseUrl }}/foundation/{{ foundationId }}",
+      "headers": [],
+      "parameters": [],
+      "body": {},
+      "scripts": { "afterResponse": { "type": "text/javascript", "exec": "insomnia.test('Status 204', () => insomnia.expect(insomnia.response.status).to.eql(204));\n" } }
+    },
+    {
+      "_id": "req_cleanup_delete_production",
+      "_type": "request",
+      "parentId": "grp_cleanup",
+      "name": "Delete Production (DELETE /production/:id)",
+      "method": "DELETE",
+      "url": "{{ baseUrl }}/production/{{ productionId }}",
+      "headers": [],
+      "parameters": [],
+      "body": {},
+      "scripts": { "afterResponse": { "type": "text/javascript", "exec": "insomnia.test('Status 204', () => insomnia.expect(insomnia.response.status).to.eql(204));\n" } }
+    },
+    {
+      "_id": "req_cleanup_delete_task",
+      "_type": "request",
+      "parentId": "grp_cleanup",
+      "name": "Delete Task (DELETE /task/:id)",
+      "method": "DELETE",
+      "url": "{{ baseUrl }}/task/{{ taskId }}",
+      "headers": [],
+      "parameters": [],
+      "body": {},
+      "scripts": { "afterResponse": { "type": "text/javascript", "exec": "insomnia.test('Status 204', () => insomnia.expect(insomnia.response.status).to.eql(204));\n" } }
+    },
+    {
+      "_id": "req_cleanup_delete_work",
+      "_type": "request",
+      "parentId": "grp_cleanup",
+      "name": "Delete Work (DELETE /works/:id)",
+      "method": "DELETE",
+      "url": "{{ baseUrl }}/works/{{ workId }}",
+      "headers": [{ "name": "Authorization", "value": "Bearer {{ accessToken }}" }],
+      "parameters": [],
+      "body": {},
+      "scripts": { "afterResponse": { "type": "text/javascript", "exec": "insomnia.test('Status 204', () => insomnia.expect(insomnia.response.status).to.eql(204));\n" } }
+    },
+    {
+      "_id": "req_cleanup_delete_user",
+      "_type": "request",
+      "parentId": "grp_cleanup",
+      "name": "Delete User (DELETE /users/:id)",
+      "method": "DELETE",
+      "url": "{{ baseUrl }}/users/{{ userId }}",
+      "headers": [{ "name": "Authorization", "value": "Bearer {{ accessToken }}" }],
+      "parameters": [],
+      "body": {},
+      "scripts": { "afterResponse": { "type": "text/javascript", "exec": "insomnia.test('Status 204', () => insomnia.expect(insomnia.response.status).to.eql(204));\n" } }
+    }
+  ]
+}
+

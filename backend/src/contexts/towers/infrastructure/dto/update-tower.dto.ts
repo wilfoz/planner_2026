@@ -1,0 +1,60 @@
+import { ApiPropertyOptional } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
+import { ArrayUnique, IsArray, IsInt, IsNumber, IsOptional, IsString, IsUUID, ValidateNested } from 'class-validator';
+import { CoordinatesDto } from '@/contexts/towers/infrastructure/dto/create-tower.dto';
+
+export class UpdateTowerDto {
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsInt()
+  code?: number;
+
+  @ApiPropertyOptional({ name: 'tower' })
+  @IsOptional()
+  @IsString()
+  tower?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  type?: string;
+
+  @ApiPropertyOptional({ type: CoordinatesDto })
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => CoordinatesDto)
+  coordinates?: CoordinatesDto;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsNumber()
+  distance?: number | null;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsNumber()
+  height?: number | null;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsNumber()
+  weight?: number | null;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  embargo?: string | null;
+
+  @ApiPropertyOptional({ isArray: true })
+  @IsOptional()
+  @IsArray()
+  @ArrayUnique()
+  @IsUUID(undefined, { each: true })
+  foundations?: string[];
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsUUID()
+  work_id?: string;
+}
+

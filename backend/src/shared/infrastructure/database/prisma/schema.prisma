@@ -1,0 +1,166 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum STATUS_EQUIPMENT {
+  ACTIVE
+  MAINTENANCE
+  DEMOBILIZED
+}
+
+enum STATUS_PRODUCTION {
+  EXECUTED
+  PROGRAMMED
+  PROGRESS
+}
+
+enum STATUS_EMPLOYEE {
+  ACTIVE
+  AWAY
+}
+
+model User {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String?
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+
+  @@map("users")
+}
+
+
+model Work {
+  id         String    @id @default(uuid()) @db.Uuid
+  name       String
+  tension    String?
+  extension  String?
+  start_date DateTime?
+  end_date   DateTime?
+  createdAt  DateTime  @default(now())
+
+  towers      Tower[]
+  productions Production[]
+
+  @@map("works")
+}
+
+model Tower {
+  id           String      @id @default(uuid()) @db.Uuid
+  code         Int
+  tower_number String
+  type         String
+  coordinates  Json
+  distance     Float?
+  height       Float?
+  weight       Float?
+  embargo      String?
+  createdAt    DateTime    @default(now())
+
+  work_id      String      @db.Uuid
+  work         Work        @relation(fields: [work_id], references: [id])
+
+  foundations  Foundation[]
+  productions  Production[]
+
+  @@map("towers")
+}
+
+model Foundation {
+  id               String   @id @default(uuid()) @db.Uuid
+  project          String
+  revision         String
+  description      String   @unique
+  excavation_volume Float?
+  concrete_volume  Float?
+  backfill_volume  Float?
+  steel_volume     Float?
+  createdAt        DateTime @default(now())
+
+  towers           Tower[]
+
+  @@map("foundations")
+}
+
+model Task {
+  id        String      @id @default(uuid()) @db.Uuid
+  code      Int
+  stage     String
+  group     String
+  name      String
+  unit      String
+  createdAt DateTime    @default(now())
+
+  production Production?
+
+  @@map("tasks")
+}
+
+model Team {
+  id        String      @id @default(uuid()) @db.Uuid
+  name      String      @unique
+  createdAt DateTime    @default(now())
+
+  employees Employee[]
+  equipments Equipment[]
+  production Production[]
+
+  @@map("teams")
+}
+
+model Equipment {
+  id            String           @id @default(uuid()) @db.Uuid
+  registration  String
+  model         String
+  manufacturer  String
+  license_plate String           @unique
+  provider      String
+  status        STATUS_EQUIPMENT @default(ACTIVE)
+  createdAt     DateTime         @default(now())
+
+  team_id       String?          @db.Uuid
+  team          Team?            @relation(fields: [team_id], references: [id])
+
+  @@map("equipments")
+}
+
+model Employee {
+  id           String          @id @default(uuid()) @db.Uuid
+  registration String
+  full_name    String          @unique
+  occupation   String
+  leadership   Boolean
+  status       STATUS_EMPLOYEE @default(ACTIVE)
+  createdAt    DateTime        @default(now())
+
+  team_id      String?         @db.Uuid
+  team         Team?           @relation(fields: [team_id], references: [id])
+
+  @@map("employees")
+}
+
+model Production {
+  id         String            @id @default(uuid()) @db.Uuid
+  status     STATUS_PRODUCTION @default(EXECUTED)
+  comments   String?
+  start_time DateTime?
+  final_time DateTime?
+  createdAt  DateTime          @default(now())
+
+  task_id    String            @unique @db.Uuid
+  task       Task              @relation(fields: [task_id], references: [id])
+  
+  work_id    String            @db.Uuid
+  work       Work              @relation(fields: [work_id], references: [id])
+
+  towers     Tower[]
+  teams      Team[]
+
+  @@map("productions")
+}
+
