@@ -1,0 +1,11 @@
+Model Information:
+* title:	Transmission Tower
+* source:	https://sketchfab.com/3d-models/transmission-tower-72b2db5379654983a292a40a322240cd
+* author:	rileylane (https://sketchfab.com/rileylane)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Transmission Tower" (https://sketchfab.com/3d-models/transmission-tower-72b2db5379654983a292a40a322240cd) by rileylane (https://sketchfab.com/rileylane) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

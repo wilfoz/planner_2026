@@ -1,0 +1,158 @@
+
+> my-project@0.0.0 build
+> ng build --no-progress
+
+Application bundle generation failed. [8.218 seconds] - 2026-01-20T20:54:47.974Z
+
+[1m[31m[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'tower' does not exist on type 'Tower'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/towers/towers-detail/towers-detail.component.html:30:72:
+[37m      30 │ ...text-lg font-medium leading-6 text-white">Torre {{ t.[32mtower[37m }}</h3>
+         ╵                                                         [32m~~~~~[0m
+
+  Error occurs in the template of component TowersDetailComponent.
+
+    src/app/features/towers/towers-detail/towers-detail.component.ts:10:15:
+[37m      10 │   templateUrl: [32m'./towers-detail.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'tower' does not exist on type 'Tower'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/towers/towers-form/towers-form.component.ts:65:23:
+[37m      65 │           tower: tower.[32mtower[37m,
+         ╵                        [32m~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'tower' does not exist on type 'Tower'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/towers/towers-list/towers-list.component.html:37:87:
+[37m      37 │ ...ace-nowrap px-3 py-4 text-sm text-gray-400">{{ tower.[32mtower[37m }}</td>
+         ╵                                                         [32m~~~~~[0m
+
+  Error occurs in the template of component TowersListComponent.
+
+    src/app/features/towers/towers-list/towers-list.component.ts:10:15:
+[37m      10 │   templateUrl: [32m'./towers-list.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2551: Property 'startDate' does not exist on type 'Work'. Did you mean 'start_date'?[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/works/works-detail/works-detail.component.html:40:17:
+[37m      40 │             {{ w.[32mstartDate[37m | date }} - {{ w.endDate ? (w.endDate |...
+         ╵                  [32m~~~~~~~~~[0m
+
+  Error occurs in the template of component WorksDetailComponent.
+
+    src/app/features/works/works-detail/works-detail.component.ts:12:15:
+[37m      12 │   templateUrl: [32m'./works-detail.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2551: Property 'endDate' does not exist on type 'Work'. Did you mean 'end_date'?[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/works/works-detail/works-detail.component.html:40:44:
+[37m      40 │ ....startDate | date }} - {{ w.[32mendDate[37m ? (w.endDate | date) : 'Ong...
+         ╵                                [32m~~~~~~~[0m
+
+  Error occurs in the template of component WorksDetailComponent.
+
+    src/app/features/works/works-detail/works-detail.component.ts:12:15:
+[37m      12 │   templateUrl: [32m'./works-detail.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2551: Property 'endDate' does not exist on type 'Work'. Did you mean 'end_date'?[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/works/works-detail/works-detail.component.html:40:57:
+[37m      40 │ ...tDate | date }} - {{ w.endDate ? (w.[32mendDate[37m | date) : 'Ongoing' }}
+         ╵                                        [32m~~~~~~~[0m
+
+  Error occurs in the template of component WorksDetailComponent.
+
+    src/app/features/works/works-detail/works-detail.component.ts:12:15:
+[37m      12 │   templateUrl: [32m'./works-detail.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2322: Type 'string | undefined' is not assignable to type 'number | null | undefined'.
+  Type 'string' is not assignable to type 'number'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/works/works-form/works-form.component.ts:55:10:
+[37m      55 │           [32mtension[37m: work.tension,
+         ╵           [32m~~~~~~~[0m
+
+  The expected type comes from property 'tension' which is declared here on type 'Partial<{ name: string | null; tension: number | null; extension: number | null; startDate: string | null; endDate: string | null; }>'
+
+    src/app/features/works/works-form/works-form.component.ts:32:4:
+[37m      32 │     [32mtension: [0, [Validators.required, Validators.min(0)]][37m,
+         ╵     [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2322: Type 'string | undefined' is not assignable to type 'number | null | undefined'.
+  Type 'string' is not assignable to type 'number'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/works/works-form/works-form.component.ts:56:10:
+[37m      56 │           [32mextension[37m: work.extension,
+         ╵           [32m~~~~~~~~~[0m
+
+  The expected type comes from property 'extension' which is declared here on type 'Partial<{ name: string | null; tension: number | null; extension: number | null; startDate: string | null; endDate: string | null; }>'
+
+    src/app/features/works/works-form/works-form.component.ts:33:4:
+[37m      33 │     [32mextension: [0, [Validators.required, Validators.min(0)]][37m,
+         ╵     [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2551: Property 'startDate' does not exist on type 'Work'. Did you mean 'start_date'?[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/works/works-form/works-form.component.ts:57:35:
+[37m      57 │ ...  startDate: new Date(work.[32mstartDate[37m).toISOString().split('T')[...
+         ╵                               [32m~~~~~~~~~[0m
+
+  'start_date' is declared here.
+
+    src/app/core/models/work.model.ts:6:2:
+[37m      6 │   [32mstart_date[37m?: string | Date;
+        ╵   [32m~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2551: Property 'endDate' does not exist on type 'Work'. Did you mean 'end_date'?[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/works/works-form/works-form.component.ts:58:24:
+[37m      58 │           endDate: work.[32mendDate[37m ? new Date(work.endDate).toISOStri...
+         ╵                         [32m~~~~~~~[0m
+
+  'end_date' is declared here.
+
+    src/app/core/models/work.model.ts:7:2:
+[37m      7 │   [32mend_date[37m?: string | Date;
+        ╵   [32m~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2551: Property 'endDate' does not exist on type 'Work'. Did you mean 'end_date'?[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/works/works-form/works-form.component.ts:58:48:
+[37m      58 │ ...ork.endDate ? new Date(work.[32mendDate[37m).toISOString().split('T')[0...
+         ╵                                [32m~~~~~~~[0m
+
+  'end_date' is declared here.
+
+    src/app/core/models/work.model.ts:7:2:
+[37m      7 │   [32mend_date[37m?: string | Date;
+        ╵   [32m~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2551: Property 'startDate' does not exist on type 'Work'. Did you mean 'start_date'?[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/works/works-list/works-list.component.html:37:86:
+[37m      37 │ ... px-3 py-4 text-sm text-gray-400">{{ work.[32mstartDate[37m | date }}</td>
+         ╵                                              [32m~~~~~~~~~[0m
+
+  Error occurs in the template of component WorksListComponent.
+
+    src/app/features/works/works-list/works-list.component.ts:12:15:
+[37m      12 │   templateUrl: [32m'./works-list.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+[39m[22m

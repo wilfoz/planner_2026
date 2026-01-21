@@ -1,0 +1,178 @@
+{
+  "mapData": {
+    "success": true,
+    "data": {
+      "project": {
+        "id": "project-123",
+        "name": "LT 500kV Mock Project"
+      },
+      "mapConfig": {
+        "center": {
+          "lat": -23.5505,
+          "lng": -46.6333
+        },
+        "zoom": 13,
+        "bounds": [
+          -46.65,
+          -23.56,
+          -46.61,
+          -23.54
+        ]
+      },
+      "cableSettings": {
+        "tension": 1500,
+        "globalOpacity": 0.8,
+        "towerVerticalOffset": 0,
+        "anchors": [
+          {
+            "id": "a-1",
+            "label": "Phase A",
+            "horizontalOffset": -5,
+            "verticalRatio": 0.8,
+            "color": "#FF0000",
+            "width": 3,
+            "enabled": true
+          },
+          {
+            "id": "a-2",
+            "label": "Phase B",
+            "horizontalOffset": 0,
+            "verticalRatio": 0.8,
+            "color": "#00FF00",
+            "width": 3,
+            "enabled": true
+          },
+          {
+            "id": "a-3",
+            "label": "Phase C",
+            "horizontalOffset": 5,
+            "verticalRatio": 0.8,
+            "color": "#0000FF",
+            "width": 3,
+            "enabled": true
+          }
+        ]
+      },
+      "towers": [
+        {
+          "id": "t-1",
+          "projectId": "project-123",
+          "name": "T-01",
+          "lat": -23.5505,
+          "lng": -46.6333,
+          "altitude": 760,
+          "height": 45,
+          "deflection": 0,
+          "structureType": "suspension",
+          "isHidden": false
+        },
+        {
+          "id": "t-2",
+          "projectId": "project-123",
+          "name": "T-02",
+          "lat": -23.548,
+          "lng": -46.628,
+          "altitude": 755,
+          "height": 48,
+          "deflection": 15,
+          "structureType": "suspension",
+          "isHidden": false
+        },
+        {
+          "id": "t-3",
+          "projectId": "project-123",
+          "name": "T-03",
+          "lat": -23.545,
+          "lng": -46.623,
+          "altitude": 770,
+          "height": 50,
+          "deflection": -10,
+          "structureType": "anchor",
+          "isHidden": false
+        },
+        {
+          "id": "t-4",
+          "projectId": "project-123",
+          "name": "T-04",
+          "lat": -23.54,
+          "lng": -46.62,
+          "altitude": 780,
+          "height": 42,
+          "deflection": 0,
+          "structureType": "suspension",
+          "isHidden": false
+        }
+      ],
+      "spans": [
+        {
+          "id": "s-1",
+          "projectId": "project-123",
+          "towerStartId": "t-1",
+          "towerEndId": "t-2",
+          "spanName": "Vão 01",
+          "spanLength": 600,
+          "tension": 1500,
+          "cablePhases": 3,
+          "cableColor": "#FFFFFF",
+          "heightStart": 35,
+          "heightEnd": 35
+        },
+        {
+          "id": "s-2",
+          "projectId": "project-123",
+          "towerStartId": "t-2",
+          "towerEndId": "t-3",
+          "spanName": "Vão 02",
+          "spanLength": 750,
+          "tension": 1400,
+          "cablePhases": 3,
+          "cableColor": "#FFFFFF",
+          "heightStart": 38,
+          "heightEnd": 40
+        },
+        {
+          "id": "s-3",
+          "projectId": "project-123",
+          "towerStartId": "t-3",
+          "towerEndId": "t-4",
+          "spanName": "Vão 03",
+          "spanLength": 800,
+          "tension": 1300,
+          "cablePhases": 3,
+          "cableColor": "#FFFFFF",
+          "heightStart": 40,
+          "heightEnd": 32
+        }
+      ],
+      "userPermissions": {
+        "canUpdate": true
+      }
+    }
+  },
+  "towers": [
+    {
+      "id": "t-1",
+      "projectId": "project-123",
+      "name": "T-01",
+      "lat": -23.5505,
+      "lng": -46.6333,
+      "altitude": 760,
+      "height": 45,
+      "deflection": 0,
+      "structureType": "suspension",
+      "isHidden": false
+    },
+    {
+      "id": "t-2",
+      "projectId": "project-123",
+      "name": "T-02",
+      "lat": -23.548,
+      "lng": -46.628,
+      "altitude": 755,
+      "height": 48,
+      "deflection": 0,
+      "structureType": "suspension",
+      "isHidden": false
+    }
+  ]
+}

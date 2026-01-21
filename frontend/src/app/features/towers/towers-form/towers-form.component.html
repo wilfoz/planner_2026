@@ -1,0 +1,95 @@
+<div class="px-4 sm:px-6 lg:px-8 py-8">
+  <div class="sm:flex sm:items-center">
+    <div class="sm:flex-auto">
+      <h1 class="text-xl font-semibold text-white">{{ isEditMode() ? 'Editar Torre' : 'Nova Torre' }}</h1>
+      <p class="mt-2 text-sm text-gray-400">{{ isEditMode() ? 'Atualize os dados da torre.' : 'Cadastre uma nova torre.'
+        }}</p>
+    </div>
+    <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none flex gap-3">
+      <a routerLink="/towers"
+        class="inline-flex items-center justify-center rounded-md border border-[#3f3f46] bg-[#27272a] px-4 py-2 text-sm font-medium text-gray-300 shadow-sm hover:bg-[#3f3f46] transition-colors">
+        Cancelar
+      </a>
+      <button type="button" (click)="onSubmit()" [disabled]="towerForm.invalid || isLoading()"
+        class="inline-flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 disabled:opacity-50 transition-colors">
+        <lucide-icon [img]="SaveIcon" class="mr-2 h-4 w-4"></lucide-icon>
+        Salvar
+      </button>
+    </div>
+  </div>
+
+  <div class="mt-8">
+    <form [formGroup]="towerForm">
+      <div class="overflow-hidden shadow ring-1 ring-white/10 md:rounded-lg bg-[#27272a]">
+        <div class="px-4 py-5 sm:p-6">
+          <div class="grid grid-cols-12 gap-6">
+            <div class="col-span-12 sm:col-span-4 md:col-span-2">
+              <label for="code" class="block text-sm font-medium text-gray-300">Código *</label>
+              <input type="number" formControlName="code" id="code"
+                class="mt-1 block w-full rounded-md border-0 bg-[#3f3f46] text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm py-2 px-3">
+            </div>
+
+            <div class="col-span-12 sm:col-span-4 md:col-span-2">
+              <label for="tower" class="block text-sm font-medium text-gray-300">Torre *</label>
+              <input type="text" formControlName="tower" id="tower"
+                class="mt-1 block w-full rounded-md border-0 bg-[#3f3f46] text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm py-2 px-3">
+            </div>
+
+            <div class="col-span-12 sm:col-span-4 md:col-span-2">
+              <label for="type" class="block text-sm font-medium text-gray-300">Tipo *</label>
+              <input type="text" formControlName="type" id="type"
+                class="mt-1 block w-full rounded-md border-0 bg-[#3f3f46] text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm py-2 px-3">
+            </div>
+
+            <div class="col-span-12 sm:col-span-6 md:col-span-3">
+              <label for="work_id" class="block text-sm font-medium text-gray-300">Obra *</label>
+              <select formControlName="work_id" id="work_id"
+                class="mt-1 block w-full rounded-md border-0 bg-[#3f3f46] text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm py-2 px-3">
+                <option value="">Selecione uma obra</option>
+                @for (work of works(); track work.id) {
+                <option [value]="work.id">{{ work.name }}</option>
+                }
+              </select>
+            </div>
+
+            <div class="col-span-12 sm:col-span-6 md:col-span-3">
+              <label for="embargo" class="block text-sm font-medium text-gray-300">Embargo</label>
+              <input type="text" formControlName="embargo" id="embargo"
+                class="mt-1 block w-full rounded-md border-0 bg-[#3f3f46] text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm py-2 px-3">
+            </div>
+
+            <div class="col-span-12 sm:col-span-4 md:col-span-2">
+              <label for="height" class="block text-sm font-medium text-gray-300">Altura (m)</label>
+              <input type="number" formControlName="height" id="height"
+                class="mt-1 block w-full rounded-md border-0 bg-[#3f3f46] text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm py-2 px-3">
+            </div>
+
+            <div class="col-span-12 sm:col-span-4 md:col-span-2">
+              <label for="weight" class="block text-sm font-medium text-gray-300">Peso (kg)</label>
+              <input type="number" formControlName="weight" id="weight"
+                class="mt-1 block w-full rounded-md border-0 bg-[#3f3f46] text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm py-2 px-3">
+            </div>
+
+            <div class="col-span-12 sm:col-span-4 md:col-span-2">
+              <label for="distance" class="block text-sm font-medium text-gray-300">Distância (m)</label>
+              <input type="number" formControlName="distance" id="distance"
+                class="mt-1 block w-full rounded-md border-0 bg-[#3f3f46] text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm py-2 px-3">
+            </div>
+
+            <div class="col-span-12 sm:col-span-6 md:col-span-3">
+              <label for="latitude" class="block text-sm font-medium text-gray-300">Latitude</label>
+              <input type="number" step="any" formControlName="latitude" id="latitude"
+                class="mt-1 block w-full rounded-md border-0 bg-[#3f3f46] text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm py-2 px-3">
+            </div>
+
+            <div class="col-span-12 sm:col-span-6 md:col-span-3">
+              <label for="longitude" class="block text-sm font-medium text-gray-300">Longitude</label>
+              <input type="number" step="any" formControlName="longitude" id="longitude"
+                class="mt-1 block w-full rounded-md border-0 bg-[#3f3f46] text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm py-2 px-3">
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

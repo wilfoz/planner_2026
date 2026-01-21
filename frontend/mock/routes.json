@@ -1,0 +1,4 @@
+{
+  "/api/projects/:id/map": "/mapData",
+  "/api/towers/:id": "/towers/:id"
+}

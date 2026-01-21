@@ -1,0 +1,46 @@
+<div class="px-4 sm:px-6 lg:px-8 py-8" *ngIf="work() as w">
+  <div class="mb-8 flex items-center justify-between">
+    <div class="flex items-center">
+      <a routerLink="/works" class="mr-4 text-gray-400 hover:text-gray-200">
+        <lucide-icon [img]="ArrowLeftIcon" class="h-6 w-6"></lucide-icon>
+      </a>
+      <h1 class="text-2xl font-bold leading-7 text-white sm:truncate sm:text-3xl sm:tracking-tight">{{ w.name }}</h1>
+    </div>
+    <div class="flex">
+      <a [routerLink]="['/works', w.id, 'edit']"
+        class="inline-flex items-center rounded-md border border-[#3f3f46] bg-[#27272a] px-4 py-2 text-sm font-medium text-gray-300 shadow-sm hover:bg-[#3f3f46] focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-[#18181b]">
+        <lucide-icon [img]="EditIcon" class="mr-2 h-4 w-4 text-gray-400"></lucide-icon>
+        Edit
+      </a>
+    </div>
+  </div>
+
+  <div class="overflow-hidden bg-[#27272a] shadow sm:rounded-lg ring-1 ring-white/10">
+    <div class="px-4 py-5 sm:px-6 border-b border-white/10">
+      <h3 class="text-lg font-medium leading-6 text-white">Work Details</h3>
+      <p class="mt-1 max-w-2xl text-sm text-gray-400">Information about the construction project.</p>
+    </div>
+    <div class="border-t border-white/10">
+      <dl>
+        <div class="bg-[#3f3f46]/20 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium text-gray-400">Name</dt>
+          <dd class="mt-1 text-sm text-white sm:col-span-2 sm:mt-0">{{ w.name }}</dd>
+        </div>
+        <div class="bg-[#27272a] px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium text-gray-400">Tension</dt>
+          <dd class="mt-1 text-sm text-white sm:col-span-2 sm:mt-0">{{ w.tension }} kV</dd>
+        </div>
+        <div class="bg-[#3f3f46]/20 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium text-gray-400">Extension</dt>
+          <dd class="mt-1 text-sm text-white sm:col-span-2 sm:mt-0">{{ w.extension }} km</dd>
+        </div>
+        <div class="bg-[#27272a] px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium text-gray-400">Dates</dt>
+          <dd class="mt-1 text-sm text-white sm:col-span-2 sm:mt-0">
+            {{ w.start_date | date }} - {{ w.end_date ? (w.end_date | date) : 'Ongoing' }}
+          </dd>
+        </div>
+      </dl>
+    </div>
+  </div>
+</div>

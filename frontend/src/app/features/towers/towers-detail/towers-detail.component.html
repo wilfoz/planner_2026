@@ -1,0 +1,76 @@
+<div class="px-4 sm:px-6 lg:px-8 py-8">
+  <div class="mb-8">
+    <nav class="flex" aria-label="Breadcrumb">
+      <ol role="list" class="flex items-center space-x-4">
+        <li><a routerLink="/" class="text-sm font-medium text-gray-400 hover:text-gray-200">Dashboard</a></li>
+        <li>
+          <div class="flex items-center">
+            <svg class="h-5 w-5 flex-shrink-0 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M5.555 17.776l8-16 .894.448-8 16-.894-.448z" />
+            </svg>
+            <a routerLink="/towers" class="ml-4 text-sm font-medium text-gray-400 hover:text-gray-200">Torres</a>
+          </div>
+        </li>
+        <li>
+          <div class="flex items-center">
+            <svg class="h-5 w-5 flex-shrink-0 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M5.555 17.776l8-16 .894.448-8 16-.894-.448z" />
+            </svg>
+            <span class="ml-4 text-sm font-medium text-gray-400">Detalhes</span>
+          </div>
+        </li>
+      </ol>
+    </nav>
+  </div>
+
+  @if (tower(); as t) {
+  <div class="bg-[#27272a] shadow ring-1 ring-white/10 rounded-lg overflow-hidden">
+    <div class="px-4 py-5 sm:px-6 flex justify-between items-center">
+      <div>
+        <h3 class="text-lg font-medium leading-6 text-white">Torre {{ t.tower_number }}</h3>
+        <p class="mt-1 max-w-2xl text-sm text-gray-400">Código: {{ t.code }}</p>
+      </div>
+      <a [routerLink]="['/towers', t.id, 'edit']"
+        class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700">
+        <lucide-icon [img]="EditIcon" class="mr-2 h-4 w-4"></lucide-icon>
+        Editar
+      </a>
+    </div>
+    <div class="border-t border-white/10 px-4 py-5 sm:px-6">
+      <dl class="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-3">
+        <div>
+          <dt class="text-sm font-medium text-gray-400">Tipo</dt>
+          <dd class="mt-1 text-sm text-white">{{ t.type }}</dd>
+        </div>
+        <div>
+          <dt class="text-sm font-medium text-gray-400">Altura</dt>
+          <dd class="mt-1 text-sm text-white">{{ t.height ? t.height + ' m' : '-' }}</dd>
+        </div>
+        <div>
+          <dt class="text-sm font-medium text-gray-400">Peso</dt>
+          <dd class="mt-1 text-sm text-white">{{ t.weight ? t.weight + ' kg' : '-' }}</dd>
+        </div>
+        <div>
+          <dt class="text-sm font-medium text-gray-400">Distância</dt>
+          <dd class="mt-1 text-sm text-white">{{ t.distance ? t.distance + ' m' : '-' }}</dd>
+        </div>
+        <div>
+          <dt class="text-sm font-medium text-gray-400">Embargo</dt>
+          <dd class="mt-1 text-sm text-white">{{ t.embargo || '-' }}</dd>
+        </div>
+        <div>
+          <dt class="text-sm font-medium text-gray-400">Fundações</dt>
+          <dd class="mt-1 text-sm text-white">{{ t.foundations?.length || 0 }}</dd>
+        </div>
+      </dl>
+    </div>
+  </div>
+  }
+
+  <div class="mt-6">
+    <a routerLink="/towers" class="inline-flex items-center text-sm font-medium text-gray-400 hover:text-gray-200">
+      <lucide-icon [img]="ArrowLeftIcon" class="mr-2 h-4 w-4"></lucide-icon>
+      Voltar para lista
+    </a>
+  </div>
+</div>

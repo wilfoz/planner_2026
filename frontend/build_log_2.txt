@@ -1,0 +1,29 @@
+
+> my-project@0.0.0 build
+> ng build --no-progress
+
+[1mInitial chunk files[22m  [2m | [22m[1mNames[22m             [2m | [22m [1mRaw size[22m[2m | [22m[1mEstimated transfer size[22m
+[32mchunk-LPTPDBYK.js[39m    [2m | [22m[2m-[22m                 [2m | [22m[36m319.98 kB[39m[2m | [22m               [36m84.14 kB[39m
+[32mpolyfills-5CFQRCPP.js[39m[2m | [22m[2mpolyfills[22m         [2m | [22m [36m34.59 kB[39m[2m | [22m               [36m11.33 kB[39m
+[32mstyles-O7UUG55A.css[39m  [2m | [22m[2mstyles[22m            [2m | [22m [36m26.47 kB[39m[2m | [22m                [36m4.71 kB[39m
+[32mmain-H5DKGLIV.js[39m     [2m | [22m[2mmain[22m              [2m | [22m [36m19.16 kB[39m[2m | [22m                [36m4.49 kB[39m
+
+[1m [22m                    [2m | [22m[1mInitial total[22m     [2m | [22m[1m400.19 kB[22m[2m | [22m              [1m104.68 kB[22m
+
+[1mLazy chunk files[22m     [2m | [22m[1mNames[22m             [2m | [22m [1mRaw size[22m[2m | [22m[1mEstimated transfer size[22m
+[32mchunk-AU2T34OF.js[39m    [2m | [22m[2mtowers-routes[22m     [2m | [22m [36m16.00 kB[39m[2m | [22m                [36m3.83 kB[39m
+[32mchunk-X4OPTXZ7.js[39m    [2m | [22m[2memployees-routes[22m  [2m | [22m [36m15.70 kB[39m[2m | [22m                [36m3.96 kB[39m
+[32mchunk-XYCUJYUQ.js[39m    [2m | [22m[2mequipments-routes[22m [2m | [22m [36m15.67 kB[39m[2m | [22m                [36m3.81 kB[39m
+[32mchunk-DC54PCN6.js[39m    [2m | [22m[2mproductions-routes[22m[2m | [22m [36m14.45 kB[39m[2m | [22m                [36m3.62 kB[39m
+[32mchunk-YDWF3ZBY.js[39m    [2m | [22m[2mfoundations-routes[22m[2m | [22m [36m13.38 kB[39m[2m | [22m                [36m3.25 kB[39m
+[32mchunk-2JQVD6RH.js[39m    [2m | [22m[2mworks-routes[22m      [2m | [22m [36m12.05 kB[39m[2m | [22m                [36m3.12 kB[39m
+[32mchunk-VETM5A7C.js[39m    [2m | [22m[2mtasks-routes[22m      [2m | [22m [36m11.30 kB[39m[2m | [22m                [36m2.95 kB[39m
+[32mchunk-2NMO2I7S.js[39m    [2m | [22m[2mteams-routes[22m      [2m | [22m [36m10.26 kB[39m[2m | [22m                [36m2.98 kB[39m
+[32mchunk-T2JKHEFW.js[39m    [2m | [22m[2m-[22m                 [2m | [22m[36m508 bytes[39m[2m | [22m              [36m508 bytes[39m
+[32mchunk-QP6HLQGH.js[39m    [2m | [22m[2m-[22m                 [2m | [22m[36m508 bytes[39m[2m | [22m              [36m508 bytes[39m
+[32mchunk-4PH22R7J.js[39m    [2m | [22m[2m-[22m                 [2m | [22m[36m507 bytes[39m[2m | [22m              [36m507 bytes[39m
+
+Application bundle generation complete. [6.777 seconds] - 2026-01-20T20:55:43.679Z
+
+Output location: C:\Users\Wilerson\Desktop\LT-PLANNER\lt-budget\frontend\dist\my-project
+
