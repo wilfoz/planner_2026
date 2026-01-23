@@ -38,8 +38,11 @@ model User {
 model Work {
   id         String    @id @default(uuid()) @db.Uuid
   name       String
-  tension    String?
-  extension  String?
+  tension    Float?
+  extension  Float?
+  phases     Float?
+  circuits   Float?
+  lightning_rod Int?
   start_date DateTime?
   end_date   DateTime?
   createdAt  DateTime  @default(now())
@@ -60,6 +63,10 @@ model Tower {
   height       Float?
   weight       Float?
   embargo      String?
+  deflection   Float?
+  structureType String?
+  color        String?
+  isHidden     Boolean @default(false)
   createdAt    DateTime    @default(now())
 
   work_id      String      @db.Uuid

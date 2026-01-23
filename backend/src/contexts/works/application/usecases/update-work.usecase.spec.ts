@@ -23,14 +23,14 @@ describe('UpdateWorkUseCase', () => {
     const id = 'work-id-123';
     const input = {
       name: 'Updated Project Name',
-      extension: '200km',
+      extension: 200,
     };
 
     const updatedWork = new Work({
       id: 'work-id-123',
       name: 'Updated Project Name',
-      tension: '500kV',
-      extension: '200km',
+      tension: 500,
+      extension: 200,
       start_date: mockDate,
       end_date: null,
       createdAt: mockDate,
@@ -42,11 +42,11 @@ describe('UpdateWorkUseCase', () => {
 
     expect(mockRepository.update).toHaveBeenCalledWith('work-id-123', {
       name: 'Updated Project Name',
-      extension: '200km',
+      extension: 200,
     });
 
     expect(result.name).toBe('Updated Project Name');
-    expect(result.extension).toBe('200km');
+    expect(result.extension).toBe(200);
   });
 
   it('should only update fields that are provided', async () => {
@@ -58,8 +58,8 @@ describe('UpdateWorkUseCase', () => {
     const updatedWork = new Work({
       id: 'work-id-123',
       name: 'LT 500kV Project',
-      tension: '500kV',
-      extension: '150km',
+      tension: 500,
+      extension: 150,
       start_date: mockDate,
       end_date: mockDate,
       createdAt: mockDate,

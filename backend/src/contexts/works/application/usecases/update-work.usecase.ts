@@ -10,8 +10,11 @@ export class UpdateWorkUseCase {
     id: string,
     input: {
       name?: string;
-      tension?: string;
-      extension?: string;
+      tension?: number;
+      extension?: number;
+      phases?: number;
+      circuits?: number;
+      lightning_rod?: number;
       start_date?: string;
       end_date?: string;
     },
@@ -20,6 +23,9 @@ export class UpdateWorkUseCase {
       name: input.name,
       tension: input.tension,
       extension: input.extension,
+      phases: input.phases,
+      circuits: input.circuits,
+      lightning_rod: input.lightning_rod,
       start_date: input.start_date ? new Date(input.start_date) : undefined,
       end_date: input.end_date ? new Date(input.end_date) : undefined,
     });

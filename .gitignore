@@ -47,4 +47,5 @@ backend/.env.development
 backend/.env.test
 backend/.env.production
 backend/.database/
+backend/.docker/dbdata/
 backend/.thunder-client/

@@ -1,6 +1,5 @@
-export interface Tower {
+export interface TowerMap {
   id: string;
-  projectId: string;
   name: string;
   lat: number;
   lng: number;

@@ -6,8 +6,11 @@ export type WorksListResult = { total: number; items: Work[] };
 export interface WorksRepository {
   create(input: {
     name: string;
-    tension?: string | null;
-    extension?: string | null;
+    tension?: number | null;
+    extension?: number | null;
+    phases?: number | null;
+    circuits?: number | null;
+    lightning_rod?: number | null;
     start_date?: Date | null;
     end_date?: Date | null;
   }): Promise<Work>;
@@ -17,8 +20,11 @@ export interface WorksRepository {
     id: string,
     input: Partial<{
       name: string;
-      tension?: string | null;
-      extension?: string | null;
+      tension?: number | null;
+      extension?: number | null;
+      phases?: number | null;
+      circuits?: number | null;
+      lightning_rod?: number | null;
       start_date?: Date | null;
       end_date?: Date | null;
     }>,

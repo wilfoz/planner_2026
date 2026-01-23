@@ -17,6 +17,10 @@ export class CreateTowerUseCase {
     embargo?: string;
     work_id: string;
     foundations?: string[];
+    deflection?: number;
+    structureType?: string;
+    color?: string;
+    isHidden?: boolean;
   }): Promise<TowerOutput> {
     const created = await this.towers.create({
       code: input.code,
@@ -29,6 +33,10 @@ export class CreateTowerUseCase {
       embargo: input.embargo ?? null,
       work_id: input.work_id,
       foundations: input.foundations,
+      deflection: input.deflection ?? null,
+      structureType: input.structureType ?? null,
+      color: input.color ?? null,
+      isHidden: input.isHidden ?? false,
     });
 
     return mapTowerToOutput(created);

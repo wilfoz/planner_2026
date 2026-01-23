@@ -3,7 +3,7 @@ import { Tower as PrismaTower } from '@prisma/client';
 import { Foundation } from '@/contexts/foundations/domain/foundation.entity';
 import { Coordinates } from '@/contexts/towers/domain/coordinates.type';
 import { Tower } from '@/contexts/towers/domain/tower.entity';
-import { TowersListResult, TowersRepository } from '@/contexts/towers/domain/towers.repository';
+import { ListTowersInput, TowersListResult, TowersRepository } from '@/contexts/towers/domain/towers.repository';
 import { NotFoundError } from '@/shared/errors/not-found.error';
 import { PrismaService } from '@/shared/infrastructure/database/prisma/prisma.service';
 import { PageInput } from '@/shared/pagination/pagination';
@@ -37,6 +37,10 @@ function mapTower(record: PrismaTower & { foundations: any[] }): Tower {
     height: record.height,
     weight: record.weight,
     embargo: record.embargo,
+    deflection: record.deflection,
+    structureType: record.structureType,
+    color: record.color,
+    isHidden: record.isHidden,
     work_id: record.work_id,
     createdAt: record.createdAt,
     foundations,
@@ -55,6 +59,10 @@ export class PrismaTowersRepository implements TowersRepository {
     height?: number | null;
     weight?: number | null;
     embargo?: string | null;
+    deflection?: number | null;
+    structureType?: string | null;
+    color?: string | null;
+    isHidden?: boolean;
     work_id: string;
     foundations?: string[];
   }): Promise<Tower> {
@@ -69,6 +77,10 @@ export class PrismaTowersRepository implements TowersRepository {
           height: input.height ?? null,
           weight: input.weight ?? null,
           embargo: input.embargo ?? null,
+          deflection: input.deflection ?? null,
+          structureType: input.structureType ?? null,
+          color: input.color ?? null,
+          isHidden: input.isHidden ?? false,
           work: { connect: { id: input.work_id } },
           ...(input.foundations
             ? { foundations: { connect: input.foundations.map((id) => ({ id })) } }
@@ -94,19 +106,22 @@ export class PrismaTowersRepository implements TowersRepository {
     return mapTower(found);
   }
 
-  async list(input: PageInput): Promise<TowersListResult> {
+  async list(input: ListTowersInput): Promise<TowersListResult> {
     const skip = (input.page - 1) * input.per_page;
     const take = input.per_page;
     const filter = input.filter?.trim();
+    const workId = input.work_id;
 
-    const where = filter
-      ? {
-        OR: [
-          { tower_number: { contains: filter, mode: 'insensitive' as const } },
-          { type: { contains: filter, mode: 'insensitive' as const } },
-        ],
-      }
-      : {};
+    const where: any = {
+      ...(workId ? { work_id: workId } : {}),
+    };
+
+    if (filter) {
+      where.OR = [
+        { tower_number: { contains: filter, mode: 'insensitive' as const } },
+        { type: { contains: filter, mode: 'insensitive' as const } },
+      ];
+    }
 
     const orderByField = input.sort && ['createdAt', 'code', 'tower_number', 'type'].includes(input.sort)
       ? input.sort
@@ -137,6 +152,10 @@ export class PrismaTowersRepository implements TowersRepository {
       height?: number | null;
       weight?: number | null;
       embargo?: string | null;
+      deflection?: number | null;
+      structureType?: string | null;
+      color?: string | null;
+      isHidden?: boolean;
       work_id?: string;
       foundations?: string[];
     }>,
@@ -153,6 +172,10 @@ export class PrismaTowersRepository implements TowersRepository {
           ...(input.height !== undefined ? { height: input.height } : {}),
           ...(input.weight !== undefined ? { weight: input.weight } : {}),
           ...(input.embargo !== undefined ? { embargo: input.embargo } : {}),
+          ...(input.deflection !== undefined ? { deflection: input.deflection } : {}),
+          ...(input.structureType !== undefined ? { structureType: input.structureType } : {}),
+          ...(input.color !== undefined ? { color: input.color } : {}),
+          ...(input.isHidden !== undefined ? { isHidden: input.isHidden } : {}),
           ...(input.work_id !== undefined ? { work: { connect: { id: input.work_id } } } : {}),
           ...(input.foundations !== undefined
             ? { foundations: { set: input.foundations.map((fid) => ({ id: fid })) } }

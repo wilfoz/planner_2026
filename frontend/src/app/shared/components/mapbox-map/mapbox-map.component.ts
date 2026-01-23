@@ -13,7 +13,7 @@ import { MapDataService, MapDataResponse } from './services/map-data.service';
 import { MapCacheService } from './services/map-cache.service';
 import { Tower3DLayerService } from './layers/tower-3d-layer.service';
 import { CableLayerService } from './layers/cable-layer.service';
-import { Tower, Span, CableSettings } from './models';
+import { TowerMap, Span, CableSettings } from './models';
 
 @Component({
   selector: 'app-mapbox-map',
@@ -27,7 +27,7 @@ export class MapboxMapComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input({ required: true }) projectId!: string;
   @Input() show3D = true;
 
-  @Output() towerSelect = new EventEmitter<Tower | null>();
+  @Output() towerSelect = new EventEmitter<TowerMap | null>();
   @Output() mapReady = new EventEmitter<void>();
   @Output() error = new EventEmitter<string>();
 
@@ -39,13 +39,13 @@ export class MapboxMapComponent implements OnInit, AfterViewInit, OnDestroy {
   private map!: Map;
   private overlay: MapboxOverlay | null = null;
 
-  readonly towers = signal<Tower[]>([]);
+  readonly towers = signal<TowerMap[]>([]);
   readonly spans = signal<Span[]>([]);
   readonly cableSettings = signal<CableSettings | null>(null);
   readonly canUpdate = signal(false);
   readonly isOffline = signal(!navigator.onLine);
 
-  readonly selectedTower = signal<Tower | null>(null);
+  readonly selectedTower = signal<TowerMap | null>(null);
   readonly viewState = signal({ zoom: 12, bearing: 0, pitch: 0, elevation: 0 });
   readonly isLoading = toSignal(this.mapDataService.loading$, { initialValue: false });
 
@@ -207,7 +207,7 @@ export class MapboxMapComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  updateTower(towerId: string, updates: Partial<Tower>): void {
+  updateTower(towerId: string, updates: Partial<TowerMap>): void {
     if (!this.canUpdate()) return;
     this.towers.update(list => list.map(t => t.id === towerId ? { ...t, ...updates } : t));
     this.mapDataService.updateTower(towerId, updates)

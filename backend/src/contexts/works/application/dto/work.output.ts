@@ -10,10 +10,19 @@ export class WorkOutput {
   name!: string;
 
   @ApiProperty({ nullable: true })
-  tension!: string | null;
+  tension!: number | null;
 
   @ApiProperty({ nullable: true })
-  extension!: string | null;
+  extension!: number | null;
+
+  @ApiProperty({ nullable: true })
+  phases!: number | null;
+
+  @ApiProperty({ nullable: true })
+  circuits!: number | null;
+
+  @ApiProperty({ nullable: true })
+  lightning_rod!: number | null;
 
   @ApiProperty({ nullable: true })
   start_date!: Date | null;

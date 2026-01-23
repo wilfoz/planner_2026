@@ -2,6 +2,10 @@ import { Tower } from '@/contexts/towers/domain/tower.entity';
 import { Coordinates } from '@/contexts/towers/domain/coordinates.type';
 import { PageInput } from '@/shared/pagination/pagination';
 
+export type ListTowersInput = PageInput & {
+  work_id?: string;
+};
+
 export type TowersListResult = { total: number; items: Tower[] };
 
 export interface TowersRepository {
@@ -16,9 +20,13 @@ export interface TowersRepository {
     embargo?: string | null;
     work_id: string;
     foundations?: string[];
+    deflection?: number | null;
+    structureType?: string | null;
+    color?: string | null;
+    isHidden?: boolean;
   }): Promise<Tower>;
   findById(id: string): Promise<Tower | null>;
-  list(input: PageInput): Promise<TowersListResult>;
+  list(input: ListTowersInput): Promise<TowersListResult>;
   update(
     id: string,
     input: Partial<{
@@ -32,6 +40,10 @@ export interface TowersRepository {
       embargo?: string | null;
       work_id?: string;
       foundations?: string[];
+      deflection?: number | null;
+      structureType?: string | null;
+      color?: string | null;
+      isHidden?: boolean;
     }>,
   ): Promise<Tower>;
   delete(id: string): Promise<void>;

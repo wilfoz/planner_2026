@@ -34,6 +34,10 @@ describe('ListTowersUseCase', () => {
         work_id: 'work-123',
         createdAt: mockDate,
         foundations: [],
+        deflection: 0,
+        structureType: 'suspension',
+        color: 'red',
+        isHidden: false,
       }),
       new Tower({
         id: 'tower-2',
@@ -48,6 +52,10 @@ describe('ListTowersUseCase', () => {
         work_id: 'work-123',
         createdAt: mockDate,
         foundations: [],
+        deflection: 0,
+        structureType: 'suspension',
+        color: 'red',
+        isHidden: false,
       }),
     ];
 

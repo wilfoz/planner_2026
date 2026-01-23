@@ -31,6 +31,10 @@ describe('UpdateTowerUseCase', () => {
       weight: 7000,
       embargo: 'environmental',
       foundations: ['foundation-1'],
+      deflection: 0,
+      structureType: 'suspension',
+      color: 'red',
+      isHidden: false,
     };
 
     const updatedTower = new Tower({
@@ -46,6 +50,10 @@ describe('UpdateTowerUseCase', () => {
       work_id: 'work-123',
       createdAt: mockDate,
       foundations: [],
+      deflection: 0,
+      structureType: 'suspension',
+      color: 'red',
+      isHidden: false,
     });
 
     mockRepository.update.mockResolvedValue(updatedTower);
@@ -62,11 +70,16 @@ describe('UpdateTowerUseCase', () => {
       weight: 7000,
       embargo: 'environmental',
       foundations: ['foundation-1'],
+      deflection: 0,
+      structureType: 'suspension',
+      color: 'red',
+      isHidden: false,
     });
 
     expect(result.code).toBe(5);
     expect(result.tower).toBe('T-005');
     expect(result.type).toBe('anchor');
+    expect(result.deflection).toBe(0);
   });
 
   it('should only update fields that are provided', async () => {
@@ -88,6 +101,10 @@ describe('UpdateTowerUseCase', () => {
       work_id: 'work-123',
       createdAt: mockDate,
       foundations: [],
+      deflection: 0,
+      structureType: 'suspension',
+      color: 'red',
+      isHidden: false,
     });
 
     mockRepository.update.mockResolvedValue(updatedTower);
@@ -122,6 +139,10 @@ describe('UpdateTowerUseCase', () => {
       work_id: 'work-123',
       createdAt: mockDate,
       foundations: [],
+      deflection: 0,
+      structureType: 'suspension',
+      color: 'red',
+      isHidden: false,
     });
 
     mockRepository.update.mockResolvedValue(updatedTower);
@@ -135,6 +156,7 @@ describe('UpdateTowerUseCase', () => {
     });
 
     expect(result.distance).toBeNull();
+    expect(result.height).toBeNull();
     expect(result.height).toBeNull();
     expect(result.embargo).toBeNull();
   });

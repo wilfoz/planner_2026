@@ -19,6 +19,10 @@ describe('mapTowerToOutput', () => {
       work_id: 'work-123',
       createdAt: mockDate,
       foundations: [],
+      deflection: 0,
+      structureType: 'suspension',
+      color: 'red',
+      isHidden: false,
     });
 
     const result = mapTowerToOutput(tower);
@@ -35,6 +39,10 @@ describe('mapTowerToOutput', () => {
       embargo: 'none',
       foundations: [],
       created_at: mockDate,
+      deflection: 0,
+      structureType: 'suspension',
+      color: 'red',
+      isHidden: false,
     });
   });
 
@@ -64,6 +72,10 @@ describe('mapTowerToOutput', () => {
       work_id: 'work-123',
       createdAt: mockDate,
       foundations: [foundation],
+      deflection: 0,
+      structureType: 'suspension',
+      color: 'red',
+      isHidden: false,
     });
 
     const result = mapTowerToOutput(tower);
@@ -96,6 +108,10 @@ describe('mapTowerToOutput', () => {
       work_id: 'work-123',
       createdAt: mockDate,
       foundations: [],
+      deflection: null,
+      structureType: null,
+      color: null,
+      isHidden: false,
     });
 
     const result = mapTowerToOutput(tower);
@@ -104,6 +120,10 @@ describe('mapTowerToOutput', () => {
     expect(result.height).toBeNull();
     expect(result.weight).toBeNull();
     expect(result.embargo).toBeNull();
+    expect(result.deflection).toBeNull();
+    expect(result.structureType).toBeNull();
+    expect(result.color).toBeNull();
+    expect(result.isHidden).toBe(false);
   });
 
   it('should handle undefined optional fields in foundations', () => {
@@ -132,6 +152,10 @@ describe('mapTowerToOutput', () => {
       work_id: 'work-123',
       createdAt: mockDate,
       foundations: [foundation],
+      deflection: null,
+      structureType: null,
+      color: null,
+      isHidden: false,
     });
 
     const result = mapTowerToOutput(tower);

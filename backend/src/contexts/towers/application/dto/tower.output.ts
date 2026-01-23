@@ -11,6 +11,10 @@ export type TowerOutput = {
   height?: number | null;
   weight?: number | null;
   embargo?: string | null;
+  deflection?: number | null;
+  structureType?: string | null;
+  color?: string | null;
+  isHidden: boolean;
   foundations: FoundationOutput[];
   created_at: Date;
 };

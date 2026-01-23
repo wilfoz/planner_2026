@@ -25,6 +25,10 @@ export function mapTowerToOutput(t: Tower): TowerOutput {
     height: t.props.height ?? null,
     weight: t.props.weight ?? null,
     embargo: t.props.embargo ?? null,
+    deflection: t.props.deflection ?? null,
+    structureType: t.props.structureType ?? null,
+    color: t.props.color ?? null,
+    isHidden: t.props.isHidden,
     foundations,
     created_at: t.props.createdAt,
   };

@@ -17,6 +17,10 @@ export class UpdateTowerUseCase {
     weight?: number | null;
     embargo?: string | null;
     foundations?: string[];
+    deflection?: number | null;
+    structureType?: string | null;
+    color?: string | null;
+    isHidden?: boolean;
   }): Promise<TowerOutput> {
     const updated = await this.towers.update(input.id, {
       ...(input.code !== undefined ? { code: input.code } : {}),
@@ -28,6 +32,10 @@ export class UpdateTowerUseCase {
       ...(input.weight !== undefined ? { weight: input.weight } : {}),
       ...(input.embargo !== undefined ? { embargo: input.embargo } : {}),
       ...(input.foundations !== undefined ? { foundations: input.foundations } : {}),
+      ...(input.deflection !== undefined ? { deflection: input.deflection } : {}),
+      ...(input.structureType !== undefined ? { structureType: input.structureType } : {}),
+      ...(input.color !== undefined ? { color: input.color } : {}),
+      ...(input.isHidden !== undefined ? { isHidden: input.isHidden } : {}),
     });
     return mapTowerToOutput(updated);
   }

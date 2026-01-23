@@ -1,6 +1,6 @@
 
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsDateString, IsOptional, IsString } from 'class-validator';
+import { IsDateString, IsOptional, IsString, IsNumber, IsInt } from 'class-validator';
 
 export class UpdateWorkDto {
   @ApiPropertyOptional()
@@ -10,13 +10,28 @@ export class UpdateWorkDto {
 
   @ApiPropertyOptional()
   @IsOptional()
-  @IsString()
-  tension?: string;
+  @IsNumber()
+  tension?: number;
 
   @ApiPropertyOptional()
   @IsOptional()
-  @IsString()
-  extension?: string;
+  @IsNumber()
+  extension?: number;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsNumber()
+  phases?: number;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsNumber()
+  circuits?: number;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsInt()
+  lightning_rod?: number;
 
   @ApiPropertyOptional()
   @IsOptional()

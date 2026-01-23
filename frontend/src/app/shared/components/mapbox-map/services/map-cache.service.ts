@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import Dexie, { Table } from 'dexie';
-import { Tower, Span, CableSettings } from '../models';
+import { TowerMap, Span, CableSettings } from '../models';
 
 interface CachedMapData {
   projectId: string;
-  towers: Tower[];
+  towers: TowerMap[];
   spans: Span[];
   cableSettings: CableSettings;
   cachedAt: number;
@@ -34,7 +34,7 @@ export class MapCacheService {
     return cached;
   }
 
-  async set(projectId: string, towers: Tower[], spans: Span[], cableSettings: CableSettings): Promise<void> {
+  async set(projectId: string, towers: TowerMap[], spans: Span[], cableSettings: CableSettings): Promise<void> {
     await this.db.mapData.put({ projectId, towers, spans, cableSettings, cachedAt: Date.now() });
   }
 

@@ -29,8 +29,11 @@ export class WorksFormComponent implements OnInit {
 
   workForm = this.fb.group({
     name: ['', Validators.required],
-    tension: ['', Validators.required],
-    extension: ['', Validators.required],
+    tension: [undefined as number | undefined, Validators.required],
+    extension: [undefined as number | undefined, Validators.required],
+    phases: [undefined as number | undefined],
+    circuits: [undefined as number | undefined],
+    lightning_rod: [undefined as number | undefined],
     start_date: ['', Validators.required],
     end_date: ['']
   });
@@ -54,6 +57,9 @@ export class WorksFormComponent implements OnInit {
           name: work.name,
           tension: work.tension,
           extension: work.extension,
+          phases: work.phases,
+          circuits: work.circuits,
+          lightning_rod: work.lightning_rod,
           start_date: new Date(work.start_date!).toISOString().split('T')[0], // Simple date handling
           end_date: work.end_date ? new Date(work.end_date).toISOString().split('T')[0] : ''
         });
@@ -70,8 +76,11 @@ export class WorksFormComponent implements OnInit {
     const formValue = this.workForm.value;
     const workDto: any = {
       ...formValue,
-      tension: formValue.tension,
-      extension: formValue.extension
+      tension: formValue.tension ? Number(formValue.tension) : undefined,
+      extension: formValue.extension ? Number(formValue.extension) : undefined,
+      phases: formValue.phases ? Number(formValue.phases) : undefined,
+      circuits: formValue.circuits ? Number(formValue.circuits) : undefined,
+      lightning_rod: formValue.lightning_rod ? Number(formValue.lightning_rod) : undefined,
     };
 
 

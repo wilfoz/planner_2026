@@ -24,8 +24,8 @@ describe('ListWorksUseCase', () => {
       new Work({
         id: 'work-1',
         name: 'Project A',
-        tension: '500kV',
-        extension: '150km',
+        tension: 500,
+        extension: 150,
         start_date: mockDate,
         end_date: null,
         createdAt: mockDate,
@@ -33,8 +33,8 @@ describe('ListWorksUseCase', () => {
       new Work({
         id: 'work-2',
         name: 'Project B',
-        tension: '230kV',
-        extension: '100km',
+        tension: 230,
+        extension: 100,
         start_date: mockDate,
         end_date: mockDate,
         createdAt: mockDate,

@@ -31,6 +31,10 @@ describe('CreateTowerUseCase', () => {
       embargo: 'none',
       work_id: 'work-123',
       foundations: ['foundation-1', 'foundation-2'],
+      deflection: 0,
+      structureType: 'suspension',
+      color: 'red',
+      isHidden: false,
     };
 
     const createdTower = new Tower({
@@ -46,6 +50,10 @@ describe('CreateTowerUseCase', () => {
       work_id: 'work-123',
       createdAt: mockDate,
       foundations: [],
+      deflection: 0,
+      structureType: 'suspension',
+      color: 'red',
+      isHidden: false,
     });
 
     mockRepository.create.mockResolvedValue(createdTower);
@@ -63,6 +71,10 @@ describe('CreateTowerUseCase', () => {
       embargo: 'none',
       work_id: 'work-123',
       foundations: ['foundation-1', 'foundation-2'],
+      deflection: 0,
+      structureType: 'suspension',
+      color: 'red',
+      isHidden: false,
     });
 
     expect(result).toEqual({
@@ -77,6 +89,10 @@ describe('CreateTowerUseCase', () => {
       embargo: 'none',
       foundations: [],
       created_at: mockDate,
+      deflection: 0,
+      structureType: 'suspension',
+      color: 'red',
+      isHidden: false,
     });
   });
 
@@ -102,6 +118,10 @@ describe('CreateTowerUseCase', () => {
       work_id: 'work-456',
       createdAt: mockDate,
       foundations: [],
+      deflection: null,
+      structureType: null,
+      color: null,
+      isHidden: false,
     });
 
     mockRepository.create.mockResolvedValue(createdTower);
@@ -119,11 +139,19 @@ describe('CreateTowerUseCase', () => {
       embargo: null,
       work_id: 'work-456',
       foundations: undefined,
+      deflection: null,
+      structureType: null,
+      color: null,
+      isHidden: false,
     });
 
     expect(result.distance).toBeNull();
     expect(result.height).toBeNull();
     expect(result.weight).toBeNull();
     expect(result.embargo).toBeNull();
+    expect(result.deflection).toBeNull();
+    expect(result.structureType).toBeNull();
+    expect(result.color).toBeNull();
+    expect(result.isHidden).toBe(false);
   });
 });

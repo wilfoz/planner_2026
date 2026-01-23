@@ -4,11 +4,16 @@ import { TowersRepository } from '@/contexts/towers/domain/towers.repository';
 import { buildPaginationMeta, normalizePageInput, PageInput } from '@/shared/pagination/pagination';
 import { CollectionPresenter, PaginationMetaPresenter } from '@/shared/presenters/collection.presenter';
 
-export class ListTowersUseCase {
-  constructor(private readonly towers: TowersRepository) {}
+import { ListTowersInput } from '@/contexts/towers/domain/towers.repository';
 
-  async execute(input: Partial<PageInput>): Promise<CollectionPresenter<TowerOutput>> {
-    const pageInput = normalizePageInput(input);
+export class ListTowersUseCase {
+  constructor(private readonly towers: TowersRepository) { }
+
+  async execute(input: Partial<ListTowersInput>): Promise<CollectionPresenter<TowerOutput>> {
+    const pageInput: ListTowersInput = {
+      ...normalizePageInput(input),
+      work_id: input.work_id,
+    };
     const result = await this.towers.list(pageInput);
 
     const meta = new PaginationMetaPresenter(

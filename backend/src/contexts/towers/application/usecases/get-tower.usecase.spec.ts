@@ -34,6 +34,10 @@ describe('GetTowerUseCase', () => {
       work_id: 'work-123',
       createdAt: mockDate,
       foundations: [],
+      deflection: 0,
+      structureType: 'suspension',
+      color: 'red',
+      isHidden: false,
     });
 
     mockRepository.findById.mockResolvedValue(tower);
@@ -53,6 +57,10 @@ describe('GetTowerUseCase', () => {
       embargo: 'none',
       foundations: [],
       created_at: mockDate,
+      deflection: 0,
+      structureType: 'suspension',
+      color: 'red',
+      isHidden: false,
     });
   });
 

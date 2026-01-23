@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { ArrayUnique, IsArray, IsInt, IsNumber, IsOptional, IsString, IsUUID, ValidateNested } from 'class-validator';
+import { ArrayUnique, IsArray, IsBoolean, IsInt, IsNumber, IsOptional, IsString, IsUUID, ValidateNested } from 'class-validator';
 
 export class CoordinatesDto {
   @ApiProperty()
@@ -60,6 +60,26 @@ export class CreateTowerDto {
   @ArrayUnique()
   @IsUUID(undefined, { each: true })
   foundations?: string[];
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsNumber()
+  deflection?: number;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  structureType?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  color?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsBoolean()
+  isHidden?: boolean;
 
   @ApiProperty()
   @IsUUID()

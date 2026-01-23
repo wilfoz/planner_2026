@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MapboxMapComponent } from '../../shared/components/mapbox-map/mapbox-map.component';
-import { Tower } from '../../shared/components/mapbox-map/models';
+import { TowerMap } from '../../shared/components/mapbox-map/models';
 
 @Component({
   selector: 'app-map-page',
@@ -52,7 +52,7 @@ export class MapPageComponent {
     }
   }
 
-  onTowerSelect(tower: Tower | null) {
+  onTowerSelect(tower: TowerMap | null) {
     console.log('Tower selected:', tower?.name);
   }
 

@@ -1,16 +1,22 @@
 export interface Work {
   id: string;
   name: string;
-  tension?: string;
-  extension?: string;
+  tension?: number;
+  extension?: number;
+  phases?: number;
+  circuits?: number;
+  lightning_rod?: number;
   start_date?: string | Date;
   end_date?: string | Date;
 }
 
 export interface CreateWorkDto {
   name: string;
-  tension?: string;
-  extension?: string;
+  tension?: number;
+  extension?: number;
+  phases?: number;
+  circuits?: number;
+  lightning_rod?: number;
   start_date?: string | Date;
   end_date?: string | Date;
 }

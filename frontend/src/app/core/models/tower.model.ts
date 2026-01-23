@@ -9,6 +9,10 @@ export interface Tower {
   weight?: number;
   embargo?: string;
   foundations?: string[];
+  deflection?: number;
+  structureType?: 'suspension' | 'anchor' | 'terminal' | 'transposition';
+  color?: string;
+  isHidden?: boolean;
   work_id: string;
 }
 
@@ -22,6 +26,10 @@ export interface CreateTowerDto {
   weight?: number;
   embargo?: string;
   foundations?: string[];
+  deflection?: number;
+  structureType?: 'suspension' | 'anchor' | 'terminal' | 'transposition';
+  color?: string;
+  isHidden?: boolean;
   work_id: string;
 }
 

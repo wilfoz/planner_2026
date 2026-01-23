@@ -13,6 +13,10 @@ export class Tower {
       height?: number | null;
       weight?: number | null;
       embargo?: string | null;
+      deflection?: number | null;
+      structureType?: string | null;
+      color?: string | null;
+      isHidden: boolean;
       work_id: string;
       createdAt: Date;
       foundations: Foundation[];

@@ -24,8 +24,8 @@ describe('GetWorkUseCase', () => {
     const work = new Work({
       id: 'work-id-123',
       name: 'LT 500kV Project',
-      tension: '500kV',
-      extension: '150km',
+      tension: 500,
+      extension: 150,
       start_date: mockDate,
       end_date: null,
       createdAt: mockDate,

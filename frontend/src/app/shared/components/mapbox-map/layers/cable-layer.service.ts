@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { PathLayer } from '@deck.gl/layers';
-import { Tower, Span, CableSettings } from '../models';
+import { TowerMap, Span, CableSettings } from '../models';
 import { CatenaryCalculatorService, Point3D } from '../services/catenary-calculator.service';
 
 interface CableData {
@@ -13,7 +13,7 @@ interface CableData {
 export class CableLayerService {
   private readonly catenary = inject(CatenaryCalculatorService);
 
-  getLayers(towers: Tower[], spans: Span[], settings: CableSettings): any[] {
+  getLayers(towers: TowerMap[], spans: Span[], settings: CableSettings): any[] {
     const towerMap = new Map(towers.map(t => [t.id, t]));
     const cables: CableData[] = [];
 

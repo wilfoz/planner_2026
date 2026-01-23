@@ -22,8 +22,8 @@ describe('CreateWorkUseCase', () => {
   it('should create a work with all fields', async () => {
     const input = {
       name: 'LT 500kV Project',
-      tension: '500kV',
-      extension: '150km',
+      tension: 500,
+      extension: 150,
       start_date: mockDate.toISOString(),
       end_date: undefined,
     };
@@ -31,8 +31,8 @@ describe('CreateWorkUseCase', () => {
     const createdWork = new Work({
       id: 'work-id-123',
       name: 'LT 500kV Project',
-      tension: '500kV',
-      extension: '150km',
+      tension: 500,
+      extension: 150,
       start_date: mockDate,
       end_date: null,
       createdAt: mockDate,
@@ -44,15 +44,15 @@ describe('CreateWorkUseCase', () => {
 
     expect(mockRepository.create).toHaveBeenCalledWith({
       name: 'LT 500kV Project',
-      tension: '500kV',
-      extension: '150km',
+      tension: 500,
+      extension: 150,
       start_date: mockDate,
       end_date: null,
     });
 
     expect(result.id).toBe('work-id-123');
     expect(result.name).toBe('LT 500kV Project');
-    expect(result.tension).toBe('500kV');
+    expect(result.tension).toBe(500);
   });
 
   it('should create a work with minimal fields', async () => {
