@@ -1,0 +1,50 @@
+
+> lt-planner@1.0.0 test
+> dotenv -e .env.test -- jest src/contexts/towers/infrastructure/database/prisma/prisma-towers.repository.int-spec.ts --runInBand
+
+warn The configuration property `package.json#prisma` is deprecated and will be removed in Prisma 7. Please migrate to a Prisma config file (e.g., `prisma.config.ts`).
+For more information, see: https://pris.ly/prisma-config
+
+Environment variables loaded from .env
+Prisma schema loaded from src\shared\infrastructure\database\prisma\schema.prisma
+Datasource "db": PostgreSQL database "lt-db", schema "test" at "127.0.0.1:5432"
+
+1 migration found in prisma/migrations
+
+
+No pending migrations to apply.
+FAIL src/contexts/towers/infrastructure/database/prisma/prisma-towers.repository.int-spec.ts (6.48 s)
+  PrismaTowersRepository (integration)
+    × creates and finds tower (345 ms)
+
+  ● PrismaTowersRepository (integration) › creates and finds tower
+
+    PrismaClientKnownRequestError: 
+    Invalid `prisma.work.deleteMany()` invocation in
+    C:\Users\Wilerson\Desktop\LT-PLANNER\lt-budget\backend\src\contexts\towers\infrastructure\database\prisma\prisma-towers.repository.int-spec.ts:21:23
+
+      18 beforeEach(async () => {
+      19   // Cleanup order matters due to FKs
+      20   await prisma.tower.deleteMany();
+    → 21   await prisma.work.deleteMany(
+    The table `test.works` does not exist in the current database.
+
+    [0m [90m 19 |[39m     [90m// Cleanup order matters due to FKs[39m
+     [90m 20 |[39m     [36mawait[39m prisma[33m.[39mtower[33m.[39mdeleteMany()[33m;[39m
+    [31m[1m>[22m[39m[90m 21 |[39m     [36mawait[39m prisma[33m.[39mwork[33m.[39mdeleteMany()[33m;[39m
+     [90m    |[39m     [31m[1m^[22m[39m
+     [90m 22 |[39m
+     [90m 23 |[39m     [90m// Create a dummy work for relation[39m
+     [90m 24 |[39m     [36mconst[39m work [33m=[39m [36mawait[39m prisma[33m.[39mwork[33m.[39mcreate({[0m
+
+      at ei.handleRequestError (node_modules/@prisma/client/src/runtime/RequestHandler.ts:228:13)
+      at ei.handleAndLogRequestError (node_modules/@prisma/client/src/runtime/RequestHandler.ts:174:12)
+      at ei.request (node_modules/@prisma/client/src/runtime/RequestHandler.ts:143:12)
+      at a (node_modules/@prisma/client/src/runtime/getPrismaClient.ts:833:24)
+      at Object.<anonymous> (src/contexts/towers/infrastructure/database/prisma/prisma-towers.repository.int-spec.ts:21:5)
+
+Test Suites: 1 failed, 1 total
+Tests:       1 failed, 1 total
+Snapshots:   0 total
+Time:        6.578 s
+Ran all test suites matching /src\\contexts\\towers\\infrastructure\\database\\prisma\\prisma-towers.repository.int-spec.ts/i.

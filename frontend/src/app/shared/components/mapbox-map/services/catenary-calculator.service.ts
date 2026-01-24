@@ -68,4 +68,8 @@ export class CatenaryCalculatorService {
 
     return points;
   }
+
+  metersToLng(meters: number, lat: number): number {
+    return meters / (111320 * Math.cos(lat * Math.PI / 180));
+  }
 }

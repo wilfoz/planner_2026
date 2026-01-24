@@ -28,13 +28,13 @@ export class CableLayerService {
       // Generate cables for each enabled anchor
       for (const anchor of anchors.filter(a => a.enabled)) {
         const start: Point3D = {
-          x: startTower.lng + this.metersToLng(anchor.horizontalOffset, startTower.lat),
+          x: startTower.lng + this.catenary.metersToLng(anchor.horizontalOffset, startTower.lat),
           y: startTower.lat,
           z: startTower.altitude + startTower.height * anchor.verticalRatio + settings.towerVerticalOffset
         };
 
         const end: Point3D = {
-          x: endTower.lng + this.metersToLng(anchor.horizontalOffset, endTower.lat),
+          x: endTower.lng + this.catenary.metersToLng(anchor.horizontalOffset, endTower.lat),
           y: endTower.lat,
           z: endTower.altitude + endTower.height * anchor.verticalRatio + settings.towerVerticalOffset
         };
@@ -63,10 +63,6 @@ export class CableLayerService {
     });
 
     return [layer];
-  }
-
-  private metersToLng(meters: number, lat: number): number {
-    return meters / (111320 * Math.cos(lat * Math.PI / 180));
   }
 
   private hexToRgba(hex: string, opacity: number): [number, number, number, number] {

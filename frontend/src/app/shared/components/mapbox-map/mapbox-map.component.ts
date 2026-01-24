@@ -1,6 +1,6 @@
 import {
-  Component, Input, Output, EventEmitter, OnInit, OnDestroy,
-  ElementRef, ViewChild, AfterViewInit, signal, inject, computed, effect
+  Component, Output, EventEmitter, OnInit, OnDestroy,
+  ElementRef, ViewChild, AfterViewInit, signal, inject, computed, effect, input
 } from '@angular/core';
 import { CommonModule, DecimalPipe } from '@angular/common';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -13,6 +13,7 @@ import { MapDataService, MapDataResponse } from './services/map-data.service';
 import { MapCacheService } from './services/map-cache.service';
 import { Tower3DLayerService } from './layers/tower-3d-layer.service';
 import { CableLayerService } from './layers/cable-layer.service';
+import { AnchorLayerService } from './layers/anchor-layer.service';
 import { TowerMap, Span, CableSettings } from './models';
 
 @Component({
@@ -24,8 +25,8 @@ import { TowerMap, Span, CableSettings } from './models';
 export class MapboxMapComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('mapContainer', { static: true }) mapContainer!: ElementRef<HTMLDivElement>;
 
-  @Input({ required: true }) projectId!: string;
-  @Input() show3D = true;
+  readonly projectId = input.required<string>();
+  readonly show3D = input(true);
 
   @Output() towerSelect = new EventEmitter<TowerMap | null>();
   @Output() mapReady = new EventEmitter<void>();
@@ -35,6 +36,7 @@ export class MapboxMapComponent implements OnInit, AfterViewInit, OnDestroy {
   private readonly cacheService = inject(MapCacheService);
   private readonly tower3DLayer = inject(Tower3DLayerService);
   private readonly cableLayer = inject(CableLayerService);
+  private readonly anchorLayer = inject(AnchorLayerService);
   private readonly destroy$ = new Subject<void>();
   private map!: Map;
   private overlay: MapboxOverlay | null = null;
@@ -63,10 +65,11 @@ export class MapboxMapComponent implements OnInit, AfterViewInit, OnDestroy {
 
       let layers: any[] = [];
 
-      if (this.show3D && settings) {
+      if (this.show3D() && settings) {
         const towerLayers = this.tower3DLayer.getLayers(towers, { towerVerticalOffset: settings.towerVerticalOffset });
         const cableLayers = this.cableLayer.getLayers(this.towers(), spans, settings);
-        layers = [...towerLayers, ...cableLayers];
+        const anchorLayers = this.anchorLayer.getLayers(this.towers(), settings);
+        layers = [...towerLayers, ...cableLayers, ...anchorLayers];
       }
 
       this.overlay.setProps({ layers });
@@ -99,7 +102,7 @@ export class MapboxMapComponent implements OnInit, AfterViewInit, OnDestroy {
   private async loadData(): Promise<void> {
     // 1. Try cache first
     try {
-      const cached = await this.cacheService.get(this.projectId);
+      const cached = await this.cacheService.get(this.projectId());
       if (cached) {
         console.log('Loaded map data from cache');
         this.applyCachedData(cached);
@@ -114,19 +117,19 @@ export class MapboxMapComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     // 3. Fetch fresh data
-    this.mapDataService.getMapData(this.projectId)
+    this.mapDataService.getMapData(this.projectId())
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: async (res) => {
+        next: async (res: MapDataResponse) => {
           this.applyData(res);
           await this.cacheService.set(
-            this.projectId,
+            this.projectId(),
             res.data.towers,
             res.data.spans,
             res.data.cableSettings
           );
         },
-        error: (err) => {
+        error: (err: any) => {
           this.error.emit(err.message || 'Failed to load map data');
         }
       });
@@ -179,10 +182,11 @@ export class MapboxMapComponent implements OnInit, AfterViewInit, OnDestroy {
       // Force update layers now that overlay is ready
       const towers = this.visibleTowers();
       const settings = this.cableSettings();
-      if (this.show3D && settings) {
+      if (this.show3D() && settings) {
         const towerLayers = this.tower3DLayer.getLayers(towers, { towerVerticalOffset: settings.towerVerticalOffset });
         const cableLayers = this.cableLayer.getLayers(this.towers(), this.spans(), settings);
-        this.overlay.setProps({ layers: [...towerLayers, ...cableLayers] });
+        const anchorLayers = this.anchorLayer.getLayers(this.towers(), settings);
+        this.overlay.setProps({ layers: [...towerLayers, ...cableLayers, ...anchorLayers] });
       }
 
       this.mapReady.emit();
@@ -209,10 +213,10 @@ export class MapboxMapComponent implements OnInit, AfterViewInit, OnDestroy {
 
   updateTower(towerId: string, updates: Partial<TowerMap>): void {
     if (!this.canUpdate()) return;
-    this.towers.update(list => list.map(t => t.id === towerId ? { ...t, ...updates } : t));
+    this.towers.update((list: TowerMap[]) => list.map((t: TowerMap) => t.id === towerId ? { ...t, ...updates } : t));
     this.mapDataService.updateTower(towerId, updates)
       .pipe(takeUntil(this.destroy$))
-      .subscribe({ error: (err) => this.error.emit(err.message) });
+      .subscribe({ error: (err: any) => this.error.emit(err.message) });
   }
 
   toggleVisibility(towerId: string, hide: boolean): void {

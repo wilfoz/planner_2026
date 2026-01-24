@@ -1,0 +1,5 @@
+
+Invalid `prisma.work.create()` invocation:
+
+
+The column `phases` does not exist in the current database.
