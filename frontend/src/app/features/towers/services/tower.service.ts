@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { Tower, CreateTowerDto, UpdateTowerDto } from '../../../core/models/tower.model';
+import { Collection } from '../../../core/models/collection.model';
 
 @Injectable({
   providedIn: 'root'
@@ -23,9 +24,12 @@ export class TowerService {
     );
   }
 
-  getByWorkId(workId: string): Observable<Tower[]> {
-    return this.http.get<any>(`${this.apiUrl}?work_id=${workId}`).pipe(
-      map(response => response.data || [])
+  getByWorkId(workId: string, params?: { page?: number; per_page?: number }): Observable<Collection<Tower>> {
+    return this.http.get<any>(`${this.apiUrl}?work_id=${workId}`, { params: params as any }).pipe(
+      map(response => ({
+        data: response.data,
+        meta: response.meta
+      }))
     );
   }
 

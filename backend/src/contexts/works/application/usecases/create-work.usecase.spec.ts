@@ -36,6 +36,7 @@ describe('CreateWorkUseCase', () => {
       start_date: mockDate,
       end_date: null,
       createdAt: mockDate,
+      states: [],
     });
 
     mockRepository.create.mockResolvedValue(createdWork);
@@ -72,6 +73,7 @@ describe('CreateWorkUseCase', () => {
       start_date: null,
       end_date: null,
       createdAt: mockDate,
+      states: [],
     });
 
     mockRepository.create.mockResolvedValue(createdWork);

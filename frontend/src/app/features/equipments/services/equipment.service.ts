@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { Equipment, CreateEquipmentDto, UpdateEquipmentDto } from '../../../core/models/equipment.model';
+import { Collection } from '../../../core/models/collection.model';
 
 @Injectable({
   providedIn: 'root'
@@ -11,9 +12,12 @@ export class EquipmentService {
   private http = inject(HttpClient);
   private apiUrl = `${environment.apiUrl}/equipments`;
 
-  getAll(): Observable<Equipment[]> {
-    return this.http.get<any>(this.apiUrl).pipe(
-      map(response => response.data || [])
+  getAll(params?: { page?: number; per_page?: number }): Observable<Collection<Equipment>> {
+    return this.http.get<any>(this.apiUrl, { params: params as any }).pipe(
+      map(response => ({
+        data: response.data,
+        meta: response.meta
+      }))
     );
   }
 

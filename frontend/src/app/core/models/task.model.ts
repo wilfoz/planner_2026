@@ -13,6 +13,7 @@ export interface CreateTaskDto {
   group: string;
   name: string;
   unit: string;
+  work_id: string;
 }
 
 export interface UpdateTaskDto extends Partial<CreateTaskDto> { }

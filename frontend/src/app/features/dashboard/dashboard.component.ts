@@ -123,10 +123,10 @@ export class DashboardComponent {
       error: (err) => console.error(err)
     });
 
-    // Fetch productions
-    this.productionService.getByWorkId(workId).subscribe({
-      next: (data) => {
-        this.productions.set(data);
+    // Fetch productions - Get larger set for stats (e.g. 1000)
+    this.productionService.getByWorkId(workId, { per_page: 1000 }).subscribe({
+      next: (response) => {
+        this.productions.set(response.data);
         this.isLoading.set(false);
       },
       error: (err) => {

@@ -54,4 +54,8 @@
       </tbody>
     </table>
   </div>
+  <div class="mt-4">
+    <app-pagination [meta]="meta()" [loading]="isLoading()" (pageChange)="onPageChange($event)">
+    </app-pagination>
+  </div>
 </div>

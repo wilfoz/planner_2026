@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client';
 import { TaskEntity } from '@/contexts/task/domain/task.entity';
 import { TaskListResult, TaskRepository } from '@/contexts/task/domain/task.repository';
 import { NotFoundError } from '@/shared/errors/not-found.error';
@@ -8,8 +9,24 @@ import { isPrismaRecordNotFoundError } from '@/shared/infrastructure/database/pr
 export class PrismaTaskRepository implements TaskRepository {
   constructor(private readonly prisma: PrismaService) { }
 
-  async create(input: { code: number; stage: string; group: string; name: string; unit: string }): Promise<TaskEntity> {
-    const created = await this.prisma.task.create({ data: input });
+  async create(input: { code: number; stage: string; group: string; name: string; unit: string; work_id: string }): Promise<TaskEntity> {
+    const { work_id, ...taskData } = input;
+    const created = await this.prisma.$transaction(async (tx) => {
+      // 1. Create the Task
+      const task = await tx.task.create({ data: taskData });
+
+      // 2. Create the Production associated with the Work and Task
+      await tx.production.create({
+        data: {
+          task_id: task.id,
+          work_id: work_id,
+          status: 'EXECUTED', // Default status as per plan
+        },
+      });
+
+      return task;
+    });
+
     return new TaskEntity({ ...created, createdAt: created.createdAt });
   }
 
@@ -24,16 +41,21 @@ export class PrismaTaskRepository implements TaskRepository {
     const take = input.per_page;
     const filter = input.filter?.trim();
 
-    const where = filter
-      ? {
-        OR: [
-          { name: { contains: filter, mode: 'insensitive' as const } },
-          { stage: { contains: filter, mode: 'insensitive' as const } },
-          { group: { contains: filter, mode: 'insensitive' as const } },
-          { unit: { contains: filter, mode: 'insensitive' as const } },
-        ],
-      }
-      : {};
+    const workId = input.work_id;
+
+    const where: Prisma.TaskWhereInput = {
+      ...(workId ? { production: { work_id: workId } } : {}),
+      ...(filter
+        ? {
+          OR: [
+            { name: { contains: filter, mode: 'insensitive' as const } },
+            { stage: { contains: filter, mode: 'insensitive' as const } },
+            { group: { contains: filter, mode: 'insensitive' as const } },
+            { unit: { contains: filter, mode: 'insensitive' as const } },
+          ],
+        }
+        : {}),
+    };
 
     const orderByField =
       input.sort && ['createdAt', 'code', 'stage', 'group', 'name', 'unit'].includes(input.sort)

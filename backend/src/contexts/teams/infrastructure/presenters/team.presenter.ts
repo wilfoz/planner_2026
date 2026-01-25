@@ -13,17 +13,17 @@ export class TeamPresenter {
 
   @ApiProperty({ isArray: true })
   @Expose()
-  employees!: string[];
+  employees!: any[];
 
   @ApiProperty({ isArray: true })
   @Expose()
-  equipments!: string[];
+  equipments!: any[];
 
   @ApiProperty({ name: 'created_at' })
   @Expose()
   created_at!: Date;
 
-  constructor(input: { id: string; name: string; employees: string[]; equipments: string[]; created_at: Date }) {
+  constructor(input: { id: string; name: string; employees: any[]; equipments: any[]; created_at: Date }) {
     Object.assign(this, input);
   }
 }

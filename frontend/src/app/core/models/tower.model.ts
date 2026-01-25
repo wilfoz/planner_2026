@@ -18,7 +18,7 @@ export interface Tower {
 
 export interface CreateTowerDto {
   code: number;
-  tower: string;
+  tower_number: string;
   type: string;
   coordinates: Record<string, unknown>;
   distance?: number;

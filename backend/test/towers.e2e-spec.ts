@@ -47,7 +47,7 @@ describe('Towers (e2e)', () => {
   it('create and list towers', async () => {
     const createDto = {
       code: 1,
-      tower: 'T-01',
+      tower_number: 'T-01',
       type: 'Suspension',
       coordinates: { lat: 10, lng: 20, altitude: 30 },
       work_id: workId,
@@ -60,7 +60,7 @@ describe('Towers (e2e)', () => {
       .expect(201);
 
     expect(create.body).toHaveProperty('data.id');
-    expect(create.body.data).toHaveProperty('tower', 'T-01');
+    expect(create.body.data).toHaveProperty('tower_number', 'T-01');
 
     // List
     const list = await request(app.getHttpServer())
@@ -70,6 +70,6 @@ describe('Towers (e2e)', () => {
     expect(list.body).toHaveProperty('meta');
     expect(Array.isArray(list.body.data)).toBe(true);
     expect(list.body.data.length).toBeGreaterThanOrEqual(1);
-    expect(list.body.data[0]).toHaveProperty('tower', 'T-01');
+    expect(list.body.data[0]).toHaveProperty('tower_number', 'T-01');
   });
 });

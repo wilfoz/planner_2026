@@ -4,10 +4,12 @@ import { ProductionService } from '../services/production.service';
 import { WorkContextService } from '../../../core/services/work-context.service';
 import { Production } from '../../../core/models/production.model';
 import { LucideAngularModule, Plus, Edit, Trash2, Eye, Activity } from 'lucide-angular';
+import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
+import { PaginationMeta } from '../../../core/models/collection.model';
 
 @Component({
   selector: 'app-productions-list',
-  imports: [RouterLink, LucideAngularModule],
+  imports: [RouterLink, LucideAngularModule, PaginationComponent],
   templateUrl: './productions-list.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -16,6 +18,9 @@ export class ProductionsListComponent {
   private workContextService = inject(WorkContextService);
 
   productions = signal<Production[]>([]);
+  meta = signal<PaginationMeta | undefined>(undefined);
+  isLoading = signal(false);
+
   readonly PlusIcon = Plus;
   readonly EditIcon = Edit;
   readonly TrashIcon = Trash2;
@@ -32,8 +37,21 @@ export class ProductionsListComponent {
     });
   }
 
-  loadProductions(workId: string) {
-    this.productionService.getByWorkId(workId).subscribe(data => this.productions.set(data));
+  loadProductions(workId: string, page: number = 1) {
+    this.isLoading.set(true);
+    this.productionService.getByWorkId(workId, { page, per_page: 10 }).subscribe({
+      next: (response) => {
+        this.productions.set(response.data);
+        this.meta.set(response.meta);
+        this.isLoading.set(false);
+      },
+      error: () => this.isLoading.set(false)
+    });
+  }
+
+  onPageChange(page: number) {
+    const workId = this.workContextService.selectedWorkId();
+    if (workId) this.loadProductions(workId, page);
   }
 
   deleteProduction(id: string) {

@@ -1,43 +1,49 @@
 import { Injectable } from '@angular/core';
 import { ScenegraphLayer } from '@deck.gl/mesh-layers';
 import { ScatterplotLayer } from '@deck.gl/layers';
-import { GLTFLoader } from '@loaders.gl/gltf';
-import { registerLoaders } from '@loaders.gl/core';
 import { TowerMap } from '../models';
+
+export interface TowerLayerOptions {
+  towerVerticalOffset: number;
+  getTerrainElevation?: (lng: number, lat: number) => number;
+}
 
 @Injectable({ providedIn: 'root' })
 export class Tower3DLayerService {
-  constructor() {
-    registerLoaders([GLTFLoader]);
-  }
+  getLayers(towers: TowerMap[], options: TowerLayerOptions): any[] {
+    if (!options || towers.length === 0) return [];
 
-  getLayers(towers: TowerMap[], cableSettings: { towerVerticalOffset: number }): any[] {
-    if (!cableSettings || towers.length === 0) return [];
+    const visibleTowers = towers.filter(t => !t.isHidden);
 
-    // Debug layer to visualize tower positions independently of the model
+    // Debug layer to visualize tower positions
+    // Use altitude from tower data - this was working before
     const debugLayer = new ScatterplotLayer({
       id: 'tower-debug-points',
-      data: towers.filter(t => !t.isHidden),
-      getPosition: (d: TowerMap) => [d.lng, d.lat, d.altitude + cableSettings.towerVerticalOffset],
-      getRadius: 10,
-      getFillColor: [255, 0, 0],
+      data: visibleTowers,
+      getPosition: (d: TowerMap) => [d.lng, d.lat, d.altitude],
+      getRadius: 15,
+      getFillColor: [255, 0, 0, 255],
       pickable: true
     });
 
-    const layer = new ScenegraphLayer({
+    // ScenegraphLayer for 3D tower models
+    const towerLayer = new ScenegraphLayer({
       id: 'tower-3d-layer',
-      data: towers.filter(t => !t.isHidden),
+      data: visibleTowers,
       scenegraph: '/assets/models/towers/scene.gltf',
-      getPosition: (d: TowerMap) => [d.lng, d.lat, d.altitude + cableSettings.towerVerticalOffset],
-      getOrientation: (d: TowerMap) => [0, (d.deflection + 90) % 360, 90],
-      sizeScale: 50, // Temporarily increased scale for debugging
-      pickable: true,
-      onClick: (info: any) => {
-        if (info.object) return true;
-        return false;
-      }
+      getPosition: (d: TowerMap) => [d.lng, d.lat, d.altitude],
+      getOrientation: (d: TowerMap) => [0, d.deflection, 90],
+      sizeScale: 1,
+      getScale: (d: TowerMap) => {
+        const height = d.height || 30;
+        return [height, height, height];
+      },
+      pickable: true
     });
 
-    return [layer, debugLayer];
+    console.log('Tower layer created with', visibleTowers.length, 'visible towers');
+    console.log('First tower:', visibleTowers[0]?.name, 'altitude:', visibleTowers[0]?.altitude);
+
+    return [towerLayer, debugLayer];
   }
 }

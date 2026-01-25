@@ -1,17 +1,11 @@
 <div class="px-4 sm:px-6 lg:px-8 py-8">
-  <div class="sm:flex sm:items-center">
-    <div class="sm:flex-auto">
-      <h1 class="text-xl font-semibold text-white">Funcionários</h1>
-      <p class="mt-2 text-sm text-gray-400">Lista de todos os funcionários da empresa.</p>
-    </div>
-    <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
-      <a routerLink="/employees/new"
-        class="inline-flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-[#18181b] sm:w-auto transition-colors">
-        <lucide-icon [img]="PlusIcon" class="mr-2 h-4 w-4"></lucide-icon>
-        Adicionar
-      </a>
-    </div>
-  </div>
+  <app-page-header title="Funcionários" [breadcrumbs]="breadcrumbs">
+    <a routerLink="/employees/new"
+      class="inline-flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-[#18181b] sm:w-auto transition-colors">
+      <lucide-icon [img]="PlusIcon" class="mr-2 h-4 w-4"></lucide-icon>
+      Adicionar
+    </a>
+  </app-page-header>
   <div class="mt-8 flex flex-col">
     <div class="-my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8">
       <div class="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
@@ -19,7 +13,8 @@
           <table class="min-w-full divide-y divide-[#3f3f46]">
             <thead class="bg-[#27272a]">
               <tr>
-                <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-white sm:pl-6">Matrícula</th>
+                <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-white sm:pl-6">Matrícula
+                </th>
                 <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-white">Nome</th>
                 <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-white">Cargo</th>
                 <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-white">Liderança</th>
@@ -31,46 +26,51 @@
             </thead>
             <tbody class="divide-y divide-[#3f3f46] bg-[#27272a]">
               @for (employee of employees(); track employee.id) {
-                <tr>
-                  <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-white sm:pl-6">{{ employee.registration }}</td>
-                  <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-400">{{ employee.full_name }}</td>
-                  <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-400">{{ employee.occupation }}</td>
-                  <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-400">
-                    @if (employee.leadership) {
-                      <span class="px-2 py-1 text-xs rounded-full bg-indigo-500/20 text-indigo-400">Sim</span>
-                    } @else {
-                      <span class="px-2 py-1 text-xs rounded-full bg-gray-500/20 text-gray-400">Não</span>
-                    }
-                  </td>
-                  <td class="whitespace-nowrap px-3 py-4 text-sm">
-                    <span class="px-2 py-1 text-xs rounded-full" [class]="getStatusClass(employee.status)">
-                      {{ getStatusLabel(employee.status) }}
-                    </span>
-                  </td>
-                  <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                    <div class="flex justify-end gap-2">
-                      <a [routerLink]="['/employees', employee.id]" class="text-indigo-400 hover:text-indigo-300">
-                        <lucide-icon [img]="EyeIcon" class="h-4 w-4"></lucide-icon>
-                      </a>
-                      <a [routerLink]="['/employees', employee.id, 'edit']" class="text-blue-400 hover:text-blue-300">
-                        <lucide-icon [img]="EditIcon" class="h-4 w-4"></lucide-icon>
-                      </a>
-                      <button (click)="deleteEmployee(employee.id)" class="text-red-400 hover:text-red-300">
-                        <lucide-icon [img]="TrashIcon" class="h-4 w-4"></lucide-icon>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
+              <tr>
+                <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-white sm:pl-6">{{
+                  employee.registration }}</td>
+                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-400">{{ employee.full_name }}</td>
+                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-400">{{ employee.occupation }}</td>
+                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-400">
+                  @if (employee.leadership) {
+                  <span class="px-2 py-1 text-xs rounded-full bg-indigo-500/20 text-indigo-400">Sim</span>
+                  } @else {
+                  <span class="px-2 py-1 text-xs rounded-full bg-gray-500/20 text-gray-400">Não</span>
+                  }
+                </td>
+                <td class="whitespace-nowrap px-3 py-4 text-sm">
+                  <span class="px-2 py-1 text-xs rounded-full" [class]="getStatusClass(employee.status)">
+                    {{ getStatusLabel(employee.status) }}
+                  </span>
+                </td>
+                <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                  <div class="flex justify-end gap-2">
+                    <a [routerLink]="['/employees', employee.id]" class="text-indigo-400 hover:text-indigo-300">
+                      <lucide-icon [img]="EyeIcon" class="h-4 w-4"></lucide-icon>
+                    </a>
+                    <a [routerLink]="['/employees', employee.id, 'edit']" class="text-blue-400 hover:text-blue-300">
+                      <lucide-icon [img]="EditIcon" class="h-4 w-4"></lucide-icon>
+                    </a>
+                    <button (click)="deleteEmployee(employee.id)" class="text-red-400 hover:text-red-300">
+                      <lucide-icon [img]="TrashIcon" class="h-4 w-4"></lucide-icon>
+                    </button>
+                  </div>
+                </td>
+              </tr>
               }
               @if (employees().length === 0) {
-                <tr>
-                  <td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500">Nenhum funcionário encontrado.</td>
-                </tr>
+              <tr>
+                <td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500">Nenhum funcionário encontrado.</td>
+              </tr>
               }
             </tbody>
           </table>
         </div>
       </div>
     </div>
+  </div>
+  <div class="mt-4">
+    <app-pagination [meta]="meta()" [loading]="isLoading()" (pageChange)="onPageChange($event)">
+    </app-pagination>
   </div>
 </div>

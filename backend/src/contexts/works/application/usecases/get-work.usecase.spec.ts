@@ -29,6 +29,7 @@ describe('GetWorkUseCase', () => {
       start_date: mockDate,
       end_date: null,
       createdAt: mockDate,
+      states: [],
     });
 
     mockRepository.findById.mockResolvedValue(work);

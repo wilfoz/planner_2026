@@ -7,10 +7,13 @@ import { Tower, CreateTowerDto } from '../../../core/models/tower.model';
 import { LucideAngularModule, Plus, Edit, Trash2, Eye, Radio, UploadCloud } from 'lucide-angular';
 import { ToastService } from '../../../shared/components/toast/toast.service';
 import { LoadingService } from '../../../shared/services/loading.service';
+import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
+import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
+import { PaginationMeta } from '../../../core/models/collection.model';
 
 @Component({
   selector: 'app-towers-list',
-  imports: [RouterLink, LucideAngularModule],
+  imports: [RouterLink, LucideAngularModule, PageHeaderComponent, PaginationComponent],
   templateUrl: './towers-list.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -22,6 +25,8 @@ export class TowersListComponent {
   private loadingService = inject(LoadingService);
 
   towers = signal<Tower[]>([]);
+  meta = signal<PaginationMeta | undefined>(undefined);
+  isLoading = signal(false);
   isImporting = signal<boolean>(false);
 
   readonly PlusIcon = Plus;
@@ -30,6 +35,12 @@ export class TowersListComponent {
   readonly EyeIcon = Eye;
   readonly TowerIcon = Radio;
   readonly UploadIcon = UploadCloud;
+
+  breadcrumbs = [
+    { label: 'Home', link: '/' },
+    { label: 'Map', link: '/map' },
+    { label: 'Torres' }
+  ];
 
   constructor() {
     effect(() => {
@@ -42,8 +53,21 @@ export class TowersListComponent {
     });
   }
 
-  loadTowers(workId: string) {
-    this.towerService.getByWorkId(workId).subscribe(data => this.towers.set(data));
+  loadTowers(workId: string, page: number = 1) {
+    this.isLoading.set(true);
+    this.towerService.getByWorkId(workId, { page, per_page: 10 }).subscribe({
+      next: (response) => {
+        this.towers.set(response.data);
+        this.meta.set(response.meta);
+        this.isLoading.set(false);
+      },
+      error: () => this.isLoading.set(false)
+    });
+  }
+
+  onPageChange(page: number) {
+    const workId = this.workContextService.selectedWorkId();
+    if (workId) this.loadTowers(workId, page);
   }
 
   deleteTower(id: string) {

@@ -34,6 +34,7 @@ describe('UpdateWorkUseCase', () => {
       start_date: mockDate,
       end_date: null,
       createdAt: mockDate,
+      states: [],
     });
 
     mockRepository.update.mockResolvedValue(updatedWork);
@@ -63,6 +64,7 @@ describe('UpdateWorkUseCase', () => {
       start_date: mockDate,
       end_date: mockDate,
       createdAt: mockDate,
+      states: [],
     });
 
     mockRepository.update.mockResolvedValue(updatedWork);

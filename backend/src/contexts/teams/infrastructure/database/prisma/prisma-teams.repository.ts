@@ -10,7 +10,7 @@ import {
 } from '@/shared/infrastructure/database/prisma/prisma-errors';
 
 export class PrismaTeamsRepository implements TeamsRepository {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   async create(input: { name: string; employees?: string[]; equipments?: string[] }): Promise<Team> {
     try {
@@ -33,15 +33,18 @@ export class PrismaTeamsRepository implements TeamsRepository {
 
         return await tx.team.findUniqueOrThrow({
           where: { id: team.id },
-          include: { employees: { select: { id: true } }, equipments: { select: { id: true } } },
+          include: {
+            employees: { select: { id: true, registration: true, full_name: true, occupation: true } },
+            equipments: { select: { id: true, model: true, manufacturer: true, license_plate: true } }
+          },
         });
       });
 
       return new Team({
         id: created.id,
         name: created.name,
-        employees: created.employees.map((e) => e.id),
-        equipments: created.equipments.map((e) => e.id),
+        employees: created.employees,
+        equipments: created.equipments,
         createdAt: created.createdAt,
       });
     } catch (e) {
@@ -53,14 +56,17 @@ export class PrismaTeamsRepository implements TeamsRepository {
   async findById(id: string): Promise<Team | null> {
     const found = await this.prisma.team.findUnique({
       where: { id },
-      include: { employees: { select: { id: true } }, equipments: { select: { id: true } } },
+      include: {
+        employees: { select: { id: true, registration: true, full_name: true, occupation: true } },
+        equipments: { select: { id: true, model: true, manufacturer: true, license_plate: true } }
+      },
     });
     if (!found) return null;
     return new Team({
       id: found.id,
       name: found.name,
-      employees: found.employees.map((e) => e.id),
-      equipments: found.equipments.map((e) => e.id),
+      employees: found.employees,
+      equipments: found.equipments,
       createdAt: found.createdAt,
     });
   }
@@ -81,7 +87,10 @@ export class PrismaTeamsRepository implements TeamsRepository {
         orderBy: { [orderByField]: input.sort_dir ?? 'desc' },
         skip,
         take,
-        include: { employees: { select: { id: true } }, equipments: { select: { id: true } } },
+        include: {
+          employees: { select: { id: true, registration: true, full_name: true, occupation: true } },
+          equipments: { select: { id: true, model: true, manufacturer: true, license_plate: true } }
+        },
       }),
     ]);
 
@@ -92,8 +101,8 @@ export class PrismaTeamsRepository implements TeamsRepository {
           new Team({
             id: t.id,
             name: t.name,
-            employees: t.employees.map((e) => e.id),
-            equipments: t.equipments.map((e) => e.id),
+            employees: t.employees,
+            equipments: t.equipments,
             createdAt: t.createdAt,
           }),
       ),
@@ -126,15 +135,18 @@ export class PrismaTeamsRepository implements TeamsRepository {
 
         return await tx.team.findUniqueOrThrow({
           where: { id },
-          include: { employees: { select: { id: true } }, equipments: { select: { id: true } } },
+          include: {
+            employees: { select: { id: true, registration: true, full_name: true, occupation: true } },
+            equipments: { select: { id: true, model: true, manufacturer: true, license_plate: true } }
+          },
         });
       });
 
       return new Team({
         id: updated.id,
         name: updated.name,
-        employees: updated.employees.map((e) => e.id),
-        equipments: updated.equipments.map((e) => e.id),
+        employees: updated.employees,
+        equipments: updated.equipments,
         createdAt: updated.createdAt,
       });
     } catch (e) {

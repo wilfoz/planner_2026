@@ -57,7 +57,7 @@ export class MapboxMapComponent implements OnInit, AfterViewInit, OnDestroy {
   constructor() {
     // Update 3D layers when towers/cables change
     effect(() => {
-      if (!this.overlay) return;
+      if (!this.overlay || !this.map) return;
 
       const towers = this.visibleTowers();
       const spans = this.spans();
@@ -66,7 +66,15 @@ export class MapboxMapComponent implements OnInit, AfterViewInit, OnDestroy {
       let layers: any[] = [];
 
       if (this.show3D() && settings) {
-        const towerLayers = this.tower3DLayer.getLayers(towers, { towerVerticalOffset: settings.towerVerticalOffset });
+        // Create terrain elevation getter that queries Mapbox terrain
+        const getTerrainElevation = (lng: number, lat: number): number => {
+          return this.map.queryTerrainElevation({ lng, lat }) ?? 0;
+        };
+
+        const towerLayers = this.tower3DLayer.getLayers(towers, {
+          towerVerticalOffset: settings.towerVerticalOffset,
+          getTerrainElevation
+        });
         const cableLayers = this.cableLayer.getLayers(this.towers(), spans, settings);
         const anchorLayers = this.anchorLayer.getLayers(this.towers(), settings);
         layers = [...towerLayers, ...cableLayers, ...anchorLayers];
@@ -183,7 +191,13 @@ export class MapboxMapComponent implements OnInit, AfterViewInit, OnDestroy {
       const towers = this.visibleTowers();
       const settings = this.cableSettings();
       if (this.show3D() && settings) {
-        const towerLayers = this.tower3DLayer.getLayers(towers, { towerVerticalOffset: settings.towerVerticalOffset });
+        const getTerrainElevation = (lng: number, lat: number): number => {
+          return this.map.queryTerrainElevation({ lng, lat }) ?? 0;
+        };
+        const towerLayers = this.tower3DLayer.getLayers(towers, {
+          towerVerticalOffset: settings.towerVerticalOffset,
+          getTerrainElevation
+        });
         const cableLayers = this.cableLayer.getLayers(this.towers(), this.spans(), settings);
         const anchorLayers = this.anchorLayer.getLayers(this.towers(), settings);
         this.overlay.setProps({ layers: [...towerLayers, ...cableLayers, ...anchorLayers] });

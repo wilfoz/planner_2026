@@ -26,6 +26,7 @@ describe('CreateTaskUseCase', () => {
       group: 'Group A',
       name: 'Foundation Work',
       unit: 'm3',
+      work_id: 'work-id-123',
     };
 
     const createdTask = new TaskEntity({
@@ -48,6 +49,7 @@ describe('CreateTaskUseCase', () => {
       group: 'Group A',
       name: 'Foundation Work',
       unit: 'm3',
+      work_id: 'work-id-123',
     });
 
     expect(result).toEqual({

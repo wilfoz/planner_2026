@@ -145,7 +145,7 @@ export class TowerImportService {
             if (code && towerNum) {
               towers.push({
                 code: Number(code),
-                tower: String(towerNum),
+                tower_number: String(towerNum),
                 type: type ? String(type) : '',
                 coordinates: {
                   lat: finalLat,

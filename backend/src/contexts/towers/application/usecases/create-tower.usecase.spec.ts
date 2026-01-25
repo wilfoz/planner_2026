@@ -22,7 +22,7 @@ describe('CreateTowerUseCase', () => {
   it('should create a tower with all fields', async () => {
     const input = {
       code: 1,
-      tower: 'T-001',
+      tower_number: 'T-001',
       type: 'suspension',
       coordinates: { lat: -23.55, lng: -46.63, altitude: 0 },
       distance: 100.5,
@@ -80,7 +80,7 @@ describe('CreateTowerUseCase', () => {
     expect(result).toEqual({
       id: 'tower-id-123',
       code: 1,
-      tower: 'T-001',
+      tower_number: 'T-001',
       type: 'suspension',
       coordinates: { lat: -23.55, lng: -46.63, altitude: 0 },
       distance: 100.5,
@@ -93,13 +93,14 @@ describe('CreateTowerUseCase', () => {
       structureType: 'suspension',
       color: 'red',
       isHidden: false,
+      work_id: 'work-123',
     });
   });
 
   it('should create a tower with optional fields as null', async () => {
     const input = {
       code: 2,
-      tower: 'T-002',
+      tower_number: 'T-002',
       type: 'anchor',
       coordinates: { lat: -23.55, lng: -46.63, altitude: 0 },
       work_id: 'work-456',

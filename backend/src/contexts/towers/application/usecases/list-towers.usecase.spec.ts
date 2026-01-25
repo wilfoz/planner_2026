@@ -76,8 +76,8 @@ describe('ListTowersUseCase', () => {
     expect(result.meta.total).toBe(2);
     expect(result.meta.last_page).toBe(1);
     expect(result.data).toHaveLength(2);
-    expect(result.data[0]!.tower).toBe('T-001');
-    expect(result.data[1]!.tower).toBe('T-002');
+    expect(result.data[0]!.tower_number).toBe('T-001');
+    expect(result.data[1]!.tower_number).toBe('T-002');
   });
 
   it('should use default pagination values', async () => {
