@@ -1,5 +1,7 @@
 
-import { Body, Controller, Delete, Get, Param, Post, Put, Query } from '@nestjs/common';
+import {
+  Body, Controller, Delete, Get, Param, Post, Put, Query   UseGuards,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 
 import { WorkOutput } from '@/contexts/works/application/dto/work.output';
@@ -11,9 +13,11 @@ import { UpdateWorkUseCase } from '@/contexts/works/application/usecases/update-
 import { CreateWorkDto } from '@/contexts/works/infrastructure/dto/create-work.dto';
 import { ListWorksQueryDto } from '@/contexts/works/infrastructure/dto/list-works.query.dto';
 import { UpdateWorkDto } from '@/contexts/works/infrastructure/dto/update-work.dto';
+import { AuthGuard } from '@/shared/infrastructure/auth/auth.guard';
 
 @ApiTags('Works')
 @ApiBearerAuth()
+@UseGuards(AuthGuard)
 @Controller('works')
 export class WorksController {
   constructor(

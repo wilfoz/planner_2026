@@ -8,6 +8,7 @@ export interface Work {
   lightning_rod?: number;
   start_date?: string | Date;
   end_date?: string | Date;
+  states?: string[];
 }
 
 export interface CreateWorkDto {
@@ -19,6 +20,7 @@ export interface CreateWorkDto {
   lightning_rod?: number;
   start_date?: string | Date;
   end_date?: string | Date;
+  states?: string[];
 }
 
 export interface UpdateWorkDto extends Partial<CreateWorkDto> { }

@@ -31,5 +31,8 @@ export class WorkOutput {
   end_date!: Date | null;
 
   @ApiProperty()
+  states!: string[];
+
+  @ApiProperty()
   createdAt!: Date;
 }

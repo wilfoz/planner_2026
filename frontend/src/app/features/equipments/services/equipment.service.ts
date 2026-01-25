@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { Equipment, CreateEquipmentDto, UpdateEquipmentDto } from '../../../core/models/equipment.model';
 
@@ -12,11 +12,15 @@ export class EquipmentService {
   private apiUrl = `${environment.apiUrl}/equipments`;
 
   getAll(): Observable<Equipment[]> {
-    return this.http.get<Equipment[]>(this.apiUrl);
+    return this.http.get<any>(this.apiUrl).pipe(
+      map(response => response.data || [])
+    );
   }
 
   getById(id: string): Observable<Equipment> {
-    return this.http.get<Equipment>(`${this.apiUrl}/${id}`);
+    return this.http.get<any>(`${this.apiUrl}/${id}`).pipe(
+      map(response => response.data || response)
+    );
   }
 
   create(equipment: CreateEquipmentDto): Observable<Equipment> {

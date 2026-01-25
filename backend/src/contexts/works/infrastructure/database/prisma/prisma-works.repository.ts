@@ -21,6 +21,7 @@ function mapWork(record: PrismaWork): Work {
     lightning_rod: record.lightning_rod,
     start_date: record.start_date,
     end_date: record.end_date,
+    states: record.states,
     createdAt: record.createdAt,
   });
 }
@@ -37,6 +38,7 @@ export class PrismaWorksRepository implements WorksRepository {
     lightning_rod?: number | null;
     start_date?: Date | null;
     end_date?: Date | null;
+    states?: string[];
   }): Promise<Work> {
     const created = await this.prisma.work.create({
       data: {
@@ -48,6 +50,7 @@ export class PrismaWorksRepository implements WorksRepository {
         lightning_rod: input.lightning_rod,
         start_date: input.start_date,
         end_date: input.end_date,
+        states: input.states,
       },
     });
 
@@ -101,6 +104,7 @@ export class PrismaWorksRepository implements WorksRepository {
       lightning_rod?: number | null;
       start_date?: Date | null;
       end_date?: Date | null;
+      states?: string[];
     }>,
   ): Promise<Work> {
     try {
@@ -115,6 +119,7 @@ export class PrismaWorksRepository implements WorksRepository {
           ...(input.lightning_rod !== undefined ? { lightning_rod: input.lightning_rod } : {}),
           ...(input.start_date !== undefined ? { start_date: input.start_date } : {}),
           ...(input.end_date !== undefined ? { end_date: input.end_date } : {}),
+          ...(input.states !== undefined ? { states: input.states } : {}),
         },
       });
       return mapWork(updated);
@@ -126,7 +131,11 @@ export class PrismaWorksRepository implements WorksRepository {
 
   async delete(id: string): Promise<void> {
     try {
-      await this.prisma.work.delete({ where: { id } });
+      await this.prisma.$transaction(async (tx) => {
+        await tx.tower.deleteMany({ where: { work_id: id } });
+        await tx.production.deleteMany({ where: { work_id: id } });
+        await tx.work.delete({ where: { id } });
+      });
     } catch (e) {
       if (isPrismaRecordNotFoundError(e)) throw new NotFoundError('Work not found');
       throw e;

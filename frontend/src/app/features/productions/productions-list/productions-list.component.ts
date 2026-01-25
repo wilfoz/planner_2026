@@ -1,6 +1,7 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal, effect } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ProductionService } from '../services/production.service';
+import { WorkContextService } from '../../../core/services/work-context.service';
 import { Production } from '../../../core/models/production.model';
 import { LucideAngularModule, Plus, Edit, Trash2, Eye, Activity } from 'lucide-angular';
 
@@ -12,6 +13,7 @@ import { LucideAngularModule, Plus, Edit, Trash2, Eye, Activity } from 'lucide-a
 })
 export class ProductionsListComponent {
   private productionService = inject(ProductionService);
+  private workContextService = inject(WorkContextService);
 
   productions = signal<Production[]>([]);
   readonly PlusIcon = Plus;
@@ -20,16 +22,26 @@ export class ProductionsListComponent {
   readonly EyeIcon = Eye;
 
   constructor() {
-    this.loadProductions();
+    effect(() => {
+      const workId = this.workContextService.selectedWorkId();
+      if (workId) {
+        this.loadProductions(workId);
+      } else {
+        this.productions.set([]);
+      }
+    });
   }
 
-  loadProductions() {
-    this.productionService.getAll().subscribe(data => this.productions.set(data));
+  loadProductions(workId: string) {
+    this.productionService.getByWorkId(workId).subscribe(data => this.productions.set(data));
   }
 
   deleteProduction(id: string) {
     if (confirm('Tem certeza que deseja excluir esta produção?')) {
-      this.productionService.delete(id).subscribe(() => this.loadProductions());
+      this.productionService.delete(id).subscribe(() => {
+        const workId = this.workContextService.selectedWorkId();
+        if (workId) this.loadProductions(workId);
+      });
     }
   }
 

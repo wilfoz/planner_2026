@@ -27,6 +27,36 @@ export class WorksFormComponent implements OnInit {
   readonly CancelIcon = X;
   readonly ArrowLeftIcon = ArrowLeft;
 
+  readonly BRAZILIAN_STATES = [
+    { value: 'AC', label: 'Acre' },
+    { value: 'AL', label: 'Alagoas' },
+    { value: 'AP', label: 'Amapá' },
+    { value: 'AM', label: 'Amazonas' },
+    { value: 'BA', label: 'Bahia' },
+    { value: 'CE', label: 'Ceará' },
+    { value: 'DF', label: 'Distrito Federal' },
+    { value: 'ES', label: 'Espírito Santo' },
+    { value: 'GO', label: 'Goiás' },
+    { value: 'MA', label: 'Maranhão' },
+    { value: 'MT', label: 'Mato Grosso' },
+    { value: 'MS', label: 'Mato Grosso do Sul' },
+    { value: 'MG', label: 'Minas Gerais' },
+    { value: 'PA', label: 'Pará' },
+    { value: 'PB', label: 'Paraíba' },
+    { value: 'PR', label: 'Paraná' },
+    { value: 'PE', label: 'Pernambuco' },
+    { value: 'PI', label: 'Piauí' },
+    { value: 'RJ', label: 'Rio de Janeiro' },
+    { value: 'RN', label: 'Rio Grande do Norte' },
+    { value: 'RS', label: 'Rio Grande do Sul' },
+    { value: 'RO', label: 'Rondônia' },
+    { value: 'RR', label: 'Roraima' },
+    { value: 'SC', label: 'Santa Catarina' },
+    { value: 'SP', label: 'São Paulo' },
+    { value: 'SE', label: 'Sergipe' },
+    { value: 'TO', label: 'Tocantins' }
+  ];
+
   workForm = this.fb.group({
     name: ['', Validators.required],
     tension: [undefined as number | undefined, Validators.required],
@@ -35,7 +65,8 @@ export class WorksFormComponent implements OnInit {
     circuits: [undefined as number | undefined],
     lightning_rod: [undefined as number | undefined],
     start_date: ['', Validators.required],
-    end_date: ['']
+    end_date: [''],
+    states: [[] as string[]]
   });
 
   ngOnInit() {
@@ -60,13 +91,25 @@ export class WorksFormComponent implements OnInit {
           phases: work.phases,
           circuits: work.circuits,
           lightning_rod: work.lightning_rod,
-          start_date: new Date(work.start_date!).toISOString().split('T')[0], // Simple date handling
-          end_date: work.end_date ? new Date(work.end_date).toISOString().split('T')[0] : ''
+          start_date: this.formatDate(work.start_date),
+          end_date: this.formatDate(work.end_date),
+          states: work.states ?? []
         });
         this.isLoading.set(false);
       },
       error: () => this.isLoading.set(false)
     });
+  }
+
+  private formatDate(date: string | Date | undefined): string {
+    if (!date) return '';
+    try {
+      const d = new Date(date);
+      if (isNaN(d.getTime())) return '';
+      return d.toISOString().split('T')[0];
+    } catch {
+      return '';
+    }
   }
 
   onSubmit() {

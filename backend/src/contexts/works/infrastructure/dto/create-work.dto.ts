@@ -42,4 +42,9 @@ export class CreateWorkDto {
   @IsOptional()
   @IsDateString()
   end_date?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString({ each: true })
+  states?: string[];
 }

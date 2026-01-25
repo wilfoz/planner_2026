@@ -6,7 +6,7 @@ import { PageInput } from '@/shared/pagination/pagination';
 import { isPrismaRecordNotFoundError } from '@/shared/infrastructure/database/prisma/prisma-errors';
 
 export class PrismaTaskRepository implements TaskRepository {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   async create(input: { code: number; stage: string; group: string; name: string; unit: string }): Promise<TaskEntity> {
     const created = await this.prisma.task.create({ data: input });
@@ -26,13 +26,13 @@ export class PrismaTaskRepository implements TaskRepository {
 
     const where = filter
       ? {
-          OR: [
-            { name: { contains: filter, mode: 'insensitive' as const } },
-            { stage: { contains: filter, mode: 'insensitive' as const } },
-            { group: { contains: filter, mode: 'insensitive' as const } },
-            { unit: { contains: filter, mode: 'insensitive' as const } },
-          ],
-        }
+        OR: [
+          { name: { contains: filter, mode: 'insensitive' as const } },
+          { stage: { contains: filter, mode: 'insensitive' as const } },
+          { group: { contains: filter, mode: 'insensitive' as const } },
+          { unit: { contains: filter, mode: 'insensitive' as const } },
+        ],
+      }
       : {};
 
     const orderByField =
@@ -71,7 +71,12 @@ export class PrismaTaskRepository implements TaskRepository {
 
   async delete(id: string): Promise<void> {
     try {
-      await this.prisma.task.delete({ where: { id } });
+      await this.prisma.$transaction(async (tx) => {
+        // Since Task has a 1-to-1 or 1-to-many relation with Production (schema dependent), we should safe delete.
+        // Assuming Task 1-1 Production based on schema (production -> task_id unique).
+        await tx.production.deleteMany({ where: { task_id: id } });
+        await tx.task.delete({ where: { id } });
+      });
     } catch (e) {
       if (isPrismaRecordNotFoundError(e)) throw new NotFoundError('Task not found');
       throw e;

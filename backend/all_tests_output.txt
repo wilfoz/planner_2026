@@ -1,0 +1,87 @@
+
+> lt-planner@1.0.0 test:e2e
+> dotenv -e .env.test -- jest -c jest.e2e.config.js
+
+warn The configuration property `package.json#prisma` is deprecated and will be removed in Prisma 7. Please migrate to a Prisma config file (e.g., `prisma.config.ts`).
+For more information, see: https://pris.ly/prisma-config
+
+warn The configuration property `package.json#prisma` is deprecated and will be removed in Prisma 7. Please migrate to a Prisma config file (e.g., `prisma.config.ts`).
+For more information, see: https://pris.ly/prisma-config
+
+warn The configuration property `package.json#prisma` is deprecated and will be removed in Prisma 7. Please migrate to a Prisma config file (e.g., `prisma.config.ts`).
+For more information, see: https://pris.ly/prisma-config
+
+Environment variables loaded from .env
+Environment variables loaded from .env
+Environment variables loaded from .env
+Prisma schema loaded from src\shared\infrastructure\database\prisma\schema.prisma
+Datasource "db": PostgreSQL database "lt-db", schema "test" at "127.0.0.1:5432"
+Prisma schema loaded from src\shared\infrastructure\database\prisma\schema.prisma
+Datasource "db": PostgreSQL database "lt-db", schema "test" at "127.0.0.1:5432"
+Prisma schema loaded from src\shared\infrastructure\database\prisma\schema.prisma
+Datasource "db": PostgreSQL database "lt-db", schema "test" at "127.0.0.1:5432"
+
+1 migration found in prisma/migrations
+
+
+1 migration found in prisma/migrations
+
+
+1 migration found in prisma/migrations
+
+
+No pending migrations to apply.
+
+No pending migrations to apply.
+
+No pending migrations to apply.
+FAIL test/productions.e2e-spec.ts (8.345 s)
+  ● Productions (e2e) › create and list productions
+
+    PrismaClientKnownRequestError: 
+    Invalid `prisma.work.deleteMany()` invocation in
+    C:\Users\Wilerson\Desktop\LT-PLANNER\lt-budget\backend\test\productions.e2e-spec.ts:24:23
+
+      21 // Cleanup
+      22 await prisma.production.deleteMany();
+      23 await prisma.task.deleteMany();
+    → 24 await prisma.work.deleteMany(
+    Foreign key constraint violated on the constraint: `towers_work_id_fkey`
+
+    [0m [90m 22 |[39m     [36mawait[39m prisma[33m.[39mproduction[33m.[39mdeleteMany()[33m;[39m
+     [90m 23 |[39m     [36mawait[39m prisma[33m.[39mtask[33m.[39mdeleteMany()[33m;[39m
+    [31m[1m>[22m[39m[90m 24 |[39m     [36mawait[39m prisma[33m.[39mwork[33m.[39mdeleteMany()[33m;[39m
+     [90m    |[39m     [31m[1m^[22m[39m
+     [90m 25 |[39m
+     [90m 26 |[39m     [36mconst[39m moduleRef [33m=[39m [36mawait[39m [33mTest[39m[33m.[39mcreateTestingModule({ imports[33m:[39m [[33mAppModule[39m] })[33m.[39mcompile()[33m;[39m
+     [90m 27 |[39m     app [33m=[39m moduleRef[33m.[39mcreateNestApplication[33m<[39m[33mNestFastifyApplication[39m[33m>[39m([36mnew[39m [33mFastifyAdapter[39m())[33m;[39m[0m
+
+      at ei.handleRequestError (node_modules/@prisma/client/src/runtime/RequestHandler.ts:228:13)
+      at ei.handleAndLogRequestError (node_modules/@prisma/client/src/runtime/RequestHandler.ts:174:12)
+      at ei.request (node_modules/@prisma/client/src/runtime/RequestHandler.ts:143:12)
+      at a (node_modules/@prisma/client/src/runtime/getPrismaClient.ts:833:24)
+      at Object.<anonymous> (test/productions.e2e-spec.ts:24:5)
+
+
+  ● Test suite failed to run
+
+    TypeError: Cannot read properties of undefined (reading 'close')
+
+    [0m [90m 54 |[39m
+     [90m 55 |[39m   afterAll([36masync[39m () [33m=>[39m {
+    [31m[1m>[22m[39m[90m 56 |[39m     [36mawait[39m app[33m.[39mclose()[33m;[39m
+     [90m    |[39m               [31m[1m^[22m[39m
+     [90m 57 |[39m     [36mawait[39m prisma[33m.[39m$disconnect()[33m;[39m
+     [90m 58 |[39m   })[33m;[39m
+     [90m 59 |[39m[0m
+
+      at Object.<anonymous> (test/productions.e2e-spec.ts:56:15)
+
+PASS test/towers.e2e-spec.ts (8.722 s)
+PASS test/users.e2e-spec.ts (8.905 s)
+
+Test Suites: 1 failed, 2 passed, 3 total
+Tests:       1 failed, 2 passed, 3 total
+Snapshots:   0 total
+Time:        9.751 s, estimated 11 s
+Ran all test suites.

@@ -45,6 +45,7 @@ model Work {
   lightning_rod Int?
   start_date DateTime?
   end_date   DateTime?
+  states     String[]  @default([])
   createdAt  DateTime  @default(now())
 
   towers      Tower[]

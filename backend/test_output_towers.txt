@@ -1,0 +1,53 @@
+
+> lt-planner@1.0.0 test:e2e
+> dotenv -e .env.test -- jest -c jest.e2e.config.js test/towers.e2e-spec.ts
+
+warn The configuration property `package.json#prisma` is deprecated and will be removed in Prisma 7. Please migrate to a Prisma config file (e.g., `prisma.config.ts`).
+For more information, see: https://pris.ly/prisma-config
+
+Environment variables loaded from .env
+Prisma schema loaded from src\shared\infrastructure\database\prisma\schema.prisma
+Datasource "db": PostgreSQL database "lt-db", schema "test" at "127.0.0.1:5432"
+
+1 migration found in prisma/migrations
+
+
+┌─────────────────────────────────────────────────────────┐
+│  Update available 6.19.2 -> 7.3.0                       │
+│                                                         │
+│  This is a major update - please follow the guide at    │
+│  https://pris.ly/d/major-version-upgrade                │
+│                                                         │
+│  Run the following to update                            │
+│    npm i --save-dev prisma@latest                       │
+│    npm i @prisma/client@latest                          │
+└─────────────────────────────────────────────────────────┘
+No pending migrations to apply.
+FAIL test/towers.e2e-spec.ts (6.536 s)
+  Towers (e2e)
+    × create and list towers (71 ms)
+
+  ● Towers (e2e) › create and list towers
+
+    expect(received).toHaveProperty(path)
+
+    Expected path: "id"
+    Received path: []
+
+    Received value: {"data": {"code": 1, "coordinates": {"altitude": 30, "lat": 10, "lng": 20}, "created_at": "2026-01-24T19:58:41.340Z", "distance": null, "embargo": null, "foundations": [], "height": null, "id": "1fb06584-2d0c-459e-abbc-17d04f847b8e", "tower": "T-01", "type": "Suspension", "weight": null}}
+
+    [0m [90m 60 |[39m       [33m.[39mexpect([35m201[39m)[33m;[39m
+     [90m 61 |[39m
+    [31m[1m>[22m[39m[90m 62 |[39m     expect(create[33m.[39mbody)[33m.[39mtoHaveProperty([32m'id'[39m)[33m;[39m
+     [90m    |[39m                         [31m[1m^[22m[39m
+     [90m 63 |[39m     expect(create[33m.[39mbody)[33m.[39mtoHaveProperty([32m'tower_number'[39m[33m,[39m [32m'T-01'[39m)[33m;[39m
+     [90m 64 |[39m
+     [90m 65 |[39m     [90m// List[39m[0m
+
+      at Object.<anonymous> (test/towers.e2e-spec.ts:62:25)
+
+Test Suites: 1 failed, 1 total
+Tests:       1 failed, 1 total
+Snapshots:   0 total
+Time:        6.63 s, estimated 7 s
+Ran all test suites matching /test\\towers.e2e-spec.ts/i.

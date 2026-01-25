@@ -11,6 +11,7 @@ export class Work {
       lightning_rod?: number | null;
       start_date?: Date | null;
       end_date?: Date | null;
+      states: string[];
       createdAt: Date;
     },
   ) { }

@@ -22,6 +22,7 @@ graph LR
 ### 3.1 Frontend (SPA)
 *   **Tecnologia:** Angular 18+ (Standalone Components), Tailwind CSS.
 *   **Responsabilidade:** Interface do usuário, renderização do mapa 3D, gestão de estado (Signals), validações de formulário (Reactive Forms).
+*   **Gestão de Contexto:** O sistema impõe que uma Obra (Work) esteja selecionada para permitir acesso às funcionalidades de Torres, Produções e Mapa. O estado da obra selecionada é persistido.
 *   **Módulos Principais:**
     *   `MapModule`: Integração com Mapbox GL e Deck.gl para visualização 3D.
     *   `ProductionModule`: Formulários de lançamento e listagens.
@@ -45,7 +46,8 @@ graph LR
 ## 4. Fluxo de Dados Principal
 
 1.  **Requisição:** O Frontend envia requisições HTTP (GET/POST/PUT/DELETE) para o Backend.
-2.  **Autenticação:** O Backend valida o token JWT no Guard de autenticação.
+2.  **Verificação de Contexto:** O Frontend verifica se há uma Obra Selecionada (Local Storage/Signal) para rotas protegidas pelo `WorkGuard`.
+3.  **Autenticação:** O Backend valida o token JWT no Guard de autenticação.
 3.  **Processamento:** O Controller encaminha para o Service/UseCase correspondente.
 4.  **Persistência:** O Service utiliza o Prisma Repository para interagir com o PostgreSQL.
 5.  **Resposta:** O Backend retorna DTOs padronizados (JSON) para o Frontend.

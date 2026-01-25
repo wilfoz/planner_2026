@@ -11,6 +11,7 @@ export function mapWorkToOutput(work: Work): WorkOutput {
     phases: work.props.phases ?? null,
     circuits: work.props.circuits ?? null,
     lightning_rod: work.props.lightning_rod ?? null,
+    states: work.props.states ?? [],
     start_date: work.props.start_date ?? null,
     end_date: work.props.end_date ?? null,
     createdAt: work.props.createdAt,

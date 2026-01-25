@@ -1,7 +1,8 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal, effect } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { TowerImportService } from '../services/tower-import.service';
 import { TowerService } from '../services/tower.service';
+import { WorkContextService } from '../../../core/services/work-context.service';
 import { Tower, CreateTowerDto } from '../../../core/models/tower.model';
 import { LucideAngularModule, Plus, Edit, Trash2, Eye, Radio, UploadCloud } from 'lucide-angular';
 
@@ -14,6 +15,7 @@ import { LucideAngularModule, Plus, Edit, Trash2, Eye, Radio, UploadCloud } from
 export class TowersListComponent {
   private towerService = inject(TowerService);
   private towerImportService = inject(TowerImportService);
+  private workContextService = inject(WorkContextService);
 
   towers = signal<Tower[]>([]);
   isImporting = signal<boolean>(false);
@@ -26,16 +28,26 @@ export class TowersListComponent {
   readonly UploadIcon = UploadCloud;
 
   constructor() {
-    this.loadTowers();
+    effect(() => {
+      const workId = this.workContextService.selectedWorkId();
+      if (workId) {
+        this.loadTowers(workId);
+      } else {
+        this.towers.set([]);
+      }
+    });
   }
 
-  loadTowers() {
-    this.towerService.getAll().subscribe(data => this.towers.set(data));
+  loadTowers(workId: string) {
+    this.towerService.getByWorkId(workId).subscribe(data => this.towers.set(data));
   }
 
   deleteTower(id: string) {
     if (confirm('Tem certeza que deseja excluir esta torre?')) {
-      this.towerService.delete(id).subscribe(() => this.loadTowers());
+      this.towerService.delete(id).subscribe(() => {
+        const workId = this.workContextService.selectedWorkId();
+        if (workId) this.loadTowers(workId);
+      });
     }
   }
 
@@ -75,10 +87,11 @@ export class TowersListComponent {
       }
 
       alert(`${importedCount} torres importadas com sucesso!`);
-      this.loadTowers();
-    } catch (error) {
+      const workId = this.workContextService.selectedWorkId();
+      if (workId) this.loadTowers(workId);
+    } catch (error: any) {
       console.error('Error importing file', error);
-      alert('Erro ao importar arquivo.');
+      alert(error.message || 'Erro ao importar arquivo.');
     } finally {
       this.isImporting.set(false);
       event.target.value = ''; // Reset input
