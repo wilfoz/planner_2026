@@ -1,18 +1,20 @@
 import { Routes } from '@angular/router';
 import { LoginComponent } from './features/auth/login/login.component';
 import { DashboardComponent } from './features/dashboard/dashboard.component';
+import { LandingComponent } from './features/landing/landing.component';
 import { MainLayoutComponent } from './layouts/main-layout/main-layout.component';
 import { authGuard } from './core/guards/auth.guard';
 import { workGuard } from './core/guards/work.guard';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
+  { path: '', component: LandingComponent, canActivate: [authGuard], pathMatch: 'full' },
   {
     path: '',
     component: MainLayoutComponent,
     canActivate: [authGuard],
     children: [
-      { path: '', component: DashboardComponent, canActivate: [workGuard] },
+      { path: 'dashboard', component: DashboardComponent },
       {
         path: 'works',
         loadChildren: () => import('./features/works/works.routes').then(m => m.worksRoutes)

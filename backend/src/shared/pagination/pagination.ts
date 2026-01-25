@@ -6,6 +6,7 @@ export type PageInput = {
   sort?: string;
   sort_dir?: SortDir;
   filter?: string;
+  work_id?: string;
 };
 
 export function normalizePageInput(input: Partial<PageInput>): PageInput {
@@ -14,8 +15,9 @@ export function normalizePageInput(input: Partial<PageInput>): PageInput {
   const sort = input.sort;
   const sort_dir = (input.sort_dir ?? 'desc') as SortDir;
   const filter = input.filter;
+  const work_id = input.work_id;
 
-  return { page, per_page, sort, sort_dir, filter };
+  return { page, per_page, sort, sort_dir, filter, work_id };
 }
 
 export function buildPaginationMeta(input: { page: number; per_page: number; total: number }) {

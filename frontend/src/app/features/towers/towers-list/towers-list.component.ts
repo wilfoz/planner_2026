@@ -5,6 +5,8 @@ import { TowerService } from '../services/tower.service';
 import { WorkContextService } from '../../../core/services/work-context.service';
 import { Tower, CreateTowerDto } from '../../../core/models/tower.model';
 import { LucideAngularModule, Plus, Edit, Trash2, Eye, Radio, UploadCloud } from 'lucide-angular';
+import { ToastService } from '../../../shared/components/toast/toast.service';
+import { LoadingService } from '../../../shared/services/loading.service';
 
 @Component({
   selector: 'app-towers-list',
@@ -16,6 +18,8 @@ export class TowersListComponent {
   private towerService = inject(TowerService);
   private towerImportService = inject(TowerImportService);
   private workContextService = inject(WorkContextService);
+  private toastService = inject(ToastService);
+  private loadingService = inject(LoadingService);
 
   towers = signal<Tower[]>([]);
   isImporting = signal<boolean>(false);
@@ -56,44 +60,52 @@ export class TowersListComponent {
     if (!file) return;
 
     this.isImporting.set(true);
+    this.loadingService.start();
+
     try {
       const towersDto = await this.towerImportService.importFromFile(file);
 
-      // Create towers sequentially to handle potential errors better or use forkJoin if concurrency is safe
-      // For now, let's do it simply
-      let importedCount = 0;
+      let successCount = 0;
+      let errorCount = 0;
+
       for (const dto of towersDto) {
-        // You might want to handle work_id here if it's not in the excel
-        // For now assuming it is or backend handles it (backend marks it required though)
-        // If work_id is missing, we might need a dialog or default value. 
-        // Let's assume for now the excel has it or we pass a default if needed.
         if (!dto.work_id) {
           console.warn('Tower skipped due to missing work_id', dto);
+          errorCount++;
           continue;
         }
 
-        await new Promise((resolve, reject) => {
+        await new Promise((resolve) => {
           this.towerService.create(dto).subscribe({
             next: () => {
-              importedCount++;
+              successCount++;
               resolve(true);
             },
             error: (err) => {
               console.error('Error creating tower', err);
-              resolve(false); // Continue even if one fails
+              errorCount++;
+              resolve(false);
             }
           });
         });
       }
 
-      alert(`${importedCount} torres importadas com sucesso!`);
+      if (successCount > 0) {
+        this.toastService.success(`${successCount} torres importadas com sucesso!`, 'Importação Concluída');
+      }
+
+      if (errorCount > 0) {
+        this.toastService.warning(`${errorCount} torres falharam ou foram ignoradas.`, 'Atenção');
+      }
+
       const workId = this.workContextService.selectedWorkId();
       if (workId) this.loadTowers(workId);
     } catch (error: any) {
       console.error('Error importing file', error);
-      alert(error.message || 'Erro ao importar arquivo.');
+      this.toastService.error(error.message || 'Erro ao importar arquivo.', 'Erro na Importação');
     } finally {
       this.isImporting.set(false);
+      this.loadingService.stop();
       event.target.value = ''; // Reset input
     }
   }

@@ -35,58 +35,134 @@ export class TowerImportService {
         try {
           const data = new Uint8Array(e.target.result);
           const workbook = XLSX.read(data, { type: 'array' });
-
           const firstSheetName = workbook.SheetNames[0];
           const worksheet = workbook.Sheets[firstSheetName];
 
-          const jsonData: any[] = XLSX.utils.sheet_to_json(worksheet);
+          // Use 'header: 1' to get raw arrays of rows, so we can process headers manually
+          const rows: any[][] = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
 
-          const towers: CreateTowerDto[] = jsonData.map((row: any) => {
-            let lat = row.lat || 0;
-            let lng = row.lng || 0;
+          if (rows.length < 2) {
+            throw new Error('O arquivo parece estar vazio ou sem cabeçalho.');
+          }
 
-            // Check if UTM coordinates are provided
-            if (row.utm_easting && row.utm_northing) {
-              const zone = row.utm_zone || defaultZone;
-              const band = row.utm_band || 'K'; // Default band if missing? 'K' is roughly brazil? 
-              // Wait, Brazil is mostly M, L, K. 'K' is around Minas/Bahia. 'J' is South.
-              // Actually, utmToLatLon logic for South Hemisphere:
-              // y = (band >= 'N') ? northing : northing - 10000000;
-              // If we are in Southern Hemisphere (Brazil), northing is > 0 but we treat it differently?
-              // Standard UTM northing in South is 10,000,000 at equator decreasing southwards.
-              // Logic in convert_utm.js: const y = (band >= 'N') ? northing : northing - 10000000;
-              // Wait, if input northing is standard UTM "Southern", it is usually large (e.g., 7,000,000).
-              // If the formula expects "true" y relative to equator, for south it's negative.
-              // If (band >= 'N') is false (South), y = northing - 10,000,000.
-              // So if northing is 7,500,000, y = -2,500,000. This is correct.
-              // So we definitely need to imply South Hemisphere for Brazil if band is missing.
-              // 'K', 'L', 'M' are all < 'N'. So 'K' works to trigger South logic.
+          // Process headers: normalize to lowercase and remove special chars
+          const rawHeaders = rows[0] as string[];
+          const headers = rawHeaders.map(h =>
+            h ? h.toString().toLowerCase().trim().replace(/[^a-z0-9]/g, '_') : ''
+          );
 
-              const conversion = utmToLatLon(
-                Number(row.utm_easting),
-                Number(row.utm_northing),
-                zone,
-                band
-              );
-              lat = conversion.lat;
-              lng = conversion.lng;
+          // Remove header row
+          const projectRows = rows.slice(1);
+
+          const towers: CreateTowerDto[] = [];
+
+          projectRows.forEach((row) => {
+            // Create a map for this row based on normalized headers
+            const rowMap: any = {};
+            headers.forEach((h, index) => {
+              if (h) rowMap[h] = row[index];
+            });
+
+            // Mapping variations
+            // Helper to parse string number with comma or dot
+            const parseNumber = (val: any): number => {
+              if (typeof val === 'number') return val;
+              if (!val) return 0;
+              // Replace comma with dot and remove non-numeric chars (except dot and minus)
+              const str = String(val).replace(',', '.');
+              return parseFloat(str) || 0;
+            };
+
+            // Mapping variations
+            const code = rowMap['code'] || rowMap['codigo'] || rowMap['torre_id'];
+            const towerNum = rowMap['tower'] || rowMap['tower_number'] || rowMap['tower_numb'] || rowMap['torre'] || rowMap['numero'];
+            const type = rowMap['type'] || rowMap['tipo'];
+            const height = parseNumber(rowMap['height'] || rowMap['altura']);
+            const weight = parseNumber(rowMap['weight'] || rowMap['peso']);
+            const distance = parseNumber(rowMap['distance'] || rowMap['distancia'] || rowMap['vão'] || rowMap['vao']);
+
+            // Coordinate logic
+            let inputLat = parseNumber(rowMap['lat'] || rowMap['latitude']);
+            let inputLng = parseNumber(rowMap['lng'] || rowMap['longitude'] || rowMap['long']);
+
+            // Check if explicit UTM columns exist, otherwise check if lat/lng look like UTM
+            let finalLat = 0;
+            let finalLng = 0;
+            let altitude = parseNumber(rowMap['altitude'] || rowMap['alt']);
+
+            const isExplicitUtm = (rowMap['utm_easting'] || rowMap['easting'] || rowMap['x']) && (rowMap['utm_northing'] || rowMap['northing'] || rowMap['y']);
+
+            if (isExplicitUtm) {
+              const easting = parseNumber(rowMap['utm_easting'] || rowMap['easting'] || rowMap['x']);
+              const northing = parseNumber(rowMap['utm_northing'] || rowMap['northing'] || rowMap['y']);
+              const zone = rowMap['utm_zone'] || rowMap['zone'] || rowMap['zona'] || defaultZone;
+              const band = rowMap['utm_band'] || rowMap['band'] || 'K';
+
+              const conversion = utmToLatLon(easting, northing, zone, band);
+              finalLat = conversion.lat;
+              finalLng = conversion.lng;
+            } else {
+              // Heuristic: If coordinates are huge, they are UTM
+              // Latitude is usually < 90, Longitude < 180.
+              // UTM Northings are millions (e.g., 8,000,000), Eastings are hundreds of thousands (e.g., 200,000).
+
+              // Check if values resemble UTM
+              const lookLikeUtm = Math.abs(inputLat) > 180 || Math.abs(inputLng) > 180;
+
+              if (lookLikeUtm) {
+                // deduce which is Northing and Easting
+                // Northing is usually larger (millions) in Brazil (Suth Hem) or 0-10M globally.
+                // Easting is usually 100k-900k.
+                // From user screenshot: Lat col = 238331 (Easting-ish), Lng col = 8703834 (Northing-ish)
+
+                let easting = 0;
+                let northing = 0;
+
+                if (Math.abs(inputLat) > Math.abs(inputLng)) {
+                  northing = inputLat;
+                  easting = inputLng;
+                } else {
+                  northing = inputLng;
+                  easting = inputLat;
+                }
+
+                // User example: Lat=238331(E), Lng=8703834(N). 
+                // Logic above: Northing=8M, Easting=238k. Correct.
+
+                const zone = rowMap['utm_zone'] || rowMap['zone'] || rowMap['zona'] || defaultZone;
+                const band = rowMap['utm_band'] || rowMap['band'] || 'K';
+
+                const conversion = utmToLatLon(easting, northing, zone, band);
+                finalLat = conversion.lat;
+                finalLng = conversion.lng;
+              } else {
+                // Assume standard lat/lon
+                finalLat = inputLat;
+                finalLng = inputLng;
+              }
             }
 
-            return {
-              code: row.code,
-              tower_number: row.tower ? String(row.tower) : '',
-              type: row.type ? String(row.type) : '',
-              coordinates: {
-                lat: lat,
-                lng: lng,
-                altitude: row.altitude || 0
-              },
-              distance: row.distance,
-              height: row.height,
-              weight: row.weight,
-              work_id: workId
-            };
-          }).filter(t => t.code && t.tower_number);
+            if (code && towerNum) {
+              towers.push({
+                code: Number(code),
+                tower: String(towerNum),
+                type: type ? String(type) : '',
+                coordinates: {
+                  lat: finalLat,
+                  lng: finalLng,
+                  altitude: altitude
+                },
+                distance: distance,
+                height: height,
+                weight: weight,
+                work_id: workId
+              });
+            }
+          });
+
+          if (towers.length === 0) {
+            throw new Error('Nenhuma torre válida encontrada. Verifique os cabeçalhos (Code, Tower, etc).');
+          }
 
           resolve(towers);
         } catch (error) {
