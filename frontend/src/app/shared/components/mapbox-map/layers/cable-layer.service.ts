@@ -27,16 +27,21 @@ export class CableLayerService {
 
       // Generate cables for each enabled anchor
       for (const anchor of anchors.filter(a => a.enabled)) {
+        // With interleaved: true in MapboxOverlay, z is relative to terrain surface
+        // Calculate z as height * verticalRatio (position on tower relative to ground)
+        const startZ = startTower.height * anchor.verticalRatio + settings.towerVerticalOffset;
+        const endZ = endTower.height * anchor.verticalRatio + settings.towerVerticalOffset;
+
         const start: Point3D = {
           x: startTower.lng + this.catenary.metersToLng(anchor.horizontalOffset, startTower.lat),
           y: startTower.lat,
-          z: startTower.altitude + startTower.height * anchor.verticalRatio + settings.towerVerticalOffset
+          z: startZ
         };
 
         const end: Point3D = {
           x: endTower.lng + this.catenary.metersToLng(anchor.horizontalOffset, endTower.lat),
           y: endTower.lat,
-          z: endTower.altitude + endTower.height * anchor.verticalRatio + settings.towerVerticalOffset
+          z: endZ
         };
 
         const points = this.catenary.generateCatenaryPoints(start, end, settings.tension, 30);

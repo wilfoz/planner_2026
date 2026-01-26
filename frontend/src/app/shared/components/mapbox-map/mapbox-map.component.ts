@@ -1,25 +1,22 @@
 import {
   Component, Output, EventEmitter, OnInit, OnDestroy,
-  ElementRef, ViewChild, AfterViewInit, signal, inject, computed, effect, input
+  ElementRef, ViewChild, AfterViewInit, signal, inject, computed, input, NgZone
 } from '@angular/core';
 import { CommonModule, DecimalPipe } from '@angular/common';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Subject, takeUntil } from 'rxjs';
 import mapboxgl, { Map, NavigationControl, FullscreenControl } from 'mapbox-gl';
-import { MapboxOverlay } from '@deck.gl/mapbox';
 import { environment } from '@environments/environment';
 
 import { MapDataService, MapDataResponse } from './services/map-data.service';
 import { MapCacheService } from './services/map-cache.service';
-import { Tower3DLayerService } from './layers/tower-3d-layer.service';
-import { CableLayerService } from './layers/cable-layer.service';
-import { AnchorLayerService } from './layers/anchor-layer.service';
+import { DeckLayerDirective } from './directives/deck-layer.directive';
 import { TowerMap, Span, CableSettings } from './models';
 
 @Component({
   selector: 'app-mapbox-map',
   standalone: true,
-  imports: [CommonModule, DecimalPipe],
+  imports: [CommonModule, DecimalPipe, DeckLayerDirective],
   templateUrl: './mapbox-map.component.html'
 })
 export class MapboxMapComponent implements OnInit, AfterViewInit, OnDestroy {
@@ -34,12 +31,11 @@ export class MapboxMapComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private readonly mapDataService = inject(MapDataService);
   private readonly cacheService = inject(MapCacheService);
-  private readonly tower3DLayer = inject(Tower3DLayerService);
-  private readonly cableLayer = inject(CableLayerService);
-  private readonly anchorLayer = inject(AnchorLayerService);
+  private readonly ngZone = inject(NgZone);
   private readonly destroy$ = new Subject<void>();
-  private map!: Map;
-  private overlay: MapboxOverlay | null = null;
+
+  // Expose map instance as signal for directive binding
+  readonly mapInstance = signal<Map | null>(null);
 
   readonly towers = signal<TowerMap[]>([]);
   readonly spans = signal<Span[]>([]);
@@ -54,35 +50,12 @@ export class MapboxMapComponent implements OnInit, AfterViewInit, OnDestroy {
   readonly visibleTowers = computed(() => this.towers().filter(t => !t.isHidden));
   readonly totalSpans = computed(() => this.spans().length);
 
-  constructor() {
-    // Update 3D layers when towers/cables change
-    effect(() => {
-      if (!this.overlay || !this.map) return;
-
-      const towers = this.visibleTowers();
-      const spans = this.spans();
-      const settings = this.cableSettings();
-
-      let layers: any[] = [];
-
-      if (this.show3D() && settings) {
-        // Create terrain elevation getter that queries Mapbox terrain
-        const getTerrainElevation = (lng: number, lat: number): number => {
-          return this.map.queryTerrainElevation({ lng, lat }) ?? 0;
-        };
-
-        const towerLayers = this.tower3DLayer.getLayers(towers, {
-          towerVerticalOffset: settings.towerVerticalOffset,
-          getTerrainElevation
-        });
-        const cableLayers = this.cableLayer.getLayers(this.towers(), spans, settings);
-        const anchorLayers = this.anchorLayer.getLayers(this.towers(), settings);
-        layers = [...towerLayers, ...cableLayers, ...anchorLayers];
-      }
-
-      this.overlay.setProps({ layers });
-    });
-  }
+  // Getter for template binding
+  get mapInstanceValue() { return this.mapInstance(); }
+  get towersValue() { return this.towers(); }
+  get spansValue() { return this.spans(); }
+  get cableSettingsValue() { return this.cableSettings(); }
+  get show3DValue() { return this.show3D(); }
 
   ngOnInit(): void {
     // Access token should be set globally or here
@@ -100,8 +73,7 @@ export class MapboxMapComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
-    this.overlay?.finalize();
-    this.map?.remove();
+    this.mapInstance()?.remove();
 
     window.removeEventListener('online', () => this.isOffline.set(false));
     window.removeEventListener('offline', () => this.isOffline.set(true));
@@ -147,6 +119,9 @@ export class MapboxMapComponent implements OnInit, AfterViewInit, OnDestroy {
     this.towers.set(cached.towers);
     this.spans.set(cached.spans);
     this.cableSettings.set(cached.cableSettings);
+
+    // Center map on towers when loading from cache
+    this.centerOnTowers(cached.towers);
   }
 
   private applyData(res: MapDataResponse): void {
@@ -156,72 +131,91 @@ export class MapboxMapComponent implements OnInit, AfterViewInit, OnDestroy {
     this.cableSettings.set(data.cableSettings);
     this.canUpdate.set(data.userPermissions.canUpdate);
 
-    if (data.mapConfig.bounds) {
-      this.map.fitBounds(data.mapConfig.bounds as [number, number, number, number], { padding: 100, duration: 2000 });
-    } else {
-      this.map.flyTo({ center: [data.mapConfig.center.lng, data.mapConfig.center.lat], zoom: data.mapConfig.zoom });
+    const map = this.mapInstance();
+    if (map) {
+      if (data.mapConfig.bounds) {
+        map.fitBounds(data.mapConfig.bounds as [number, number, number, number], { padding: 100, duration: 2000 });
+      } else if (data.towers.length > 0) {
+        // Center on towers if no bounds provided
+        this.centerOnTowers(data.towers);
+      } else {
+        map.flyTo({ center: [data.mapConfig.center.lng, data.mapConfig.center.lat], zoom: data.mapConfig.zoom });
+      }
     }
   }
 
-  private async initMap(): Promise<void> {
-    this.map = new Map({
-      container: this.mapContainer.nativeElement,
-      style: 'mapbox://styles/mapbox/satellite-streets-v12',
-      center: [-46.6333, -23.5505],
-      zoom: 12,
-      pitch: 60,
-      bearing: 0,
-      preserveDrawingBuffer: true,
-      antialias: true
+  private centerOnTowers(towers: TowerMap[]): void {
+    const map = this.mapInstance();
+    if (!map || towers.length === 0) return;
+
+    // Calculate bounds from tower coordinates
+    const lngs = towers.map(t => t.lng);
+    const lats = towers.map(t => t.lat);
+
+    const bounds: [[number, number], [number, number]] = [
+      [Math.min(...lngs), Math.min(...lats)],
+      [Math.max(...lngs), Math.max(...lats)]
+    ];
+
+    map.fitBounds(bounds, {
+      padding: 100,
+      duration: 2000,
+      pitch: 60
     });
+  }
 
-    this.map.addControl(new NavigationControl(), 'bottom-right');
-    this.map.addControl(new FullscreenControl(), 'bottom-right');
-
-    this.map.on('load', async () => {
-      this.setupTerrain();
-
-      this.overlay = new MapboxOverlay({
-        interleaved: true,
-        layers: []
+  private initMap(): void {
+    this.ngZone.runOutsideAngular(() => {
+      const map = new Map({
+        container: this.mapContainer.nativeElement,
+        style: 'mapbox://styles/mapbox/satellite-streets-v12',
+        center: [-46.6333, -23.5505],
+        zoom: 12,
+        pitch: 60,
+        bearing: 0,
+        preserveDrawingBuffer: true,
+        antialias: true
       });
-      this.map.addControl(this.overlay as any);
 
-      // Force update layers now that overlay is ready
-      const towers = this.visibleTowers();
-      const settings = this.cableSettings();
-      if (this.show3D() && settings) {
-        const getTerrainElevation = (lng: number, lat: number): number => {
-          return this.map.queryTerrainElevation({ lng, lat }) ?? 0;
-        };
-        const towerLayers = this.tower3DLayer.getLayers(towers, {
-          towerVerticalOffset: settings.towerVerticalOffset,
-          getTerrainElevation
+      map.addControl(new NavigationControl(), 'bottom-right');
+      map.addControl(new FullscreenControl(), 'bottom-right');
+
+      map.on('load', () => {
+        this.setupTerrain(map);
+        // Set map instance AFTER terrain is ready - this triggers directive initialization
+        this.ngZone.run(() => {
+          this.mapInstance.set(map);
+          this.mapReady.emit();
+
+          // If we already have distinct towers loaded, center on them
+          if (this.towers().length > 0) {
+            this.centerOnTowers(this.towers());
+          }
         });
-        const cableLayers = this.cableLayer.getLayers(this.towers(), this.spans(), settings);
-        const anchorLayers = this.anchorLayer.getLayers(this.towers(), settings);
-        this.overlay.setProps({ layers: [...towerLayers, ...cableLayers, ...anchorLayers] });
-      }
+      });
 
-      this.mapReady.emit();
+      map.on('move', () => this.updateViewState(map));
     });
-
-    this.map.on('move', () => this.updateViewState());
   }
 
-  private setupTerrain(): void {
-    this.map.addSource('mapbox-dem', { type: 'raster-dem', url: 'mapbox://mapbox.mapbox-terrain-dem-v1', tileSize: 512 });
-    this.map.setTerrain({ source: 'mapbox-dem', exaggeration: 1.0 });
-    this.map.setFog({ range: [0.5, 10], color: '#1a1c24', 'high-color': '#242b3b', 'space-color': '#000000' });
+  private setupTerrain(map: Map): void {
+    map.addSource('mapbox-dem', {
+      type: 'raster-dem',
+      url: 'mapbox://mapbox.mapbox-terrain-dem-v1',
+      tileSize: 512,
+      maxzoom: 14
+    });
+    map.setTerrain({ source: 'mapbox-dem', exaggeration: 1.0 });
+    map.setFog({ range: [0.5, 10], color: '#1a1c24', 'high-color': '#242b3b', 'space-color': '#000000' });
   }
 
-  private updateViewState(): void {
-    const center = this.map.getCenter();
+  private updateViewState(map: Map): void {
+    const center = map.getCenter();
     this.viewState.set({
-      zoom: this.map.getZoom(),
-      bearing: this.map.getBearing(),
-      pitch: this.map.getPitch(),
-      elevation: this.map.queryTerrainElevation(center) ?? 0
+      zoom: map.getZoom(),
+      bearing: map.getBearing(),
+      pitch: map.getPitch(),
+      elevation: map.queryTerrainElevation(center) ?? 0
     });
   }
 
@@ -238,5 +232,11 @@ export class MapboxMapComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   refresh(): void { this.loadData(); }
-  flyTo(lat: number, lng: number, zoom = 16): void { this.map.flyTo({ center: [lng, lat], zoom, duration: 2000, pitch: 60 }); }
+
+  flyTo(lat: number, lng: number, zoom = 16): void {
+    const map = this.mapInstance();
+    if (map) {
+      map.flyTo({ center: [lng, lat], zoom, duration: 2000, pitch: 60 });
+    }
+  }
 }
