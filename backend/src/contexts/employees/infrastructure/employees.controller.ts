@@ -5,6 +5,7 @@ import {
   Get,
   HttpCode,
   Param,
+  Patch,
   Post,
   Put,
   Query,
@@ -36,7 +37,7 @@ export class EmployeesController {
     private readonly getEmployee: GetEmployeeUseCase,
     private readonly updateEmployee: UpdateEmployeeUseCase,
     private readonly deleteEmployee: DeleteEmployeeUseCase,
-  ) {}
+  ) { }
 
   @Post()
   async create(@Body() dto: CreateEmployeeDto) {
@@ -66,7 +67,7 @@ export class EmployeesController {
     return new EmployeePresenter(output);
   }
 
-  @Put(':id')
+  @Patch(':id')
   async update(@Param('id') id: string, @Body() dto: UpdateEmployeeDto) {
     const output = await this.updateEmployee.execute({ id, ...dto });
     return new EmployeePresenter(output);

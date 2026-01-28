@@ -14,13 +14,16 @@ function mapWork(record: PrismaWork): Work {
   return new Work({
     id: record.id,
     name: record.name,
+    contractor: record.contractor,
     tension: record.tension,
     extension: record.extension,
     phases: record.phases,
     circuits: record.circuits,
     lightning_rod: record.lightning_rod,
+    number_of_conductor_cables: record.number_of_conductor_cables,
     start_date: record.start_date,
     end_date: record.end_date,
+    states: record.states,
     createdAt: record.createdAt,
   });
 }
@@ -30,24 +33,30 @@ export class PrismaWorksRepository implements WorksRepository {
 
   async create(input: {
     name: string;
+    contractor?: string | null;
     tension?: number | null;
     extension?: number | null;
     phases?: number | null;
     circuits?: number | null;
     lightning_rod?: number | null;
+    number_of_conductor_cables?: number | null;
     start_date?: Date | null;
     end_date?: Date | null;
+    states?: string[];
   }): Promise<Work> {
     const created = await this.prisma.work.create({
       data: {
         name: input.name,
+        contractor: input.contractor,
         tension: input.tension,
         extension: input.extension,
         phases: input.phases,
         circuits: input.circuits,
         lightning_rod: input.lightning_rod,
+        number_of_conductor_cables: input.number_of_conductor_cables,
         start_date: input.start_date,
         end_date: input.end_date,
+        states: input.states,
       },
     });
 
@@ -94,13 +103,16 @@ export class PrismaWorksRepository implements WorksRepository {
     id: string,
     input: Partial<{
       name: string;
+      contractor?: string | null;
       tension?: number | null;
       extension?: number | null;
       phases?: number | null;
       circuits?: number | null;
       lightning_rod?: number | null;
+      number_of_conductor_cables?: number | null;
       start_date?: Date | null;
       end_date?: Date | null;
+      states?: string[];
     }>,
   ): Promise<Work> {
     try {
@@ -108,13 +120,16 @@ export class PrismaWorksRepository implements WorksRepository {
         where: { id },
         data: {
           ...(input.name !== undefined ? { name: input.name } : {}),
+          ...(input.contractor !== undefined ? { contractor: input.contractor } : {}),
           ...(input.tension !== undefined ? { tension: input.tension } : {}),
           ...(input.extension !== undefined ? { extension: input.extension } : {}),
           ...(input.phases !== undefined ? { phases: input.phases } : {}),
           ...(input.circuits !== undefined ? { circuits: input.circuits } : {}),
           ...(input.lightning_rod !== undefined ? { lightning_rod: input.lightning_rod } : {}),
+          ...(input.number_of_conductor_cables !== undefined ? { number_of_conductor_cables: input.number_of_conductor_cables } : {}),
           ...(input.start_date !== undefined ? { start_date: input.start_date } : {}),
           ...(input.end_date !== undefined ? { end_date: input.end_date } : {}),
+          ...(input.states !== undefined ? { states: input.states } : {}),
         },
       });
       return mapWork(updated);
@@ -126,7 +141,11 @@ export class PrismaWorksRepository implements WorksRepository {
 
   async delete(id: string): Promise<void> {
     try {
-      await this.prisma.work.delete({ where: { id } });
+      await this.prisma.$transaction(async (tx) => {
+        await tx.tower.deleteMany({ where: { work_id: id } });
+        await tx.production.deleteMany({ where: { work_id: id } });
+        await tx.work.delete({ where: { id } });
+      });
     } catch (e) {
       if (isPrismaRecordNotFoundError(e)) throw new NotFoundError('Work not found');
       throw e;

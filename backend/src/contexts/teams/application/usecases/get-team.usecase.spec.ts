@@ -21,11 +21,19 @@ describe('GetTeamUseCase', () => {
   });
 
   it('should return team when found', async () => {
+    const mockEmployees = [
+      { id: 'emp-1', registration: '123', full_name: 'John Doe', occupation: 'Worker' },
+      { id: 'emp-2', registration: '456', full_name: 'Jane Doe', occupation: 'Engineer' }
+    ];
+    const mockEquipments = [
+      { id: 'eq-1', model: 'Model X', manufacturer: 'Maker', license_plate: 'ABC-1234' }
+    ];
+
     const team = new Team({
       id: 'team-id-123',
       name: 'Team Alpha',
-      employees: ['emp-1', 'emp-2'],
-      equipments: ['eq-1'],
+      employees: mockEmployees,
+      equipments: mockEquipments,
       createdAt: mockDate,
     });
 
@@ -35,7 +43,7 @@ describe('GetTeamUseCase', () => {
 
     expect(mockRepository.findById).toHaveBeenCalledWith('team-id-123');
     expect(result.name).toBe('Team Alpha');
-    expect(result.employees).toEqual(['emp-1', 'emp-2']);
+    expect(result.employees).toEqual(mockEmployees);
   });
 
   it('should throw NotFoundError when team not found', async () => {

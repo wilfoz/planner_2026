@@ -1,0 +1,61 @@
+<div class="flex items-center justify-between border-t border-white/10 bg-[#27272a] px-4 py-3 sm:px-6"
+  *ngIf="meta && meta.total > 0">
+  <div class="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
+    <div>
+      <p class="text-sm text-gray-400">
+        Mostrando
+        <span class="font-medium text-white">{{ (meta.page - 1) * meta.per_page + 1 }}</span>
+        a
+        <span class="font-medium text-white">{{ min(meta.page * meta.per_page, meta.total) }}</span>
+        de
+        <span class="font-medium text-white">{{ meta.total }}</span>
+        resultados
+      </p>
+    </div>
+    <div>
+      <nav class="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
+        <button (click)="changePage(meta.page - 1)" [disabled]="meta.page === 1 || loading"
+          class="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-white/10 hover:bg-white/5 focus:z-20 focus:outline-offset-0 disabled:opacity-50 disabled:cursor-not-allowed">
+          <span class="sr-only">Anterior</span>
+          <lucide-icon [img]="ChevronLeft" class="h-5 w-5"></lucide-icon>
+        </button>
+
+        <ng-container *ngFor="let p of pages">
+          <ng-container *ngIf="isNumber(p); else dots">
+            <button (click)="changePage($any(p))" [class.bg-indigo-600]="p === meta.page"
+              [class.text-white]="p === meta.page" [class.text-gray-400]="p !== meta.page"
+              [class.hover:bg-white/5]="p !== meta.page" [class.ring-1]="true" [class.ring-inset]="true"
+              [class.ring-white/10]="true" [disabled]="loading"
+              class="relative inline-flex items-center px-4 py-2 text-sm font-semibold focus:z-20 focus:outline-offset-0 transition-colors">
+              {{ p }}
+            </button>
+          </ng-container>
+          <ng-template #dots>
+            <span
+              class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-400 ring-1 ring-inset ring-white/10 focus:outline-offset-0">
+              ...
+            </span>
+          </ng-template>
+        </ng-container>
+
+        <button (click)="changePage(meta.page + 1)" [disabled]="meta.page === meta.last_page || loading"
+          class="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-white/10 hover:bg-white/5 focus:z-20 focus:outline-offset-0 disabled:opacity-50 disabled:cursor-not-allowed">
+          <span class="sr-only">Próxima</span>
+          <lucide-icon [img]="ChevronRight" class="h-5 w-5"></lucide-icon>
+        </button>
+      </nav>
+    </div>
+  </div>
+
+  <!-- Mobile view (simplified) -->
+  <div class="flex flex-1 justify-between sm:hidden">
+    <button (click)="changePage(meta.page - 1)" [disabled]="meta.page === 1 || loading"
+      class="relative inline-flex items-center rounded-md border border-white/10 bg-[#27272a] px-4 py-2 text-sm font-medium text-gray-300 hover:bg-white/5 disabled:opacity-50 disabled:cursor-not-allowed">
+      Anterior
+    </button>
+    <button (click)="changePage(meta.page + 1)" [disabled]="meta.page === meta.last_page || loading"
+      class="relative ml-3 inline-flex items-center rounded-md border border-white/10 bg-[#27272a] px-4 py-2 text-sm font-medium text-gray-300 hover:bg-white/5 disabled:opacity-50 disabled:cursor-not-allowed">
+      Próxima
+    </button>
+  </div>
+</div>

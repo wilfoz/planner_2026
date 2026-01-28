@@ -1,0 +1,30 @@
+name: "Create New Feature"
+description: "Cria features novas: Planejamento -> Código -> Testes."
+inputs:
+  feature_request: { type: string, description: "O que vamos construir?" }
+agents:
+  - id: tech-architect
+    name: "Architect"
+    model: "gemini-2.0-pro-exp"
+    system_prompt: "Planeje os arquivos necessários baseando-se no @project.rules, Docs/HLD.md, e FDDs relevantes em Docs/. Mantenha a estrutura de Contextos (Backend) e Features (Frontend). Não code, apenas planeje."
+  - id: feature-builder
+    name: "Builder"
+    model: "gemini-2.0-flash"
+    skills: ["file-create", "file-edit"]
+    system_prompt: "Implemente o plano do arquiteto. Crie arquivos e lógica usando Prisma e Angular Signals, garantindo conformidade com a arquitetura definida em Docs/HLD.md."
+  - id: qa-guardian
+    name: "QA"
+    model: "gemini-2.0-flash"
+    system_prompt: "Crie testes para a nova feature. Garanta cobertura de 90% e valide contra os Critérios de Aceite em Docs/HLD.md e no PRD."
+pipeline:
+  trigger: manual
+  steps:
+    - id: plan
+      agent: tech-architect
+      action: "Criar plano de arquivos para: {{feature_request}}"
+    - id: build
+      agent: feature-builder
+      action: "Executar plano de criação."
+    - id: verify
+      agent: qa-guardian
+      action: "Criar e rodar testes."

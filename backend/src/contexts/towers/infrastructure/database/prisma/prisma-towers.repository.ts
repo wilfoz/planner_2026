@@ -1,4 +1,4 @@
-import { Tower as PrismaTower } from '@prisma/client';
+import { Tower as PrismaTower, Foundation as PrismaFoundation, Prisma } from '@prisma/client';
 
 import { Foundation } from '@/contexts/foundations/domain/foundation.entity';
 import { Coordinates } from '@/contexts/towers/domain/coordinates.type';
@@ -11,7 +11,7 @@ import {
   isPrismaRecordNotFoundError,
 } from '@/shared/infrastructure/database/prisma/prisma-errors';
 
-function mapTower(record: PrismaTower & { foundations: any[] }): Tower {
+function mapTower(record: PrismaTower & { foundations: PrismaFoundation[] }): Tower {
   const foundations = (record.foundations ?? []).map(
     (f) =>
       new Foundation({
@@ -72,7 +72,7 @@ export class PrismaTowersRepository implements TowersRepository {
           code: input.code,
           tower_number: input.tower_number,
           type: input.type,
-          coordinates: input.coordinates as any,
+          coordinates: input.coordinates as Prisma.InputJsonValue,
           distance: input.distance ?? null,
           height: input.height ?? null,
           weight: input.weight ?? null,
@@ -112,7 +112,7 @@ export class PrismaTowersRepository implements TowersRepository {
     const filter = input.filter?.trim();
     const workId = input.work_id;
 
-    const where: any = {
+    const where: Prisma.TowerWhereInput = {
       ...(workId ? { work_id: workId } : {}),
     };
 
@@ -167,7 +167,7 @@ export class PrismaTowersRepository implements TowersRepository {
           ...(input.code !== undefined ? { code: input.code } : {}),
           ...(input.tower_number !== undefined ? { tower_number: input.tower_number } : {}),
           ...(input.type !== undefined ? { type: input.type } : {}),
-          ...(input.coordinates !== undefined ? { coordinates: input.coordinates as any } : {}),
+          ...(input.coordinates !== undefined ? { coordinates: input.coordinates as Prisma.InputJsonValue } : {}),
           ...(input.distance !== undefined ? { distance: input.distance } : {}),
           ...(input.height !== undefined ? { height: input.height } : {}),
           ...(input.weight !== undefined ? { weight: input.weight } : {}),

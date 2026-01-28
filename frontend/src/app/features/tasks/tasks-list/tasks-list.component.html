@@ -1,16 +1,10 @@
 <div class="px-4 sm:px-6 lg:px-8 py-8">
-  <div class="sm:flex sm:items-center">
-    <div class="sm:flex-auto">
-      <h1 class="text-xl font-semibold text-white">Tarefas</h1>
-      <p class="mt-2 text-sm text-gray-400">Lista de tarefas de produção cadastradas.</p>
-    </div>
-    <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
-      <a routerLink="/tasks/new"
-        class="inline-flex items-center justify-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 transition-colors">
-        <lucide-icon [img]="PlusIcon" class="mr-2 h-4 w-4"></lucide-icon>Adicionar
-      </a>
-    </div>
-  </div>
+  <app-page-header title="Tarefas" [breadcrumbs]="breadcrumbs">
+    <a routerLink="/tasks/new"
+      class="inline-flex items-center justify-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 transition-colors">
+      <lucide-icon [img]="PlusIcon" class="mr-2 h-4 w-4"></lucide-icon>Adicionar
+    </a>
+  </app-page-header>
   <div class="mt-8 overflow-hidden shadow ring-1 ring-white/10 md:rounded-lg bg-[#27272a]">
     <table class="min-w-full divide-y divide-[#3f3f46]">
       <thead class="bg-[#27272a]">
@@ -50,5 +44,9 @@
         }
       </tbody>
     </table>
+  </div>
+  <div class="mt-4">
+    <app-pagination [meta]="meta()" [loading]="isLoading()" (pageChange)="onPageChange($event)">
+    </app-pagination>
   </div>
 </div>

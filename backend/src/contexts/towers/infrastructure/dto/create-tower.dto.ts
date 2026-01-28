@@ -21,9 +21,9 @@ export class CreateTowerDto {
   @IsInt()
   code!: number;
 
-  @ApiProperty({ description: 'Tower number', name: 'tower' })
+  @ApiProperty({ description: 'Tower number', name: 'tower_number' })
   @IsString()
-  tower!: string;
+  tower_number!: string;
 
   @ApiProperty()
   @IsString()

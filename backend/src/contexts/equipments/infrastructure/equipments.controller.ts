@@ -7,6 +7,7 @@ import {
   Param,
   Post,
   Put,
+  Patch,
   Query,
   UseGuards,
 } from '@nestjs/common';
@@ -36,7 +37,7 @@ export class EquipmentsController {
     private readonly getEquipment: GetEquipmentUseCase,
     private readonly updateEquipment: UpdateEquipmentUseCase,
     private readonly deleteEquipment: DeleteEquipmentUseCase,
-  ) {}
+  ) { }
 
   @Post()
   async create(@Body() dto: CreateEquipmentDto) {
@@ -67,7 +68,7 @@ export class EquipmentsController {
     return new EquipmentPresenter(output);
   }
 
-  @Put(':id')
+  @Patch(':id')
   async update(@Param('id') id: string, @Body() dto: UpdateEquipmentDto) {
     const output = await this.updateEquipment.execute({ id, ...dto });
     return new EquipmentPresenter(output);

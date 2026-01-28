@@ -1,0 +1,5 @@
+
+Invalid `prisma.work.deleteMany()` invocation:
+
+
+The table `public.works` does not exist in the current database.

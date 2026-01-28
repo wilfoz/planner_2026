@@ -3,10 +3,13 @@ import { RouterLink } from '@angular/router';
 import { EmployeeService } from '../services/employee.service';
 import { Employee } from '../../../core/models/employee.model';
 import { LucideAngularModule, Plus, Edit, Trash2, Eye, UserCircle } from 'lucide-angular';
+import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
+import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
+import { PaginationMeta } from '../../../core/models/collection.model';
 
 @Component({
   selector: 'app-employees-list',
-  imports: [RouterLink, LucideAngularModule],
+  imports: [RouterLink, LucideAngularModule, PageHeaderComponent, PaginationComponent],
   templateUrl: './employees-list.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -14,18 +17,37 @@ export class EmployeesListComponent {
   private employeeService = inject(EmployeeService);
 
   employees = signal<Employee[]>([]);
+  meta = signal<PaginationMeta | undefined>(undefined);
+  isLoading = signal(false);
+
   readonly PlusIcon = Plus;
   readonly EditIcon = Edit;
   readonly TrashIcon = Trash2;
   readonly EyeIcon = Eye;
   readonly UserIcon = UserCircle;
 
+  breadcrumbs = [
+    { label: 'Funcionários' }
+  ];
+
   constructor() {
     this.loadEmployees();
   }
 
-  loadEmployees() {
-    this.employeeService.getAll().subscribe(data => this.employees.set(data));
+  loadEmployees(page: number = 1) {
+    this.isLoading.set(true);
+    this.employeeService.getAll({ page, per_page: 10 }).subscribe({
+      next: (response) => {
+        this.employees.set(response.data);
+        this.meta.set(response.meta);
+        this.isLoading.set(false);
+      },
+      error: () => this.isLoading.set(false)
+    });
+  }
+
+  onPageChange(page: number) {
+    this.loadEmployees(page);
   }
 
   deleteEmployee(id: string) {

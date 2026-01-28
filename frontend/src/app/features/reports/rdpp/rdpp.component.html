@@ -1,0 +1,246 @@
+<div class="max-w-7xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden" *ngIf="!loading(); else loadingTpl">
+  <!-- Header -->
+  <div class="bg-gradient-to-r from-blue-900 to-blue-700 text-white px-8 py-6">
+    <div class="flex justify-between items-start">
+      <div>
+        <h1 class="text-3xl font-bold mb-2">RELATÓRIO DIÁRIO DE OBRA (RDO)</h1>
+        <h2 class="text-xl font-semibold">RELATÓRIO DIÁRIO DE PRODUÇÃO E PROGRAMAÇÃO (RDPP)</h2>
+      </div>
+      <div class="text-right">
+        <div class="bg-white text-blue-900 px-4 py-2 rounded-lg font-bold text-lg">
+          RELATÓRIO N.º: {{ reportNumber() }}
+        </div>
+        <div class="mt-2 text-sm">
+          DATA EMISSÃO: {{ currentDate() | date:'dd / MM / yy' }}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Project Info -->
+  <div class="bg-blue-50 px-8 py-4 border-b-2 border-blue-200">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div>
+        <h3 class="text-sm font-semibold text-gray-600 uppercase">Projeto</h3>
+        <p class="text-lg font-bold text-blue-900">{{ work()?.name }}</p>
+      </div>
+      <div>
+        <h3 class="text-sm font-semibold text-gray-600 uppercase">Contratante</h3>
+        <p class="text-lg font-bold text-blue-900">{{ work()?.contractor }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Date and Weather -->
+  <div class="px-8 py-4 bg-gray-50 border-b">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="bg-white p-4 rounded-lg shadow-sm">
+        <h3 class="text-xs font-semibold text-gray-500 uppercase mb-2">Produção</h3>
+        <!-- Assuming Production Date is the report date -->
+        <p class="text-base font-bold text-gray-800">{{ currentDate() | date:'fullDate' }}</p>
+      </div>
+      <div class="bg-white p-4 rounded-lg shadow-sm">
+        <h3 class="text-xs font-semibold text-gray-500 uppercase mb-2">Programação</h3>
+        <!-- Assuming Programacao is Next Day -->
+        <p class="text-base font-bold text-gray-800">{{ nextDay() | date:'fullDate' }}</p>
+        <!-- Note: The date pipe logic for +1 day is pseudo-code here, need TS logic or just use next day logic in TS if needed, 
+                     but standard Angular pipe doesn't do math. I'll just use currentDate for now or fix in TS. 
+                     For simplicity I won't do date math in template. 
+                -->
+        <label class="block text-xs text-gray-400 mt-2">Data Referência: {{ currentDate() }}</label>
+      </div>
+      <div class="bg-white p-4 rounded-lg shadow-sm">
+        <h3 class="text-xs font-semibold text-gray-500 uppercase mb-2">Condições Climáticas</h3>
+        <div class="flex gap-3">
+          <label class="flex items-center">
+            <input type="checkbox" [(ngModel)]="weatherConditions.bom" class="w-4 h-4 text-blue-600 rounded">
+            <span class="ml-2 text-sm">Bom</span>
+          </label>
+          <label class="flex items-center">
+            <input type="checkbox" [(ngModel)]="weatherConditions.parcial" class="w-4 h-4 text-blue-600 rounded">
+            <span class="ml-2 text-sm">Parcial</span>
+          </label>
+          <label class="flex items-center">
+            <input type="checkbox" [(ngModel)]="weatherConditions.chuva" class="w-4 h-4 text-blue-600 rounded">
+            <span class="ml-2 text-sm">Chuva</span>
+          </label>
+        </div>
+        <div class="flex gap-3 mt-2">
+          <label class="flex items-center">
+            <input type="checkbox" [(ngModel)]="weatherConditions.manha" class="w-4 h-4 text-blue-600 rounded">
+            <span class="ml-2 text-sm">Manhã</span>
+          </label>
+          <label class="flex items-center">
+            <input type="checkbox" [(ngModel)]="weatherConditions.tarde" class="w-4 h-4 text-blue-600 rounded">
+            <span class="ml-2 text-sm">Tarde</span>
+          </label>
+          <label class="flex items-center">
+            <input type="checkbox" [(ngModel)]="weatherConditions.noite" class="w-4 h-4 text-blue-600 rounded">
+            <span class="ml-2 text-sm">Noite</span>
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Activities Table -->
+  <div class="px-8 py-6">
+    <h3 class="text-xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-blue-900">ATIVIDADES</h3>
+
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="bg-blue-900 text-white">
+            <th class="px-3 py-3 text-left font-semibold">ITEM</th>
+            <th class="px-3 py-3 text-left font-semibold">ATIVIDADES</th>
+            <th class="px-3 py-3 text-center font-semibold">DATA INÍCIO</th>
+            <th class="px-3 py-3 text-center font-semibold">DATA TÉRMINO</th>
+            <th class="px-3 py-3 text-center font-semibold">UNIDADE</th>
+            <th class="px-3 py-3 text-center font-semibold">PREVISTO</th>
+            <th class="px-3 py-3 text-center font-semibold">ACUMULADO</th>
+            <th class="px-3 py-3 text-center font-semibold">% ACUM.</th>
+            <th class="px-3 py-3 text-center font-semibold">PENDENTE</th>
+            <th class="px-3 py-3 text-center font-semibold">PLAN. DIA</th>
+            <th class="px-3 py-3 text-center font-semibold">PROD. DIA</th>
+            <th class="px-3 py-3 text-left font-semibold">RESPONSÁVEL</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of rows()" [class.bg-blue-100]="row.isHeader" [class.bg-blue-50]="row.isGroup"
+            [class.border-b]="!row.isHeader && !row.isGroup" [class.hover:bg-gray-50]="!row.isHeader && !row.isGroup">
+            <td class="px-3 py-2" [class.font-bold]="row.isHeader" [class.font-semibold]="row.isGroup">{{ row.item }}
+            </td>
+
+            <!-- Header Colspan -->
+            <td *ngIf="row.isHeader" colspan="11" class="px-3 py-2 font-bold text-blue-900">{{ row.activity }}</td>
+
+            <!-- Group Colspan -->
+            <td *ngIf="row.isGroup" colspan="11" class="px-3 py-2 font-semibold">{{ row.activity }}</td>
+
+            <!-- Regular Row -->
+            <ng-container *ngIf="!row.isHeader && !row.isGroup">
+              <td class="px-3 py-2">{{ row.activity }}</td>
+              <td class="px-3 py-2 text-center">{{ row.startDate | date:'dd/MM/yy' }}</td>
+              <td class="px-3 py-2 text-center">{{ row.endDate | date:'dd/MM/yy' }}</td>
+              <td class="px-3 py-2 text-center">{{ row.unit }}</td>
+              <td class="px-3 py-2 text-center">{{ row.planned | number:'1.0-2' }}</td>
+              <td class="px-3 py-2 text-center">{{ row.accumulated | number:'1.0-2' }}</td>
+              <td class="px-3 py-2 text-center">
+                <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full font-semibold">{{ row.percentAccumulated
+                  | number:'1.0-0' }}%</span>
+              </td>
+              <td class="px-3 py-2 text-center">{{ row.pending | number:'1.0-2' }}</td>
+              <td class="px-3 py-2 text-center" [class.bg-yellow-100]="row.planDay > 0"
+                [class.font-semibold]="row.planDay > 0">{{ row.planDay | number:'1.0-2' }}</td>
+              <td class="px-3 py-2 text-center" [class.bg-green-100]="row.prodDay > 0"
+                [class.font-semibold]="row.prodDay > 0">{{ row.prodDay | number:'1.0-2' }}</td>
+              <td class="px-3 py-2 font-medium">{{ row.responsible }}</td>
+            </ng-container>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Construction License Status -->
+  <div class="px-8 py-6 bg-gray-50">
+    <h3 class="text-xl font-bold text-gray-800 mb-4">LICENÇA DE CONSTRUÇÃO</h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="bg-white p-4 rounded-lg shadow-sm">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b-2 border-gray-200">
+              <th class="text-left py-2">ITEM</th>
+              <th class="text-center py-2">QTD.</th>
+              <th class="text-center py-2">%</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="border-b">
+              <td class="py-2">1. Liberadas</td>
+              <td class="text-center py-2 font-bold">{{ licenseStats().liberatedCount }}</td>
+              <td class="text-center py-2">
+                <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full font-semibold">{{
+                  licenseStats().liberatedPercent | number:'1.0-0' }}%</span>
+              </td>
+            </tr>
+            <tr class="border-b">
+              <td class="py-2">2. Embargada (Total)</td>
+              <td class="text-center py-2">{{ licenseStats().embargoedCount }}</td>
+              <td class="text-center py-2">
+                <span class="text-gray-500">{{ licenseStats().embargoedPercent | number:'1.0-0' }}%</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Comments Section -->
+  <div class="px-8 py-6">
+    <h3 class="text-xl font-bold text-gray-800 mb-4">COMENTÁRIOS / OBSERVAÇÕES</h3>
+    <textarea readonly
+      class="w-full h-32 border-2 border-gray-300 rounded-lg p-4 focus:border-blue-500 focus:outline-none bg-gray-50"
+      [value]="comments() || 'Sem comentários registrados para esta data.'"></textarea>
+  </div>
+
+  <!-- Signatures -->
+  <div class="px-8 py-6 bg-gray-50 border-t-2 border-gray-200">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div>
+        <h4 class="text-sm font-bold text-gray-700 mb-3">ELABORAÇÃO:</h4>
+        <div class="border-b-2 border-gray-400 mb-2 pb-8"></div>
+        <div class="flex gap-4 text-xs text-gray-600">
+          <span>Ass: ___________________________</span>
+          <span>Data: _____/_____/______</span>
+        </div>
+      </div>
+      <div>
+        <h4 class="text-sm font-bold text-gray-700 mb-3">ENGENHEIRO RESIDENTE:</h4>
+        <div class="border-b-2 border-gray-400 mb-2 pb-8"></div>
+        <div class="flex gap-4 text-xs text-gray-600">
+          <span>Ass: ___________________________</span>
+          <span>Data: _____/_____/______</span>
+        </div>
+      </div>
+      <div>
+        <h4 class="text-sm font-bold text-gray-700 mb-3">CONTRATANTE/FISCALIZAÇÃO:</h4>
+        <div class="border-b-2 border-gray-400 mb-2 pb-8"></div>
+        <div class="flex gap-4 text-xs text-gray-600">
+          <span>Ass: ___________________________</span>
+          <span>Data: _____/_____/______</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="bg-blue-900 text-white text-center py-3 text-sm">
+    <p>Documento gerado em {{ now | date:'dd/MM/yyyy HH:mm' }}</p>
+  </div>
+</div>
+
+<ng-template #loadingTpl>
+  <div class="flex justify-center items-center h-screen">
+    <div class="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-blue-900"></div>
+  </div>
+</ng-template>
+
+<!-- Print Button -->
+<div class="max-w-7xl mx-auto mt-6 no-print mb-10 text-center">
+  <div class="mb-4">
+    <label for="reportDate" class="block text-sm font-medium text-gray-700 mb-1">Data do Relatório</label>
+    <input type="date" id="reportDate" [ngModel]="currentDate()" (ngModelChange)="currentDate.set($event)"
+      class="border border-gray-300 rounded px-3 py-2">
+  </div>
+
+  <button (click)="print()"
+    class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition duration-200 inline-flex items-center gap-2">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+        d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+    </svg>
+    Imprimir Relatório
+  </button>
+</div>

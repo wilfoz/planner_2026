@@ -10,6 +10,11 @@ export class UpdateWorkDto {
 
   @ApiPropertyOptional()
   @IsOptional()
+  @IsString()
+  contractor?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
   @IsNumber()
   tension?: number;
 
@@ -35,6 +40,11 @@ export class UpdateWorkDto {
 
   @ApiPropertyOptional()
   @IsOptional()
+  @IsInt()
+  number_of_conductor_cables?: number;
+
+  @ApiPropertyOptional()
+  @IsOptional()
   @IsDateString()
   start_date?: string;
 
@@ -42,4 +52,9 @@ export class UpdateWorkDto {
   @IsOptional()
   @IsDateString()
   end_date?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString({ each: true })
+  states?: string[];
 }

@@ -45,6 +45,8 @@ describe('Users (e2e)', () => {
       .expect(201);
 
     expect(login.body).toHaveProperty('accessToken');
+    expect(login.body).toHaveProperty('user');
+    expect(login.body.user).toHaveProperty('email', 'john@example.com');
     const token = login.body.accessToken as string;
 
     const list = await request(app.getHttpServer())

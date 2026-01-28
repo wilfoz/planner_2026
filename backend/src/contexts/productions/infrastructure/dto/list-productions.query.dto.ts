@@ -1,6 +1,6 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsIn, IsInt, IsOptional, IsString, Min } from 'class-validator';
+import { IsIn, IsInt, IsOptional, IsString, Min, IsUUID } from 'class-validator';
 
 export class ListProductionsQueryDto {
   @ApiPropertyOptional()
@@ -31,5 +31,9 @@ export class ListProductionsQueryDto {
   @IsOptional()
   @IsString()
   filter?: string;
-}
 
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  work_id?: string;
+}

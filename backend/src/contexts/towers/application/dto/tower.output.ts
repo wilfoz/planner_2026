@@ -4,7 +4,7 @@ import { Coordinates } from '@/contexts/towers/domain/coordinates.type';
 export type TowerOutput = {
   id: string;
   code: number;
-  tower: string;
+  tower_number: string;
   type: string;
   coordinates: Coordinates;
   distance?: number | null;
@@ -15,6 +15,7 @@ export type TowerOutput = {
   structureType?: string | null;
   color?: string | null;
   isHidden: boolean;
+  work_id: string;
   foundations: FoundationOutput[];
   created_at: Date;
 };

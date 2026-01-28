@@ -1,0 +1,34 @@
+name: "Repo-Wide Modernization"
+description: "Refatora código legado para padrões modernos com segurança de testes."
+agents:
+  - id: tech-lead
+    name: "Tech Lead"
+    model: "gemini-3.0-pro-exp"
+    skills: ["file-search", "git-branch"]
+    system_prompt: "Analise a estrutura de contextos, crie branch de refatoração e liste arquivos críticos em backend/src/contexts ou frontend/src/app que desviem do Docs/HLD.md."
+  - id: qa-guardian
+    name: "Guardian (QA)"
+    model: "gemini-3.0-flash"
+    skills: ["terminal", "test-runner"]
+    system_prompt: "Crie testes para código legado antes de qualquer mudança. Garanta o 'Green State'."
+  - id: code-architect
+    name: "Architect"
+    model: "gemini-3.0-flash"
+    skills: ["file-edit"]
+    system_prompt: "Refatore para TypeScript/Clean Code seguindo Hexagonal Arch e diretrizes do Docs/HLD.md. Se quebrar testes, corrija imediatamente."
+pipeline:
+  trigger: manual
+  steps:
+    - id: setup
+      agent: tech-lead
+      action: "Criar branch 'refactor/modernization' e listar arquivos .js/.ts antigos."
+    - id: process-loop
+      type: foreach
+      items: "{{setup.output_files}}"
+      steps:
+        - agent: qa-guardian
+          action: "Criar testes de segurança para {{item}}"
+        - agent: code-architect
+          action: "Refatorar {{item}} mantendo compatibilidade com testes."
+        - agent: qa-guardian
+          action: "Validar refatoração."

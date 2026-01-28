@@ -1,0 +1,15 @@
+# Regras de Engenharia e Tech Stack
+1. **Stack:** TypeScript, Angular 19+ (Standalone Components), NestJS.
+2. **Estilo:** Clean Code, SOLID, Arquitetura Hexagonal (DDD).
+3. **Backend Structure:** Use a estrutura de `contexts` (Application, Domain, Infrastructure).
+4. **Banco de Dados:** Use **Prisma** para ORM e gerenciamento de banco de dados.
+    - Schema location: `backend/src/shared/infrastructure/database/prisma/schema.prisma`
+5. **Testes:** Todo código novo DEVE ter testes unitários.
+6. **Segurança:** Nunca exponha secrets no código. Valide todos os inputs.
+7. **UI Components:** Considere componentes no frontend existentes como base.
+    - Use Signals para gerenciamento de estado.
+    - Componentes são Standalone por padrão (`standalone: true` é default, não adicione explicitamente).
+8. **Versionamento:** Use Git para controlar versões do código.
+9. **Documentação:** Use Swagger para documentar APIs.
+10. **Deploy:** Use Docker para containerização.
+11. **CI/CD:** Use GitHub Actions para CI/CD.

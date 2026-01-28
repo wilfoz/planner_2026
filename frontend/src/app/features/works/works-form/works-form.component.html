@@ -29,6 +29,12 @@
                 class="mt-1 block w-full rounded-md border-0 bg-[#3f3f46] text-white ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-indigo-500 sm:text-sm py-2 px-3">
             </div>
 
+            <div class="col-span-12 md:col-span-6">
+              <label for="contractor" class="block text-sm font-medium text-gray-300">Empreiteira</label>
+              <input type="text" formControlName="contractor" id="contractor" placeholder="Nome da empresa contratada"
+                class="mt-1 block w-full rounded-md border-0 bg-[#3f3f46] text-white ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-indigo-500 sm:text-sm py-2 px-3">
+            </div>
+
             <div class="col-span-12 sm:col-span-6 md:col-span-3">
               <label for="tension" class="block text-sm font-medium text-gray-300">Tensão (kV)</label>
               <input type="number" formControlName="tension" id="tension"
@@ -60,15 +66,32 @@
             </div>
 
             <div class="col-span-12 sm:col-span-6 md:col-span-3">
+              <label for="number_of_conductor_cables" class="block text-sm font-medium text-gray-300">Cabos
+                Condutores</label>
+              <input type="number" formControlName="number_of_conductor_cables" id="number_of_conductor_cables"
+                class="mt-1 block w-full rounded-md border-0 bg-[#3f3f46] text-white ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-indigo-500 sm:text-sm py-2 px-3">
+            </div>
+
+            <div class="col-span-12 sm:col-span-6 md:col-span-3">
               <label for="startDate" class="block text-sm font-medium text-gray-300">Data Início</label>
-              <input type="date" formControlName="startDate" id="startDate"
+              <input type="date" formControlName="start_date" id="startDate"
                 class="mt-1 block w-full rounded-md border-0 bg-[#3f3f46] text-white ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-indigo-500 sm:text-sm py-2 px-3">
             </div>
 
             <div class="col-span-12 sm:col-span-6 md:col-span-3">
               <label for="endDate" class="block text-sm font-medium text-gray-300">Data Fim</label>
-              <input type="date" formControlName="endDate" id="endDate"
+              <input type="date" formControlName="end_date" id="endDate"
                 class="mt-1 block w-full rounded-md border-0 bg-[#3f3f46] text-white ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-indigo-500 sm:text-sm py-2 px-3">
+            </div>
+
+            <div class="col-span-12 sm:col-span-12">
+              <label for="states" class="block text-sm font-medium text-gray-300">Estados</label>
+              <select multiple formControlName="states" id="states"
+                class="mt-1 block w-full rounded-md border-0 bg-[#3f3f46] text-white ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-indigo-500 sm:text-sm py-2 px-3 h-32">
+                <option *ngFor="let state of BRAZILIAN_STATES" [value]="state.value">{{ state.label }} ({{ state.value
+                  }})</option>
+              </select>
+              <p class="mt-1 text-xs text-gray-400">Segure Ctrl (Windows) ou Cmd (Mac) para selecionar múltiplos.</p>
             </div>
           </div>
         </div>
