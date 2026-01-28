@@ -205,7 +205,8 @@ export class MapboxMapComponent implements OnInit, AfterViewInit, OnDestroy {
       tileSize: 512,
       maxzoom: 14
     });
-    map.setTerrain({ source: 'mapbox-dem', exaggeration: 1.0 });
+    // TEMPORARILY DISABLED FOR TESTING: Terrain may conflict with deck.gl interleaved mode
+    // map.setTerrain({ source: 'mapbox-dem', exaggeration: 1.0 });
     map.setFog({ range: [0.5, 10], color: '#1a1c24', 'high-color': '#242b3b', 'space-color': '#000000' });
   }
 

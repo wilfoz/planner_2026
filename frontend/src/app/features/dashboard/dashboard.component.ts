@@ -8,14 +8,15 @@ import { Production } from '../../core/models/production.model';
 import { BaseChartDirective } from 'ng2-charts';
 import { ChartConfiguration, ChartData, ChartType, Chart } from 'chart.js';
 import { registerables } from 'chart.js';
-import { LucideAngularModule, TrendingUp, CheckCircle, Clock, AlertCircle } from 'lucide-angular';
+import { LucideAngularModule, TrendingUp, CheckCircle, Clock, AlertCircle, Home, Map } from 'lucide-angular';
+import { RouterLink } from '@angular/router';
 
 Chart.register(...registerables);
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, BaseChartDirective, LucideAngularModule],
+  imports: [CommonModule, BaseChartDirective, LucideAngularModule, RouterLink],
   templateUrl: './dashboard.component.html',
   styles: []
 })
@@ -28,6 +29,8 @@ export class DashboardComponent {
   readonly CheckCircle = CheckCircle;
   readonly Clock = Clock;
   readonly AlertCircle = AlertCircle;
+  readonly Home = Home;
+  readonly Map = Map;
 
 
 

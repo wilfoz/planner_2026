@@ -15,7 +15,8 @@ import {
   UsersRound,
   Box,
   ClipboardList,
-  Activity
+  Activity,
+  FileText
 } from 'lucide-angular';
 
 @Component({
@@ -42,6 +43,7 @@ export class MainLayoutComponent {
   readonly MenuIcon = Menu;
   readonly CloseIcon = X;
   readonly LogoutIcon = LogOut;
+  readonly ReportsIcon = FileText;
 
   toggleSidebar() {
     this.isSidebarOpen.update(v => !v);

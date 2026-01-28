@@ -10,6 +10,9 @@ export class WorkOutput {
   name!: string;
 
   @ApiProperty({ nullable: true })
+  contractor!: string | null;
+
+  @ApiProperty({ nullable: true })
   tension!: number | null;
 
   @ApiProperty({ nullable: true })
@@ -23,6 +26,9 @@ export class WorkOutput {
 
   @ApiProperty({ nullable: true })
   lightning_rod!: number | null;
+
+  @ApiProperty({ nullable: true })
+  number_of_conductor_cables!: number | null;
 
   @ApiProperty({ nullable: true })
   start_date!: Date | null;

@@ -10,6 +10,11 @@ export class UpdateWorkDto {
 
   @ApiPropertyOptional()
   @IsOptional()
+  @IsString()
+  contractor?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
   @IsNumber()
   tension?: number;
 
@@ -32,6 +37,11 @@ export class UpdateWorkDto {
   @IsOptional()
   @IsInt()
   lightning_rod?: number;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsInt()
+  number_of_conductor_cables?: number;
 
   @ApiPropertyOptional()
   @IsOptional()

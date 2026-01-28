@@ -34,7 +34,7 @@ export class MapDataService {
 
     return forkJoin({
       work: this.workService.getById(projectId),
-      towers: this.towerService.getByWorkId(projectId)
+      towers: this.towerService.getByWorkId(projectId, { per_page: 1000 })
     }).pipe(
       map(({ work, towers }) => {
         const mappedTowers = this.mapper.mapTowers(towers.data);

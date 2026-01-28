@@ -59,11 +59,13 @@ export class WorksFormComponent implements OnInit {
 
   workForm = this.fb.group({
     name: ['', Validators.required],
+    contractor: [''],
     tension: [undefined as number | undefined, Validators.required],
     extension: [undefined as number | undefined, Validators.required],
     phases: [undefined as number | undefined],
     circuits: [undefined as number | undefined],
     lightning_rod: [undefined as number | undefined],
+    number_of_conductor_cables: [undefined as number | undefined],
     start_date: ['', Validators.required],
     end_date: [''],
     states: [[] as string[]]
@@ -86,11 +88,13 @@ export class WorksFormComponent implements OnInit {
       next: (work) => {
         this.workForm.patchValue({
           name: work.name,
+          contractor: work.contractor,
           tension: work.tension,
           extension: work.extension,
           phases: work.phases,
           circuits: work.circuits,
           lightning_rod: work.lightning_rod,
+          number_of_conductor_cables: work.number_of_conductor_cables,
           start_date: this.formatDate(work.start_date),
           end_date: this.formatDate(work.end_date),
           states: work.states ?? []
@@ -124,6 +128,7 @@ export class WorksFormComponent implements OnInit {
       phases: formValue.phases ? Number(formValue.phases) : undefined,
       circuits: formValue.circuits ? Number(formValue.circuits) : undefined,
       lightning_rod: formValue.lightning_rod ? Number(formValue.lightning_rod) : undefined,
+      number_of_conductor_cables: formValue.number_of_conductor_cables ? Number(formValue.number_of_conductor_cables) : undefined,
     };
 
 

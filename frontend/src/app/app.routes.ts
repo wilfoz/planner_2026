@@ -50,6 +50,11 @@ export const routes: Routes = [
         path: 'productions',
         canActivate: [workGuard],
         loadChildren: () => import('./features/productions/productions.routes').then(m => m.productionsRoutes)
+      },
+      {
+        path: 'reports',
+        canActivate: [workGuard],
+        loadChildren: () => import('./features/reports/reports.routes').then(m => m.reportsRoutes)
       }
     ]
   },

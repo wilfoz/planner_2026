@@ -27,8 +27,6 @@ export class EmployeesListComponent {
   readonly UserIcon = UserCircle;
 
   breadcrumbs = [
-    { label: 'Home', link: '/' },
-    { label: 'Map', link: '/map' },
     { label: 'Funcionários' }
   ];
 

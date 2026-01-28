@@ -38,11 +38,13 @@ model User {
 model Work {
   id         String    @id @default(uuid()) @db.Uuid
   name       String
+  contractor String?
   tension    Float?
   extension  Float?
   phases     Float?
   circuits   Float?
   lightning_rod Int?
+  number_of_conductor_cables Int?
   start_date DateTime?
   end_date   DateTime?
   states     String[]  @default([])
