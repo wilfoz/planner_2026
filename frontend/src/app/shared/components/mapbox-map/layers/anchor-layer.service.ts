@@ -2,25 +2,40 @@ import { Injectable, inject } from '@angular/core';
 import { ScatterplotLayer } from '@deck.gl/layers';
 import { TowerMap, CableSettings } from '../models';
 import { CatenaryCalculatorService } from '../services/catenary-calculator.service';
+import { TowerLayerOptions } from './tower-3d-layer.service';
+import { TowerPhysicsService } from '../services/tower-physics.service';
 
 @Injectable({ providedIn: 'root' })
 export class AnchorLayerService {
   private readonly catenary = inject(CatenaryCalculatorService);
+  private readonly physics = inject(TowerPhysicsService);
 
-  getLayers(towers: TowerMap[], settings: CableSettings): any[] {
+  getLayers(towers: TowerMap[], settings: CableSettings, options: TowerLayerOptions): any[] {
     const anchors = settings.anchors || [];
     const points: any[] = [];
+    const { getTerrainElevation, towerVerticalOffset } = options;
+    const getElev = getTerrainElevation || ((lng, lat) => 0);
 
-    for (const tower of towers) {
+    for (let i = 0; i < towers.length; i++) {
+      const tower = towers[i];
       if (tower.isHidden) continue;
 
+      const terrainAlt = getElev(tower.lng, tower.lat);
+      const bearing = this.physics.calculateTowerBearing(i, towers);
+
       for (const anchor of anchors.filter(a => a.enabled)) {
+        const pos = this.physics.calculateAnchorPosition(
+          tower,
+          bearing,
+          anchor.h,
+          1.0, // Top
+          -(anchor.vOffset || 0), // Distance DOWN from top
+          towerVerticalOffset,
+          terrainAlt
+        );
+
         points.push({
-          position: [
-            tower.lng + this.catenary.metersToLng(anchor.horizontalOffset, tower.lat),
-            tower.lat,
-            tower.altitude + tower.height * anchor.verticalRatio + settings.towerVerticalOffset
-          ],
+          position: [pos.lng, pos.lat, pos.alt],
           color: this.hexToRgb(anchor.color),
           radius: 0.5
         });
@@ -35,7 +50,10 @@ export class AnchorLayerService {
         getFillColor: (d: any) => d.color,
         getRadius: (d: any) => d.radius,
         radiusUnits: 'meters',
-        pickable: true
+        pickable: true,
+        updateTriggers: {
+          getPosition: [anchors.length, options.terrainRevision, options.towerVerticalOffset]
+        }
       })
     ];
   }

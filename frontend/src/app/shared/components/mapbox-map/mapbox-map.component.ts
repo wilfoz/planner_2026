@@ -6,17 +6,21 @@ import { CommonModule, DecimalPipe } from '@angular/common';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Subject, takeUntil } from 'rxjs';
 import mapboxgl, { Map, NavigationControl, FullscreenControl } from 'mapbox-gl';
+import { LucideAngularModule, Settings, Mountain, MountainSnow } from 'lucide-angular';
+import { CableSettingsPanelComponent } from './components/cable-settings-panel/cable-settings-panel.component';
+import { Work } from '../../../core/models/work.model';
 import { environment } from '@environments/environment';
 
 import { MapDataService, MapDataResponse } from './services/map-data.service';
 import { MapCacheService } from './services/map-cache.service';
 import { DeckLayerDirective } from './directives/deck-layer.directive';
 import { TowerMap, Span, CableSettings } from './models';
+import { TowerPhysicsService } from './services/tower-physics.service';
 
 @Component({
   selector: 'app-mapbox-map',
   standalone: true,
-  imports: [CommonModule, DecimalPipe, DeckLayerDirective],
+  imports: [CommonModule, DecimalPipe, DeckLayerDirective, LucideAngularModule, CableSettingsPanelComponent],
   templateUrl: './mapbox-map.component.html'
 })
 export class MapboxMapComponent implements OnInit, AfterViewInit, OnDestroy {
@@ -32,6 +36,7 @@ export class MapboxMapComponent implements OnInit, AfterViewInit, OnDestroy {
   private readonly mapDataService = inject(MapDataService);
   private readonly cacheService = inject(MapCacheService);
   private readonly ngZone = inject(NgZone);
+  private readonly physics = inject(TowerPhysicsService);
   private readonly destroy$ = new Subject<void>();
 
   // Expose map instance as signal for directive binding
@@ -42,6 +47,18 @@ export class MapboxMapComponent implements OnInit, AfterViewInit, OnDestroy {
   readonly cableSettings = signal<CableSettings | null>(null);
   readonly canUpdate = signal(false);
   readonly isOffline = signal(!navigator.onLine);
+  readonly terrainEnabled = signal(false);
+  readonly showSettings = signal(false);
+  readonly currentWork = signal<Work | null>(null);
+
+  // Picking State
+  readonly pickingCableIndex = signal<number | null>(null);
+  readonly pickedCableResult = signal<{ index: number; h: number; v: number } | null>(null);
+
+
+  readonly SettingsIcon = Settings;
+  readonly MountainIcon = Mountain;
+  readonly MountainSnowIcon = MountainSnow;
 
   readonly selectedTower = signal<TowerMap | null>(null);
   readonly viewState = signal({ zoom: 12, bearing: 0, pitch: 0, elevation: 0 });
@@ -56,9 +73,9 @@ export class MapboxMapComponent implements OnInit, AfterViewInit, OnDestroy {
   get spansValue() { return this.spans(); }
   get cableSettingsValue() { return this.cableSettings(); }
   get show3DValue() { return this.show3D(); }
+  get terrainEnabledValue() { return this.terrainEnabled(); }
 
   ngOnInit(): void {
-    // Access token should be set globally or here
     (mapboxgl as any).accessToken = (environment as any).mapboxToken || 'pk.eyJ1IjoiZXhhbXBsZSIsImEiOiJjbGlzZ...';
 
     window.addEventListener('online', () => this.isOffline.set(false));
@@ -80,27 +97,23 @@ export class MapboxMapComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private async loadData(): Promise<void> {
-    // 1. Try cache first
     try {
       const cached = await this.cacheService.get(this.projectId());
       if (cached) {
-        console.log('Loaded map data from cache');
         this.applyCachedData(cached);
       }
     } catch (err) {
       console.warn('Failed to load from cache', err);
     }
 
-    // 2. If offline, stop here
-    if (this.isOffline()) {
-      return;
-    }
+    if (this.isOffline()) return;
 
-    // 3. Fetch fresh data
-    this.mapDataService.getMapData(this.projectId())
+    const id = this.projectId();
+    this.mapDataService.getMapData(id)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: async (res: MapDataResponse) => {
+          this.currentWork.set(res.data.work);
           this.applyData(res);
           await this.cacheService.set(
             this.projectId(),
@@ -119,8 +132,6 @@ export class MapboxMapComponent implements OnInit, AfterViewInit, OnDestroy {
     this.towers.set(cached.towers);
     this.spans.set(cached.spans);
     this.cableSettings.set(cached.cableSettings);
-
-    // Center map on towers when loading from cache
     this.centerOnTowers(cached.towers);
   }
 
@@ -136,7 +147,6 @@ export class MapboxMapComponent implements OnInit, AfterViewInit, OnDestroy {
       if (data.mapConfig.bounds) {
         map.fitBounds(data.mapConfig.bounds as [number, number, number, number], { padding: 100, duration: 2000 });
       } else if (data.towers.length > 0) {
-        // Center on towers if no bounds provided
         this.centerOnTowers(data.towers);
       } else {
         map.flyTo({ center: [data.mapConfig.center.lng, data.mapConfig.center.lat], zoom: data.mapConfig.zoom });
@@ -148,7 +158,6 @@ export class MapboxMapComponent implements OnInit, AfterViewInit, OnDestroy {
     const map = this.mapInstance();
     if (!map || towers.length === 0) return;
 
-    // Calculate bounds from tower coordinates
     const lngs = towers.map(t => t.lng);
     const lats = towers.map(t => t.lat);
 
@@ -157,11 +166,7 @@ export class MapboxMapComponent implements OnInit, AfterViewInit, OnDestroy {
       [Math.max(...lngs), Math.max(...lats)]
     ];
 
-    map.fitBounds(bounds, {
-      padding: 100,
-      duration: 2000,
-      pitch: 60
-    });
+    map.fitBounds(bounds, { padding: 100, duration: 2000, pitch: 60 });
   }
 
   private initMap(): void {
@@ -182,12 +187,9 @@ export class MapboxMapComponent implements OnInit, AfterViewInit, OnDestroy {
 
       map.on('load', () => {
         this.setupTerrain(map);
-        // Set map instance AFTER terrain is ready - this triggers directive initialization
         this.ngZone.run(() => {
           this.mapInstance.set(map);
           this.mapReady.emit();
-
-          // If we already have distinct towers loaded, center on them
           if (this.towers().length > 0) {
             this.centerOnTowers(this.towers());
           }
@@ -195,8 +197,88 @@ export class MapboxMapComponent implements OnInit, AfterViewInit, OnDestroy {
       });
 
       map.on('move', () => this.updateViewState(map));
+
+      // New: Listen for clicks when picking
+      map.on('click', (e) => {
+        this.ngZone.run(() => this.handleMapClick(e));
+      });
     });
   }
+
+  // --- New features ---
+
+  handleMapClick(e: mapboxgl.MapMouseEvent): void {
+    const pickingIndex = this.pickingCableIndex();
+    if (pickingIndex === null) return;
+
+    const map = this.mapInstance();
+    if (!map) return;
+
+    const towers = this.towers();
+    if (towers.length === 0) return;
+
+    // Find nearest tower to click
+    let nearest: TowerMap | null = null;
+    let minDist = Infinity;
+    const clickLng = e.lngLat.lng;
+    const clickLat = e.lngLat.lat;
+
+    for (const t of towers) {
+      if (t.isHidden) continue;
+      const d2 = (t.lng - clickLng) ** 2 + (t.lat - clickLat) ** 2;
+      if (d2 < minDist) {
+        minDist = d2;
+        nearest = t;
+      }
+    }
+
+    if (!nearest) return;
+
+    // Calculate offsets
+    const towerIdx = towers.findIndex(t => t.id === nearest!.id);
+    const bearing = this.physics.calculateTowerBearing(towerIdx, towers);
+    const terrainAlt = map.queryTerrainElevation(e.lngLat) ?? 0;
+
+    const settings = this.cableSettings();
+    const globalVOffset = settings?.towerVerticalOffset || 0;
+
+    const result = this.physics.calculateLocalOffset(
+      nearest,
+      bearing,
+      { lng: clickLng, lat: clickLat, alt: terrainAlt },
+      terrainAlt,
+      globalVOffset
+    );
+
+    // Set result
+    this.pickedCableResult.set({
+      index: pickingIndex,
+      h: Number(result.h.toFixed(2)),
+      v: Number(result.v.toFixed(2))
+    });
+
+    // Reset picking mode
+    this.pickingCableIndex.set(null);
+    map.getCanvas().style.cursor = '';
+  }
+
+  startPicking(index: number): void {
+    this.pickingCableIndex.set(index);
+    const map = this.mapInstance();
+    if (map) {
+      map.getCanvas().style.cursor = 'crosshair';
+    }
+  }
+
+  cancelPicking(): void {
+    this.pickingCableIndex.set(null);
+    const map = this.mapInstance();
+    if (map) {
+      map.getCanvas().style.cursor = '';
+    }
+  }
+
+  // --- End New features ---
 
   private setupTerrain(map: Map): void {
     map.addSource('mapbox-dem', {
@@ -205,9 +287,26 @@ export class MapboxMapComponent implements OnInit, AfterViewInit, OnDestroy {
       tileSize: 512,
       maxzoom: 14
     });
-    // TEMPORARILY DISABLED FOR TESTING: Terrain may conflict with deck.gl interleaved mode
-    // map.setTerrain({ source: 'mapbox-dem', exaggeration: 1.0 });
     map.setFog({ range: [0.5, 10], color: '#1a1c24', 'high-color': '#242b3b', 'space-color': '#000000' });
+  }
+
+  toggleTerrain(): void {
+    const map = this.mapInstance();
+    if (!map) return;
+
+    const newState = !this.terrainEnabled();
+    this.terrainEnabled.set(newState);
+
+    if (newState) {
+      map.setTerrain({ source: 'mapbox-dem', exaggeration: 1.5 });
+    } else {
+      map.setTerrain(null as any);
+    }
+    map.triggerRepaint();
+  }
+
+  toggleSettings(): void {
+    this.showSettings.update(v => !v);
   }
 
   private updateViewState(map: Map): void {

@@ -7,10 +7,13 @@ import { WorkService } from '../../../../features/works/services/work.service';
 import { TowerService } from '../../../../features/towers/services/tower.service';
 import { MapMapperService } from './map-mapper.service';
 
+import { Work } from '../../../../core/models/work.model'; // Correct import
+
 export interface MapDataResponse {
   success: boolean;
   data: {
     project: { id: string; name: string };
+    work: Work; // Added work
     mapConfig: MapConfig;
     towers: TowerMap[];
     spans: Span[];
@@ -44,6 +47,7 @@ export class MapDataService {
           success: true,
           data: {
             project: { id: work.id, name: work.name },
+            work: work, // Passing work entity
             mapConfig: {
               center: mappedTowers.length > 0 ? { lat: mappedTowers[0].lat, lng: mappedTowers[0].lng } : { lat: -23.5505, lng: -46.6333 },
               zoom: 12,

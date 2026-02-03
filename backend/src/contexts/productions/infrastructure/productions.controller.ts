@@ -9,8 +9,9 @@ import {
   Put,
   Query,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { STATUS_PRODUCTION } from '@prisma/client';
+import { Roles } from 'nest-keycloak-connect';
 
 import { CreateProductionUseCase } from '@/contexts/productions/application/usecases/create-production.usecase';
 import { DeleteProductionUseCase } from '@/contexts/productions/application/usecases/delete-production.usecase';
@@ -27,7 +28,15 @@ import { ProductionPresenter } from '@/contexts/productions/infrastructure/prese
 import { CollectionPresenter } from '@/shared/presenters/collection.presenter';
 
 @ApiTags('Production')
+@ApiBearerAuth()
 @Controller('production')
+@Roles({
+  roles: [
+    'ADMIN', 'admin', 'realm:ADMIN', 'realm:admin',
+    'MANAGER', 'manager', 'realm:MANAGER', 'realm:manager',
+    'USER', 'user', 'realm:USER', 'realm:user'
+  ]
+})
 export class ProductionsController {
   constructor(
     private readonly createProduction: CreateProductionUseCase,

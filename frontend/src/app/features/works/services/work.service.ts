@@ -24,7 +24,14 @@ export class WorkService {
   }
 
   getById(id: string): Observable<Work> {
-    return this.http.get<any>(`${this.apiUrl}/${id}`).pipe(
+    const url = `${this.apiUrl}/${id}`;
+    console.log(`[WorkService] Requesting Work ID: ${id} at URL: ${url}`);
+
+    return this.http.get<any>(url).pipe(
+      tap({
+        next: (response) => console.log(`[WorkService] Response for ${id}:`, response),
+        error: (err) => console.error(`[WorkService] Error for ${id}:`, err)
+      }),
       map(response => response.data || response)
     );
   }

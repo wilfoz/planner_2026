@@ -6,7 +6,7 @@
         }}</p>
     </div>
     <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none flex gap-3">
-      <a routerLink="/works"
+      <a routerLink="/"
         class="inline-flex items-center justify-center rounded-md border border-[#3f3f46] bg-[#27272a] px-4 py-2 text-sm font-medium text-gray-300 shadow-sm hover:bg-[#3f3f46] transition-colors">
         Cancelar
       </a>
@@ -55,8 +55,11 @@
 
             <div class="col-span-12 sm:col-span-6 md:col-span-3">
               <label for="circuits" class="block text-sm font-medium text-gray-300">Circuitos</label>
-              <input type="number" formControlName="circuits" id="circuits"
+              <select formControlName="circuits" id="circuits"
                 class="mt-1 block w-full rounded-md border-0 bg-[#3f3f46] text-white ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-indigo-500 sm:text-sm py-2 px-3">
+                <option [ngValue]="1">1</option>
+                <option [ngValue]="2">2</option>
+              </select>
             </div>
 
             <div class="col-span-12 sm:col-span-6 md:col-span-3">

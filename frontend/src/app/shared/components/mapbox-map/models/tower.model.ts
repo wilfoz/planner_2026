@@ -1,6 +1,9 @@
 export interface TowerMap {
   id: string;
-  name: string;
+  name: string; // Re-added for compatibility
+  code: number;
+  tower_number: string;
+  type: string; // Added type here
   lat: number;
   lng: number;
   altitude: number;

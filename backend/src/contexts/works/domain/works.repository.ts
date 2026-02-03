@@ -18,7 +18,7 @@ export interface WorksRepository {
     states?: string[];
   }): Promise<Work>;
   findById(id: string): Promise<Work | null>;
-  list(input: PageInput): Promise<WorksListResult>;
+  list(input: PageInput, filter?: { ids?: string[] }): Promise<WorksListResult>;
   update(
     id: string,
     input: Partial<{

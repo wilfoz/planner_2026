@@ -3,10 +3,10 @@ import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class EnvConfigService {
-  constructor(private readonly config: ConfigService) {}
+  constructor(private readonly config: ConfigService) { }
 
   getAppPort(): number {
-    return Number(this.config.get<string>('APP_PORT') ?? 3000);
+    return Number(this.config.get<string>('APP_PORT') ?? 3001);
   }
 
   getNodeEnv(): string {
@@ -26,6 +26,30 @@ export class EnvConfigService {
       throw new Error('Invalid env JWT_EXPIRES_IN_SECONDS');
     }
     return seconds;
+  }
+
+  getKeycloakUrl(): string {
+    const value = this.config.get<string>('KEYCLOAK_URL');
+    if (!value) throw new Error('Missing env KEYCLOAK_URL');
+    return value;
+  }
+
+  getKeycloakRealm(): string {
+    const value = this.config.get<string>('KEYCLOAK_REALM');
+    if (!value) throw new Error('Missing env KEYCLOAK_REALM');
+    return value;
+  }
+
+  getKeycloakClientId(): string {
+    const value = this.config.get<string>('KEYCLOAK_CLIENT_ID');
+    if (!value) throw new Error('Missing env KEYCLOAK_CLIENT_ID');
+    return value;
+  }
+
+  getKeycloakClientSecret(): string {
+    const value = this.config.get<string>('KEYCLOAK_CLIENT_SECRET');
+    if (!value) throw new Error('Missing env KEYCLOAK_CLIENT_SECRET');
+    return value;
   }
 }
 

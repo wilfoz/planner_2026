@@ -71,16 +71,25 @@ export class PrismaWorksRepository implements WorksRepository {
     return mapWork(found);
   }
 
-  async list(input: PageInput): Promise<WorksListResult> {
+  async list(input: PageInput, opts?: { ids?: string[] }): Promise<WorksListResult> {
     const skip = (input.page - 1) * input.per_page;
     const take = input.per_page;
-    const filter = input.filter?.trim();
+    const searchFilter = input.filter?.trim();
 
-    const where = filter
-      ? {
-        name: { contains: filter, mode: 'insensitive' as const },
-      }
-      : {};
+    const where: any = {};
+
+    if (searchFilter) {
+      where.name = { contains: searchFilter, mode: 'insensitive' };
+    }
+
+    if (opts?.ids && opts.ids.length > 0) {
+      where.id = { in: opts.ids };
+    } else if (opts?.ids && opts.ids.length === 0) {
+      // If ids filter is provided but empty, it means user has NO assigned works.
+      // Should return empty list.
+      // However, if logic is "if not admin and not manager, use filter", then empty filter means empty result.
+      return { total: 0, items: [] };
+    }
 
     const orderByField = input.sort && ['createdAt', 'name'].includes(input.sort)
       ? input.sort

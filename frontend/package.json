@@ -41,6 +41,8 @@
     "chart.js": "^4.5.1",
     "deck.gl": "^9.2.6",
     "dexie": "^4.2.1",
+    "keycloak-angular": "^21.0.0",
+    "keycloak-js": "^26.2.2",
     "lucide": "^0.562.0",
     "lucide-angular": "^0.562.0",
     "mapbox-gl": "^3.18.0",

@@ -1,0 +1,241 @@
+version: '3.8'
+
+services:
+  # PostgreSQL para Keycloak
+  keycloak-db:
+    image: postgres:15-alpine
+    container_name: ltbudget-keycloak-db
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: ${KEYCLOAK_DB_PASSWORD:-keycloak_pass}
+    volumes:
+      - keycloak_postgres_data:/var/lib/postgresql/data
+    networks:
+      - ltbudget-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U keycloak"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Keycloak
+  keycloak:
+    image: quay.io/keycloak/keycloak:24.0
+    container_name: ltbudget-keycloak
+    command:
+      - start-dev
+      - --import-realm
+    environment:
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN:-admin}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:-admin}
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://keycloak-db:5432/keycloak
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD:-keycloak_pass}
+      KC_HTTP_ENABLED: "true"
+      KC_HOSTNAME_STRICT: "false"
+      KC_HOSTNAME_STRICT_HTTPS: "false"
+      KC_HEALTH_ENABLED: "true"
+      KC_METRICS_ENABLED: "true"
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./keycloak/realms:/opt/keycloak/data/import
+      - ./keycloak/themes:/opt/keycloak/themes
+    depends_on:
+      keycloak-db:
+        condition: service_healthy
+    networks:
+      - ltbudget-network
+    healthcheck:
+      test: ["CMD", "bash", "-c", "exec 3<>/dev/tcp/127.0.0.1/8080; echo -e 'GET /health/ready HTTP/1.1\\r\\nhost: 127.0.0.1\\r\\nConnection: close\\r\\n\\r\\n' >&3; grep 'HTTP/1.1 200 OK' <&3"]
+      interval: 5s
+      timeout: 5s
+      retries: 15
+      start_period: 30s
+
+  # Keycloak CORS Configuration (runs once after Keycloak is healthy)
+  keycloak-config:
+    image: curlimages/curl:8.5.0
+    container_name: ltbudget-keycloak-config
+    depends_on:
+      keycloak:
+        condition: service_healthy
+    environment:
+      KEYCLOAK_URL: http://keycloak:8080
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN:-admin}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:-admin}
+      KEYCLOAK_REALM: lt-budget-realm
+    volumes:
+      - ./keycloak/scripts:/scripts
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        echo "Configuring Keycloak CORS settings..."
+        
+        # Get admin token
+        echo "Getting admin token..."
+        TOKEN=$$(curl -s -X POST "http://keycloak:8080/realms/master/protocol/openid-connect/token" \
+          -H "Content-Type: application/x-www-form-urlencoded" \
+          -d "username=$${KEYCLOAK_ADMIN}" \
+          -d "password=$${KEYCLOAK_ADMIN_PASSWORD}" \
+          -d "grant_type=password" \
+          -d "client_id=admin-cli" | sed -n 's/.*"access_token":"\([^"]*\)".*/\1/p')
+        
+        if [ -z "$$TOKEN" ]; then
+          echo "Failed to get admin token"
+          exit 1
+        fi
+        echo "Got admin token"
+        
+        # Get the account client UUID
+        echo "Getting account client..."
+        CLIENT_UUID=$$(curl -s "http://keycloak:8080/admin/realms/$${KEYCLOAK_REALM}/clients?clientId=account" \
+          -H "Authorization: Bearer $$TOKEN" | sed -n 's/.*"id":"\([^"]*\)".*/\1/p' | head -1)
+        
+        if [ -z "$$CLIENT_UUID" ]; then
+          echo "Failed to find account client"
+          exit 1
+        fi
+        echo "Found account client: $$CLIENT_UUID"
+        
+        # Update the account client with CORS settings
+        echo "Updating account client CORS settings..."
+        HTTP_CODE=$$(curl -s -w "%{http_code}" -o /dev/null -X PUT "http://keycloak:8080/admin/realms/$${KEYCLOAK_REALM}/clients/$$CLIENT_UUID" \
+          -H "Authorization: Bearer $$TOKEN" \
+          -H "Content-Type: application/json" \
+          -d '{
+            "id": "'"$$CLIENT_UUID"'",
+            "clientId": "account",
+            "enabled": true,
+            "publicClient": true,
+            "standardFlowEnabled": true,
+            "redirectUris": [
+              "http://localhost:4200/*",
+              "http://localhost:3000/*",
+              "http://localhost:3001/*",
+              "/realms/lt-budget-realm/account/*"
+            ],
+            "webOrigins": [
+              "http://localhost:4200",
+              "http://localhost:3000",
+              "http://localhost:3001",
+              "https://ltbudget.company.com"
+            ]
+          }')
+        
+        if [ "$$HTTP_CODE" = "204" ]; then
+          echo "Successfully updated account client CORS settings!"
+        else
+          echo "Failed to update account client. HTTP status: $$HTTP_CODE"
+          exit 1
+        fi
+        
+        echo "Keycloak CORS configuration complete!"
+    networks:
+      - ltbudget-network
+
+
+  # PostgreSQL para Aplicação
+  app-db:
+    image: postgis/postgis:15-3.3-alpine
+    container_name: ltbudget-app-db
+    environment:
+      POSTGRES_DB: ${DB_NAME:-ltbudget}
+      POSTGRES_USER: ${DB_USER:-ltbudget}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-ltbudget_pass}
+    volumes:
+      - app_postgres_data:/var/lib/postgresql/data
+      - ./database/init:/docker-entrypoint-initdb.d
+    ports:
+      - "5432:5432"
+    networks:
+      - ltbudget-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-ltbudget}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Backend NestJS
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: ltbudget-backend
+    environment:
+      # Database
+      DB_HOST: app-db
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME:-ltbudget}
+      DB_USER: ${DB_USER:-ltbudget}
+      DB_PASSWORD: ${DB_PASSWORD:-ltbudget_pass}
+      DATABASE_URL: postgresql://${DB_USER:-ltbudget}:${DB_PASSWORD:-ltbudget_pass}@app-db:5432/${DB_NAME:-ltbudget}?schema=public
+      
+      # Keycloak
+      KEYCLOAK_URL: http://localhost:8080
+      KEYCLOAK_REALM: lt-budget-realm
+      KEYCLOAK_CLIENT_ID: lt-budget-nestjs
+      KEYCLOAK_CLIENT_SECRET: ${KEYCLOAK_BACKEND_SECRET:-not-required-for-bearer-only}
+      
+      # App
+      NODE_ENV: ${NODE_ENV:-development}
+      APP_PORT: 3001
+      PORT: 3001
+      JWT_SECRET: ${JWT_SECRET:-dev-docker-secret-change-me}
+      JWT_EXPIRES_IN_SECONDS: 3600
+      
+      # CORS
+      CORS_ORIGIN: http://localhost:4200
+    extra_hosts:
+      - "localhost:host-gateway"
+      
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+      - ./uploads:/app/uploads
+    depends_on:
+      app-db:
+        condition: service_healthy
+      keycloak:
+        condition: service_healthy
+    networks:
+      - ltbudget-network
+    healthcheck:
+      test: ["CMD-SHELL", "wget --spider -q http://127.0.0.1:3001/api/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # Frontend Angular
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: ltbudget-frontend
+    environment:
+      - KEYCLOAK_URL=http://localhost:8080
+      - KEYCLOAK_REALM=lt-budget-realm
+      - KEYCLOAK_CLIENT_ID=lt-budget-angular
+      - API_URL=http://localhost:3001
+    ports:
+      - "4200:4200"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+    networks:
+      - ltbudget-network
+
+volumes:
+  keycloak_postgres_data:
+  app_postgres_data:
+
+networks:
+  ltbudget-network:
+    driver: bridge

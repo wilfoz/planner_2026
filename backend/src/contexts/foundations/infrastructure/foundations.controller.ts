@@ -9,7 +9,8 @@ import {
   Put,
   Query,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { Roles } from 'nest-keycloak-connect';
 
 import { CreateFoundationUseCase } from '@/contexts/foundations/application/usecases/create-foundation.usecase';
 import { DeleteFoundationUseCase } from '@/contexts/foundations/application/usecases/delete-foundation.usecase';
@@ -23,7 +24,15 @@ import { FoundationPresenter } from '@/contexts/foundations/infrastructure/prese
 import { CollectionPresenter } from '@/shared/presenters/collection.presenter';
 
 @ApiTags('Foundations')
+@ApiBearerAuth()
 @Controller('foundation')
+@Roles({
+  roles: [
+    'ADMIN', 'admin', 'realm:ADMIN', 'realm:admin',
+    'MANAGER', 'manager', 'realm:MANAGER', 'realm:manager',
+    'USER', 'user', 'realm:USER', 'realm:user'
+  ]
+})
 export class FoundationsController {
   constructor(
     private readonly createFoundation: CreateFoundationUseCase,
@@ -31,7 +40,7 @@ export class FoundationsController {
     private readonly getFoundation: GetFoundationUseCase,
     private readonly updateFoundation: UpdateFoundationUseCase,
     private readonly deleteFoundation: DeleteFoundationUseCase,
-  ) {}
+  ) { }
 
   @Post()
   async create(@Body() dto: CreateFoundationDto) {

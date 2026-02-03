@@ -1,119 +1,111 @@
-import { Component, inject, signal, Input, OnInit } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
+import { LucideAngularModule, Save } from 'lucide-angular';
+import { ToastService } from '../../../shared/components/toast/toast.service';
 import { WorkService } from '../services/work.service';
-import { LucideAngularModule, Save, X, ArrowLeft } from 'lucide-angular';
+import { AuthService } from '../../../core/services/auth.service';
 import { Work } from '../../../core/models/work.model';
+
+export const BRAZILIAN_STATES = [
+  { value: 'AC', label: 'Acre' },
+  { value: 'AL', label: 'Alagoas' },
+  { value: 'AP', label: 'Amapá' },
+  { value: 'AM', label: 'Amazonas' },
+  { value: 'BA', label: 'Bahia' },
+  { value: 'CE', label: 'Ceará' },
+  { value: 'DF', label: 'Distrito Federal' },
+  { value: 'ES', label: 'Espírito Santo' },
+  { value: 'GO', label: 'Goiás' },
+  { value: 'MA', label: 'Maranhão' },
+  { value: 'MT', label: 'Mato Grosso' },
+  { value: 'MS', label: 'Mato Grosso do Sul' },
+  { value: 'MG', label: 'Minas Gerais' },
+  { value: 'PA', label: 'Pará' },
+  { value: 'PB', label: 'Paraíba' },
+  { value: 'PR', label: 'Paraná' },
+  { value: 'PE', label: 'Pernambuco' },
+  { value: 'PI', label: 'Piauí' },
+  { value: 'RJ', label: 'Rio de Janeiro' },
+  { value: 'RN', label: 'Rio Grande do Norte' },
+  { value: 'RS', label: 'Rio Grande do Sul' },
+  { value: 'RO', label: 'Rondônia' },
+  { value: 'RR', label: 'Roraima' },
+  { value: 'SC', label: 'Santa Catarina' },
+  { value: 'SP', label: 'São Paulo' },
+  { value: 'SE', label: 'Sergipe' },
+  { value: 'TO', label: 'Tocantins' }
+];
 
 @Component({
   selector: 'app-works-form',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterLink, LucideAngularModule],
-  templateUrl: './works-form.component.html',
-  styles: ``
+  templateUrl: './works-form.component.html'
 })
 export class WorksFormComponent implements OnInit {
   private fb = inject(FormBuilder);
   private workService = inject(WorkService);
+  private authService = inject(AuthService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
+  private toastService = inject(ToastService);
 
-  workId = signal<string | null>(null);
-  isEditMode = signal(false);
+  workForm!: FormGroup;
   isLoading = signal(false);
-
-  readonly SaveIcon = Save;
-  readonly CancelIcon = X;
-  readonly ArrowLeftIcon = ArrowLeft;
-
-  readonly BRAZILIAN_STATES = [
-    { value: 'AC', label: 'Acre' },
-    { value: 'AL', label: 'Alagoas' },
-    { value: 'AP', label: 'Amapá' },
-    { value: 'AM', label: 'Amazonas' },
-    { value: 'BA', label: 'Bahia' },
-    { value: 'CE', label: 'Ceará' },
-    { value: 'DF', label: 'Distrito Federal' },
-    { value: 'ES', label: 'Espírito Santo' },
-    { value: 'GO', label: 'Goiás' },
-    { value: 'MA', label: 'Maranhão' },
-    { value: 'MT', label: 'Mato Grosso' },
-    { value: 'MS', label: 'Mato Grosso do Sul' },
-    { value: 'MG', label: 'Minas Gerais' },
-    { value: 'PA', label: 'Pará' },
-    { value: 'PB', label: 'Paraíba' },
-    { value: 'PR', label: 'Paraná' },
-    { value: 'PE', label: 'Pernambuco' },
-    { value: 'PI', label: 'Piauí' },
-    { value: 'RJ', label: 'Rio de Janeiro' },
-    { value: 'RN', label: 'Rio Grande do Norte' },
-    { value: 'RS', label: 'Rio Grande do Sul' },
-    { value: 'RO', label: 'Rondônia' },
-    { value: 'RR', label: 'Roraima' },
-    { value: 'SC', label: 'Santa Catarina' },
-    { value: 'SP', label: 'São Paulo' },
-    { value: 'SE', label: 'Sergipe' },
-    { value: 'TO', label: 'Tocantins' }
-  ];
-
-  workForm = this.fb.group({
-    name: ['', Validators.required],
-    contractor: [''],
-    tension: [undefined as number | undefined, Validators.required],
-    extension: [undefined as number | undefined, Validators.required],
-    phases: [undefined as number | undefined],
-    circuits: [undefined as number | undefined],
-    lightning_rod: [undefined as number | undefined],
-    number_of_conductor_cables: [undefined as number | undefined],
-    start_date: ['', Validators.required],
-    end_date: [''],
-    states: [[] as string[]]
-  });
+  isEditMode = signal(false);
+  workId = signal<string | null>(null);
+  BRAZILIAN_STATES = BRAZILIAN_STATES;
+  SaveIcon = Save;
 
   ngOnInit() {
-    this.route.paramMap.subscribe(params => {
-      const id = params.get('id');
-      if (id) {
-        this.workId.set(id);
-        this.isEditMode.set(true);
-        this.loadWork(id);
-      }
+    this.initForm();
+    const id = this.route.snapshot.paramMap.get('id');
+    if (id) {
+      this.workId.set(id);
+      this.isEditMode.set(true);
+      this.loadWork(id);
+    }
+  }
+
+  private initForm() {
+    this.workForm = this.fb.group({
+      name: ['', Validators.required],
+      contractor: [''],
+      tension: [null],
+      extension: [null],
+      phases: [null],
+      circuits: [null],
+      lightning_rod: [null],
+      number_of_conductor_cables: [null],
+      start_date: [null],
+      end_date: [null],
+      states: [[]]
     });
   }
 
-  loadWork(id: string) {
+  private loadWork(id: string) {
     this.isLoading.set(true);
     this.workService.getById(id).subscribe({
       next: (work) => {
         this.workForm.patchValue({
-          name: work.name,
-          contractor: work.contractor,
-          tension: work.tension,
-          extension: work.extension,
-          phases: work.phases,
-          circuits: work.circuits,
-          lightning_rod: work.lightning_rod,
-          number_of_conductor_cables: work.number_of_conductor_cables,
-          start_date: this.formatDate(work.start_date),
-          end_date: this.formatDate(work.end_date),
-          states: work.states ?? []
+          ...work,
+          start_date: work.start_date ? this.formatDate(new Date(work.start_date)) : null,
+          end_date: work.end_date ? this.formatDate(new Date(work.end_date)) : null
         });
         this.isLoading.set(false);
       },
-      error: () => this.isLoading.set(false)
+      error: () => {
+        this.toastService.error('Erro ao carregar obra.', 'Erro');
+        this.router.navigate(['/']);
+        this.isLoading.set(false);
+      }
     });
   }
 
-  private formatDate(date: string | Date | undefined): string {
-    if (!date) return '';
-    try {
-      const d = new Date(date);
-      if (isNaN(d.getTime())) return '';
-      return d.toISOString().split('T')[0];
-    } catch {
-      return '';
-    }
+  private formatDate(date: Date): string {
+    return date.toISOString().split('T')[0];
   }
 
   onSubmit() {
@@ -131,16 +123,27 @@ export class WorksFormComponent implements OnInit {
       number_of_conductor_cables: formValue.number_of_conductor_cables ? Number(formValue.number_of_conductor_cables) : undefined,
     };
 
-
     if (this.isEditMode() && this.workId()) {
       this.workService.update(this.workId()!, workDto).subscribe({
-        next: () => this.router.navigate(['/works']),
-        error: () => this.isLoading.set(false)
+        next: () => {
+          this.toastService.success('Obra atualizada com sucesso!', 'Sucesso');
+          this.router.navigate(['/']);
+        },
+        error: () => {
+          this.toastService.error('Erro ao atualizar obra.', 'Erro');
+          this.isLoading.set(false);
+        }
       });
     } else {
       this.workService.create(workDto).subscribe({
-        next: () => this.router.navigate(['/works']),
-        error: () => this.isLoading.set(false)
+        next: () => {
+          this.toastService.success('Obra criada com sucesso!', 'Sucesso');
+          this.router.navigate(['/']);
+        },
+        error: () => {
+          this.toastService.error('Erro ao criar obra.', 'Erro');
+          this.isLoading.set(false);
+        }
       });
     }
   }

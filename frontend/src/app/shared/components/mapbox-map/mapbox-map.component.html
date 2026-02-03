@@ -4,7 +4,7 @@
 
   <!-- DeckGL Overlay Directive - manages 3D layers -->
   <ng-container appDeckLayer [mapInstance]="mapInstanceValue" [towers]="towersValue" [spans]="spansValue"
-    [cableSettings]="cableSettingsValue" [show3D]="show3DValue">
+    [cableSettings]="cableSettingsValue" [show3D]="show3DValue" [work]="currentWork()">
   </ng-container>
 
 
@@ -28,6 +28,21 @@
       <span class="text-[10px] font-bold uppercase tracking-wider text-white/40">Cabos</span>
       <span class="text-xs font-black tabular-nums text-purple-400">{{ totalSpans() }}</span>
     </div>
+  </div>
+
+  <!-- Terrain Toggle Button -->
+  <div class="absolute top-4 right-4 z-10 flex flex-col gap-2">
+    <button (click)="toggleTerrain()"
+      class="p-2 rounded-md bg-[#27272a] hover:bg-[#3f3f46] text-white shadow-lg transition-colors border border-white/10"
+      title="Alternar Terreno 3D">
+      <lucide-icon [img]="terrainEnabled() ? MountainSnowIcon : MountainIcon" class="h-5 w-5"></lucide-icon>
+    </button>
+
+    <button (click)="toggleSettings()"
+      class="p-2 rounded-md bg-[#27272a] hover:bg-[#3f3f46] text-white shadow-lg transition-colors border border-white/10"
+      title="Configurar Cabos">
+      <lucide-icon [img]="SettingsIcon" class="h-5 w-5"></lucide-icon>
+    </button>
   </div>
 
   <!-- Status Indicators -->
@@ -80,6 +95,19 @@
       </button>
     </div>
     }
+  </div>
+  }
+
+  <!-- Settings Panel Overlay -->
+  @if (showSettings()) {
+  <div class="absolute inset-y-0 right-0 z-50 animate-in slide-in-from-right duration-300">
+    <app-cable-settings-panel 
+      [work]="currentWork()" 
+      [pickedResult]="pickedCableResult()"
+      (close)="toggleSettings()"
+      (pickRequest)="startPicking($event)"
+      (cancelPick)="cancelPicking()">
+    </app-cable-settings-panel>
   </div>
   }
 
