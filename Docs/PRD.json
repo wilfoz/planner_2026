@@ -1,0 +1,349 @@
+{
+  "meta": {
+    "product": "Planner",
+    "feature": "Sistema de Controle de Produções em Obras de Linhas de Transmissão",
+    "prd_owner": "[A definir]",
+    "version": "1.0",
+    "date": "2026-01-24"
+  },
+  "context": {
+    "summary": "O Planner é um sistema legado em refatoração destinado ao controle padronizado de produções em obras de linhas de transmissão de energia. Esta feature substitui o controle atual via planilhas Excel descentralizadas, que geram 20% de taxa de erro nos lançamentos (4 em cada 20 produções), impactando a gestão de recursos e a saúde financeira das obras. O sistema permitirá cadastro padronizado de obras, torres, atividades, colaboradores, equipamentos, equipes e fundações, além de proporcionar acompanhamento visual do avanço através de dashboards com gráficos, listas e mapa geolocalizado com visualização 3D detalhada (terreno, catenárias).",
+    "target_audience": [
+      "Colaboradores que precisam lançar as produções executadas em obras de linhas de transmissão de energia",
+      "Gerentes que precisam ter acesso às informações e insights sobre o andamento das obras",
+      "Stakeholders que precisam acompanhar o avanço das obras"
+    ],
+    "key_use_cases": [
+      "Lançamento diário de produções executadas por equipes nas torres",
+      "Consulta gerencial de percentuais de avanço por etapa de construção",
+      "Acompanhamento visual e geolocalizado do progresso da obra através de mapa 3D",
+      "Importação em lote de dados históricos e atuais via planilha Excel"
+    ],
+    "deployment_context": {
+      "type": "existing_system",
+      "description": "Sistema legado Planner em processo de refatoração, arquitetura monolítica web cliente-servidor"
+    },
+    "problems": [
+      {
+        "description": "Controle via Excel sem padrão: Gera 20% de taxa de erro nos lançamentos (4 a cada 20 produções), causando lançamentos incorretos, erros de fórmulas, informações desatualizadas e incoerentes que impactam diretamente a gestão de recursos e a saúde financeira das obras",
+        "impact": "Gestão de recursos prejudicada e saúde financeira das obras comprometida",
+        "priority": "high"
+      },
+      {
+        "description": "Impossibilidade de acompanhar avanço dos projetos: Falta de visibilidade centralizada e em tempo real do status das obras, exigindo atualmente 2 horas para consolidar manualmente informações de diferentes planilhas",
+        "impact": "Tempo desperdiçado na consolidação manual e falta de visibilidade em tempo real",
+        "priority": "high"
+      },
+      {
+        "description": "Falta de padronização no controle: Cada obra ou equipe mantém controle próprio em Excel, impossibilitando consolidação confiável e comparação entre projetos",
+        "impact": "Impossibilidade de consolidação confiável e comparação entre projetos",
+        "priority": "medium"
+      }
+    ]
+  },
+  "goals": [
+    {
+      "goal": "Reduzir erros de lançamento",
+      "metric": "Taxa de erro em lançamentos de produção",
+      "target": "De 20% para 0%"
+    },
+    {
+      "goal": "Aumentar velocidade de consolidação de dados",
+      "metric": "Tempo para visualizar status atualizado da obra",
+      "target": "De 2 horas para tempo real"
+    },
+    {
+      "goal": "Melhorar visibilidade do avanço das obras",
+      "metric": "Visualizações disponíveis em tempo real",
+      "target": "Gráficos (tempo, barras e cards), listas com informações lançadas, e mapa com objetos 3D representando status (torres, cabos, etc.)"
+    }
+  ],
+  "scope": {
+    "in_scope": [
+      "Painel de cadastros de obras, torres, atividades, colaboradores, equipamentos, equipes e produções",
+      "Upload opcional das informações de torres, atividades, colaboradores, equipamentos e produções através de planilha Excel (.xlsx e .xls)",
+      "Dashboard com 3 cards exibindo percentual de avanço das etapas de construção",
+      "Mapa com as coordenadas das torres visualizadas como objetos 3D (GLTF/GLB)",
+      "Torres no mapa representadas como objetos 3D com pontos de ancoragem precisos",
+      "Cabos (condutores, para-raios) conectando torres através de pontos de ancoragem, com visualização de catenária calculada matematicamente",
+      "Visualização de relevo (Terrain) e efeitos atmosféricos (Neblina/Fog) para realismo"
+    ],
+    "out_of_scope": [
+      "Aplicativo mobile (Android/iOS)",
+      "Relatórios exportáveis (PDF, Excel, Word)",
+      "Gestão de fornecedores e contratos"
+    ]
+  },
+  "functional_requirements": [
+    {
+      "id": "FR-001",
+      "name": "Painel de cadastros",
+      "description": "Realizar o cadastro das informações de obras, torres, equipamentos, colaboradores, equipes, fundações e produções.",
+      "main_flow": [
+        "Usuário interno acessa o painel administrativo",
+        "Seleciona 'Criar Torre' ou faz o upload de uma planilha com as informações",
+        "Informa código, nome da torre, tipo, coordenadas, distância, tamanho, peso, embargo (verdadeiro ou falso), deflexão, tipo da estrutura",
+        "Salva e publica"
+      ],
+      "alternative_flows": [
+        "Edição de torre já cadastrada",
+        "Exclusão de torre",
+        "Validação de coordenadas duplicadas",
+        "Upload de planilha com dados inválidos"
+      ],
+      "known_errors": [
+        "Campos obrigatórios vazios",
+        "Coordenadas fora do range válido",
+        "Código de torre duplicado",
+        "Formato de planilha incorreto"
+      ],
+      "priority": "high"
+    },
+    {
+      "id": "FR-002",
+      "name": "Upload de planilha Excel",
+      "description": "Fazer o upload das informações dos cadastros através de planilha Excel.",
+      "main_flow": [
+        "Usuário clica no botão de upload do cadastro específico",
+        "Seleciona a planilha com as informações",
+        "As informações são validadas",
+        "As informações são persistidas no banco de dados"
+      ],
+      "alternative_flows": [
+        "Substituição de dados existentes",
+        "Cancelamento do upload"
+      ],
+      "known_errors": [
+        "Formato não suportado (diferente de .xlsx ou .xls)",
+        "Colunas obrigatórias ausentes",
+        "Dados duplicados na planilha",
+        "Linhas com valores inválidos"
+      ],
+      "priority": "high"
+    },
+    {
+      "id": "FR-003",
+      "name": "Dashboard com cards de percentual de avanço",
+      "description": "Informar o percentual de avanço das etapas de construção através de cards visuais.",
+      "main_flow": [
+        "O usuário acessa o dashboard no painel administrativo",
+        "O usuário visualiza os cards alinhados ao topo com os percentuais atualizados",
+        "Os avanços percentuais são calculados através do total de torres lançadas, calculando pelo total de atividades executadas por torre"
+      ],
+      "alternative_flows": [
+        "Filtro por obra específica",
+        "Atualização automática em tempo real",
+        "Drill-down para ver detalhes de uma etapa",
+        "Visualização sem dados ainda cadastrados"
+      ],
+      "known_errors": [
+        "Falha ao calcular percentuais",
+        "Dados inconsistentes",
+        "Obra sem torres cadastradas"
+      ],
+      "priority": "medium"
+    },
+    {
+      "id": "FR-004",
+      "name": "Mapa com coordenadas das torres",
+      "description": "Visualizar as torres cadastradas em um mapa com relevo e representação 3D.",
+      "main_flow": [
+        "O usuário acessa o mapa e visualiza as torres e cabos",
+        "As torres são objetos 3D com pontos de ancoragem",
+        "Os cabos são objetos conectando uma torre à outra",
+        "A quantidade de cabos e seus respectivos tipos são definidos durante o cadastro da obra",
+        "Ao clicar em uma torre aparecem as informações desta torre (Popup)",
+        "As torres podem ser filtradas através de um filtro disponível no mapa",
+        "O mapa deve suportar visualização de relevo (Terrain) e neblina (Fog) para melhor noção de profundidade",
+        "Os cabos devem ser renderizados usando curvas catenárias calculadas em tempo real baseadas na distância e desnível entre torres"
+      ],
+      "alternative_flows": [
+        "Zoom in/out",
+        "Rotação 3D",
+        "Diferentes cores de torres conforme status",
+        "Obras sem torres cadastradas",
+        "Erro ao carregar coordenadas"
+      ],
+      "known_errors": [
+        "Coordenadas inválidas ou fora do alcance",
+        "Falha ao renderizar objetos 3D",
+        "Torres sem coordenadas cadastradas"
+      ],
+      "priority": "medium"
+    },
+    {
+      "id": "FR-005",
+      "name": "Lançamento de produções",
+      "description": "Registrar a execução de atividades realizadas pelas equipes nas torres.",
+      "main_flow": [
+        "Usuário interno acessa o painel administrativo",
+        "Seleciona 'Lançar Produção'",
+        "Informa obra, status, comentários, data e hora inicial, data e hora final, atividade, equipe, torres",
+        "Salva e publica"
+      ],
+      "alternative_flows": [
+        "Edição de produção já lançada",
+        "Exclusão de produção",
+        "Produção parcial em uma torre"
+      ],
+      "known_errors": [
+        "Campos obrigatórios vazios",
+        "Data final anterior à inicial",
+        "Equipe ou torre inexistente",
+        "Atividade incompatível com a torre selecionada"
+      ],
+      "priority": "high"
+    }
+  ],
+  "non_functional_requirements": [
+    {
+      "category": "performance",
+      "specifications": [
+        "Renderização do mapa 3D entre 2 a 3 segundos",
+        "Processamento de upload de planilha entre 3 a 5 segundos"
+      ]
+    },
+    {
+      "category": "availability",
+      "specifications": [
+        "99 por cento de uptime mensal em produção"
+      ]
+    },
+    {
+      "category": "security",
+      "specifications": [
+        "Autenticação obrigatória para acesso ao sistema",
+        "Diferentes níveis de permissão: colaborador (lançamento de produções), gerente (acesso a insights e dashboards), stakeholder (visualização de avanço)"
+      ]
+    },
+    {
+      "category": "observability",
+      "specifications": [
+        "Logs estruturados em formato JSON com níveis info, warn e error (hipótese)",
+        "Métricas de erro por endpoint e operação (hipótese)",
+        "Latência de APIs e operações críticas monitorada (hipótese)",
+        "Rastreamento de ações do usuário com registro de quem fez o quê e quando (hipótese)"
+      ]
+    },
+    {
+      "category": "reliability",
+      "specifications": [
+        "Lançamento de produção deve ser transacional",
+        "Cálculo de percentuais de avanço deve ser consistente",
+        "Backup automático dos dados"
+      ]
+    },
+    {
+      "category": "compatibility",
+      "specifications": [
+        "APIs REST com versionamento (ex: /v1)",
+        "Formato de planilha Excel aceito: .xlsx e .xls"
+      ]
+    },
+    {
+      "category": "compliance",
+      "specifications": [
+        "Retenção de logs por período de 1 mês"
+      ]
+    }
+  ],
+  "architecture": {
+    "approach": "Sistema legado monolítico web com arquitetura cliente-servidor, estruturado em diretórios backend e frontend separados, com comunicação assíncrona entre as camadas",
+    "components": [
+      "Frontend em Angular 18+ (Standalone Components, Signals, Tailwind CSS)",
+      "Backend em NestJS com Prisma ORM",
+      "Banco de dados PostgreSQL como fonte de verdade",
+      "API backend de cadastros",
+      "Serviço de cálculo de percentuais de avanço",
+      "Módulo de renderização 3D no frontend",
+      "Serviço de processamento de planilhas Excel",
+      "Docker Compose para orquestração de ambientes"
+    ],
+    "integrations": [
+      "Mapbox GL para renderização de mapas e relevo (Terrain-DEM)",
+      "Deck.gl para renderização de objetos 3D (torres via ScenegraphLayer e cabos) com sobreposição correta (interleaved)"
+    ],
+    "technical_constraints": [
+      "O Frontend deve utilizar a arquitetura baseada em Features (DDD) conforme estrutura de pastas definida",
+      "O uso de 'ngClass' e 'ngStyle' deve ser evitado em favor de bindings diretos ('class', 'style') e Tailwind CSS",
+      "Ícones devem utilizar a biblioteca Lucide-Angular",
+      "Renderização 3D deve usar carregamento otimizado de modelos GLTF/GLB"
+    ]
+  },
+  "decisions_tradeoffs": [
+    {
+      "decision": "PostgreSQL como fonte de verdade",
+      "justification": "Garante consistência forte e auditoria confiável de dados críticos como cadastros, produções e histórico de alterações",
+      "trade_off": "Possível gargalo em escala muito alta e complexidade de queries geoespaciais"
+    },
+    {
+      "decision": "Mapbox GL + Deck.gl para renderização 3D",
+      "justification": "Possibilita a renderização dos objetos 3D no mapa com suporte a relevo e interatividade avançada",
+      "trade_off": "Custo de licenciamento, dependência de biblioteca externa, performance em dispositivos mais fracos, necessidade de internet para acesso"
+    }
+  ],
+  "dependencies": [
+    {
+      "type": "technical",
+      "title": "Infraestrutura Docker configurada",
+      "description": "Ambiente Docker Compose precisa estar configurado e operacional para permitir desenvolvimento, testes e deploy do sistema refatorado."
+    },
+    {
+      "type": "technical",
+      "title": "Credenciais Mapbox provisionadas",
+      "description": "Chaves de API do Mapbox GL precisam estar provisionadas e configuradas no ambiente para habilitar a renderização do mapa com relevo e objetos 3D."
+    }
+  ],
+  "risks": [
+    {
+      "risk": "Performance do mapa 3D com muitas torres",
+      "probability": "medium",
+      "impact": "Experiência degradada para usuários, com lentidão ou travamentos ao visualizar obras com grande quantidade de torres",
+      "mitigation": [
+        "Implementar lazy loading de objetos 3D",
+        "Otimização de renderização (redução de polígonos, simplificação de geometrias)"
+      ],
+      "contingency_plan": "Renderização progressiva com carregamento incremental de torres conforme navegação no mapa"
+    },
+    {
+      "risk": "Custo elevado do Mapbox",
+      "probability": "low",
+      "impact": "Necessidade de reduzir uso da plataforma ou rever funcionalidades visuais",
+      "mitigation": [
+        "Implementar cache de tiles do mapa"
+      ],
+      "contingency_plan": "Negociar plano empresarial com Mapbox ou avaliar alternativas de licenciamento"
+    },
+    {
+      "risk": "Complexidade de migração de dados do Excel",
+      "probability": "low",
+      "impact": "Necessidade de limpeza manual de dados antes da importação efetiva no sistema",
+      "mitigation": [
+        "Disponibilizar template de planilha padronizado para importação"
+      ],
+      "contingency_plan": "Suporte dedicado para limpeza de dados e validação assistida durante migração inicial"
+    }
+  ],
+  "acceptance_criteria": [
+    "Sistema permite cadastrar obras, torres, atividades, colaboradores, equipamentos e equipes com validação de campos obrigatórios",
+    "Sistema aceita upload de planilha .xlsx e .xls e valida dados antes de persistir",
+    "Sistema bloqueia cadastro de torre com coordenadas duplicadas ou código duplicado",
+    "Dashboard exibe 3 cards com percentuais de avanço calculados corretamente em tempo real",
+    "Dashboard permite filtrar por obra específica",
+    "Mapa renderiza torres como objetos 3D com coordenadas em até 3 segundos",
+    "Mapa exibe cabos conectando torres através de pontos de ancoragem",
+    "Mapa permite zoom, rotação e interação (clique para ver detalhes da torre)",
+    "Sistema registra lançamento de produção com obra, status, datas, atividade, equipe e torres",
+    "Sistema bloqueia lançamento com data final anterior à inicial",
+    "Sistema possui autenticação obrigatória e níveis de permissão (colaborador, gerente, stakeholder)",
+    "Sistema gera logs estruturados de todas operações críticas",
+    "Sistema garante disponibilidade de 99 por cento mensal"
+  ],
+  "testing_validation": {
+    "test_types": [
+      "Testes unitários para regras críticas de validação, cálculo de percentuais e lógica de negócio",
+      "Testes de interface para validar fluxos de cadastro, upload, visualização de dashboard e interação com mapa 3D"
+    ],
+    "strategy": "TDD (Test-Driven Development) para lógica crítica de cálculo de avanço, validações de cadastro e processamento de planilhas. QA manual guiado por roteiro cobrindo fluxos principais de cadastro, lançamento de produção e visualizações (dashboard e mapa)."
+  }
+}

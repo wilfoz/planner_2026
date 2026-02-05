@@ -5,6 +5,7 @@ import {
   Get,
   HttpCode,
   Param,
+  Patch,
   Post,
   Put,
   Query,
@@ -12,6 +13,7 @@ import {
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { STATUS_EMPLOYEE } from '@prisma/client';
+import { Roles } from 'nest-keycloak-connect';
 
 import { CreateEmployeeUseCase } from '@/contexts/employees/application/usecases/create-employee.usecase';
 import { DeleteEmployeeUseCase } from '@/contexts/employees/application/usecases/delete-employee.usecase';
@@ -22,13 +24,18 @@ import { CreateEmployeeDto } from '@/contexts/employees/infrastructure/dto/creat
 import { ListEmployeesQueryDto } from '@/contexts/employees/infrastructure/dto/list-employees.query.dto';
 import { UpdateEmployeeDto } from '@/contexts/employees/infrastructure/dto/update-employee.dto';
 import { EmployeePresenter } from '@/contexts/employees/infrastructure/presenters/employee.presenter';
-import { AuthGuard } from '@/shared/infrastructure/auth/auth.guard';
 import { CollectionPresenter } from '@/shared/presenters/collection.presenter';
 
 @ApiTags('Employees')
 @ApiBearerAuth()
-@UseGuards(AuthGuard)
 @Controller('employees')
+@Roles({
+  roles: [
+    'ADMIN', 'admin', 'realm:ADMIN', 'realm:admin',
+    'MANAGER', 'manager', 'realm:MANAGER', 'realm:manager',
+    'USER', 'user', 'realm:USER', 'realm:user'
+  ]
+})
 export class EmployeesController {
   constructor(
     private readonly createEmployee: CreateEmployeeUseCase,
@@ -36,7 +43,7 @@ export class EmployeesController {
     private readonly getEmployee: GetEmployeeUseCase,
     private readonly updateEmployee: UpdateEmployeeUseCase,
     private readonly deleteEmployee: DeleteEmployeeUseCase,
-  ) {}
+  ) { }
 
   @Post()
   async create(@Body() dto: CreateEmployeeDto) {
@@ -66,7 +73,7 @@ export class EmployeesController {
     return new EmployeePresenter(output);
   }
 
-  @Put(':id')
+  @Patch(':id')
   async update(@Param('id') id: string, @Body() dto: UpdateEmployeeDto) {
     const output = await this.updateEmployee.execute({ id, ...dto });
     return new EmployeePresenter(output);

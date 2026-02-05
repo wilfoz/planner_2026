@@ -18,7 +18,7 @@ export function mapTowerToOutput(t: Tower): TowerOutput {
   return {
     id: t.props.id,
     code: t.props.code,
-    tower: t.props.tower_number,
+    tower_number: t.props.tower_number,
     type: t.props.type,
     coordinates: t.props.coordinates,
     distance: t.props.distance ?? null,
@@ -29,6 +29,7 @@ export function mapTowerToOutput(t: Tower): TowerOutput {
     structureType: t.props.structureType ?? null,
     color: t.props.color ?? null,
     isHidden: t.props.isHidden,
+    work_id: t.props.work_id,
     foundations,
     created_at: t.props.createdAt,
   };

@@ -1,62 +1,84 @@
 import { Injectable, signal, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
-import { Router } from '@angular/router';
-import { environment } from '../../environments/environment';
-import { LoginRequest, AuthResponse, User } from '../models/auth.models';
+import { KeycloakService } from 'keycloak-angular';
+import { User } from '../models/auth.models';
+// import { from } from 'rxjs'; // If needed for observables
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private http = inject(HttpClient);
-  private router = inject(Router);
-  private apiUrl = `${environment.apiUrl}`;
+  private keycloak = inject(KeycloakService);
 
+  // Signal to hold current user profile, matching original API structure where possible
   currentUser = signal<User | null>(null);
 
   constructor() {
-    this.loadUserFromStorage();
+    this.initUser();
   }
 
-  login(credentials: LoginRequest): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/users/login`, credentials).pipe(
-      tap(response => this.handleAuthSuccess(response))
-    );
+  private async initUser() {
+    try {
+      if (await this.keycloak.isLoggedIn()) {
+        // Get user info from token instead of calling /account endpoint (avoids CORS issues)
+        const tokenParsed = this.keycloak.getKeycloakInstance().tokenParsed as Record<string, any>;
+        if (tokenParsed) {
+          const user: User = {
+            id: tokenParsed['sub'] || '',
+            email: tokenParsed['email'] || '',
+            name: tokenParsed['name'] || tokenParsed['preferred_username'] || '',
+            role: this.getHighestRole(),
+          };
+          this.currentUser.set(user);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load user from token', error);
+    }
+  }
+
+  login() {
+    return this.keycloak.login({
+      redirectUri: window.location.origin
+    });
   }
 
   logout() {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    this.currentUser.set(null);
-    this.router.navigate(['/login']);
+    return this.keycloak.logout();
   }
 
-  getToken(): string | null {
-    return localStorage.getItem('token');
+  async getToken(): Promise<string> {
+    return this.keycloak.getToken();
   }
 
   isAuthenticated(): boolean {
-    return !!this.getToken();
+    return this.keycloak.isLoggedIn();
   }
 
-  private handleAuthSuccess(response: AuthResponse) {
-    localStorage.setItem('token', response.accessToken);
-    localStorage.setItem('user', JSON.stringify(response.user));
-    this.currentUser.set(response.user);
-    this.router.navigate(['/']);
+  // --- RBAC Helpers ---
+
+  hasRole(role: string): boolean {
+    return this.keycloak.isUserInRole(role);
   }
 
-  private loadUserFromStorage() {
-    const user = localStorage.getItem('user');
-    if (user && user !== 'undefined') {
-      try {
-        this.currentUser.set(JSON.parse(user));
-      } catch {
-        // Invalid JSON, clear corrupted data
-        localStorage.removeItem('user');
-        localStorage.removeItem('token');
-      }
+  hasAnyRole(roles: string[]): boolean {
+    return roles.some(role => this.keycloak.isUserInRole(role));
+  }
+
+  get assignedWorks(): string[] {
+    const tokenParsed = this.keycloak.getKeycloakInstance().tokenParsed as any;
+    const works = tokenParsed?.assigned_works;
+
+    if (Array.isArray(works)) {
+      return works;
+    } else if (typeof works === 'string') {
+      return [works];
     }
+    return [];
+  }
+
+  private getHighestRole(): 'ADMIN' | 'MANAGER' | 'USER' {
+    if (this.hasRole('ADMIN')) return 'ADMIN';
+    if (this.hasRole('MANAGER')) return 'MANAGER';
+    return 'USER';
   }
 }

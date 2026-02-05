@@ -60,15 +60,16 @@ export class TowersFormComponent implements OnInit {
     this.isLoading.set(true);
     this.towerService.getById(id).subscribe({
       next: (tower) => {
+        const coordinates = tower.coordinates as any;
         this.towerForm.patchValue({
           code: tower.code,
           tower_number: tower.tower_number,
           type: tower.type,
-          latitude: (tower.coordinates as any)?.latitude || 0,
-          longitude: (tower.coordinates as any)?.longitude || 0,
-          distance: tower.distance ?? null,
-          height: tower.height ?? null,
-          weight: tower.weight ?? null,
+          latitude: coordinates?.latitude ?? 0,
+          longitude: coordinates?.longitude ?? 0,
+          distance: tower.distance,
+          height: tower.height,
+          weight: tower.weight,
           embargo: tower.embargo || '',
           work_id: tower.work_id
         });

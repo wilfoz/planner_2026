@@ -78,7 +78,7 @@ export class PrismaProductionsRepository implements ProductionsRepository {
     const take = input.per_page;
     const filter = input.filter?.trim();
 
-    const where = filter
+    const where: any = filter
       ? {
         OR: [
           { comments: { contains: filter, mode: 'insensitive' as const } },
@@ -86,6 +86,10 @@ export class PrismaProductionsRepository implements ProductionsRepository {
         ],
       }
       : {};
+
+    if (input.work_id) {
+      where.work_id = input.work_id;
+    }
 
     const orderByField =
       input.sort && ['createdAt', 'status', 'task_id', 'start_time', 'final_time'].includes(input.sort)

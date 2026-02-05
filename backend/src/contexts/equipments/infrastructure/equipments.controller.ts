@@ -7,11 +7,13 @@ import {
   Param,
   Post,
   Put,
+  Patch,
   Query,
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { STATUS_EQUIPMENT } from '@prisma/client';
+import { Roles } from 'nest-keycloak-connect';
 
 import { CreateEquipmentUseCase } from '@/contexts/equipments/application/usecases/create-equipment.usecase';
 import { DeleteEquipmentUseCase } from '@/contexts/equipments/application/usecases/delete-equipment.usecase';
@@ -22,13 +24,18 @@ import { CreateEquipmentDto } from '@/contexts/equipments/infrastructure/dto/cre
 import { ListEquipmentsQueryDto } from '@/contexts/equipments/infrastructure/dto/list-equipments.query.dto';
 import { UpdateEquipmentDto } from '@/contexts/equipments/infrastructure/dto/update-equipment.dto';
 import { EquipmentPresenter } from '@/contexts/equipments/infrastructure/presenters/equipment.presenter';
-import { AuthGuard } from '@/shared/infrastructure/auth/auth.guard';
 import { CollectionPresenter } from '@/shared/presenters/collection.presenter';
 
 @ApiTags('Equipments')
 @ApiBearerAuth()
-@UseGuards(AuthGuard)
 @Controller('equipments')
+@Roles({
+  roles: [
+    'ADMIN', 'admin', 'realm:ADMIN', 'realm:admin',
+    'MANAGER', 'manager', 'realm:MANAGER', 'realm:manager',
+    'USER', 'user', 'realm:USER', 'realm:user'
+  ]
+})
 export class EquipmentsController {
   constructor(
     private readonly createEquipment: CreateEquipmentUseCase,
@@ -36,7 +43,7 @@ export class EquipmentsController {
     private readonly getEquipment: GetEquipmentUseCase,
     private readonly updateEquipment: UpdateEquipmentUseCase,
     private readonly deleteEquipment: DeleteEquipmentUseCase,
-  ) {}
+  ) { }
 
   @Post()
   async create(@Body() dto: CreateEquipmentDto) {
@@ -67,7 +74,7 @@ export class EquipmentsController {
     return new EquipmentPresenter(output);
   }
 
-  @Put(':id')
+  @Patch(':id')
   async update(@Param('id') id: string, @Body() dto: UpdateEquipmentDto) {
     const output = await this.updateEquipment.execute({ id, ...dto });
     return new EquipmentPresenter(output);

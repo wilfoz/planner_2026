@@ -21,5 +21,9 @@ export class CreateTaskDto {
   @ApiProperty()
   @IsString()
   unit!: string;
+
+  @ApiProperty()
+  @IsString()
+  work_id!: string;
 }
 

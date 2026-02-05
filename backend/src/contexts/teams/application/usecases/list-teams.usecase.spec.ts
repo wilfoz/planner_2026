@@ -24,8 +24,8 @@ describe('ListTeamsUseCase', () => {
       new Team({
         id: 'team-1',
         name: 'Team Alpha',
-        employees: ['emp-1'],
-        equipments: ['eq-1'],
+        employees: [{ id: 'emp-1', registration: '123', full_name: 'John Doe', occupation: 'Worker' }],
+        equipments: [{ id: 'eq-1', model: 'Model X', manufacturer: 'Maker', license_plate: 'ABC-1234' }],
         createdAt: mockDate,
       }),
       new Team({

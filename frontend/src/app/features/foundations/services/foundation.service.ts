@@ -1,8 +1,9 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { Foundation, CreateFoundationDto, UpdateFoundationDto } from '../../../core/models/foundation.model';
+import { Collection } from '../../../core/models/collection.model';
 
 @Injectable({
   providedIn: 'root'
@@ -11,12 +12,19 @@ export class FoundationService {
   private http = inject(HttpClient);
   private apiUrl = `${environment.apiUrl}/foundation`;
 
-  getAll(): Observable<Foundation[]> {
-    return this.http.get<Foundation[]>(this.apiUrl);
+  getAll(params?: { page?: number; per_page?: number }): Observable<Collection<Foundation>> {
+    return this.http.get<any>(this.apiUrl, { params: params as any }).pipe(
+      map(response => ({
+        data: response.data,
+        meta: response.meta
+      }))
+    );
   }
 
   getById(id: string): Observable<Foundation> {
-    return this.http.get<Foundation>(`${this.apiUrl}/${id}`);
+    return this.http.get<any>(`${this.apiUrl}/${id}`).pipe(
+      map(response => response.data || response)
+    );
   }
 
   create(foundation: CreateFoundationDto): Observable<Foundation> {

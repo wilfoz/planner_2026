@@ -48,7 +48,7 @@ describe('GetTowerUseCase', () => {
     expect(result).toEqual({
       id: 'tower-id-123',
       code: 1,
-      tower: 'T-001',
+      tower_number: 'T-001',
       type: 'suspension',
       coordinates: { lat: -23.55, lng: -46.63, altitude: 0 },
       distance: 100.5,
@@ -61,6 +61,7 @@ describe('GetTowerUseCase', () => {
       structureType: 'suspension',
       color: 'red',
       isHidden: false,
+      work_id: 'work-123',
     });
   });
 

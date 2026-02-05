@@ -9,7 +9,8 @@ import {
   Put,
   Query,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { Roles } from 'nest-keycloak-connect';
 
 import { CreateTeamUseCase } from '@/contexts/teams/application/usecases/create-team.usecase';
 import { DeleteTeamUseCase } from '@/contexts/teams/application/usecases/delete-team.usecase';
@@ -23,7 +24,15 @@ import { TeamPresenter } from '@/contexts/teams/infrastructure/presenters/team.p
 import { CollectionPresenter } from '@/shared/presenters/collection.presenter';
 
 @ApiTags('Teams')
+@ApiBearerAuth()
 @Controller('teams')
+@Roles({
+  roles: [
+    'ADMIN', 'admin', 'realm:ADMIN', 'realm:admin',
+    'MANAGER', 'manager', 'realm:MANAGER', 'realm:manager',
+    'USER', 'user', 'realm:USER', 'realm:user'
+  ]
+})
 export class TeamsController {
   constructor(
     private readonly createTeam: CreateTeamUseCase,
@@ -31,7 +40,7 @@ export class TeamsController {
     private readonly getTeam: GetTeamUseCase,
     private readonly updateTeam: UpdateTeamUseCase,
     private readonly deleteTeam: DeleteTeamUseCase,
-  ) {}
+  ) { }
 
   @Post()
   async create(@Body() dto: CreateTeamDto) {

@@ -22,6 +22,8 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
+  app.setGlobalPrefix('api');
+  app.enableCors(); // Enable CORS for development
   applyGlobalConfig(app);
 
   const env = app.get(EnvConfigService);

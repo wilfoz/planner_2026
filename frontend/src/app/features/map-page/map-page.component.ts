@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { WorkContextService } from '../../core/services/work-context.service';
 import { MapboxMapComponent } from '../../shared/components/mapbox-map/mapbox-map.component';
 import { TowerMap } from '../../shared/components/mapbox-map/models';
 
@@ -37,8 +38,10 @@ import { TowerMap } from '../../shared/components/mapbox-map/models';
   `
 })
 export class MapPageComponent {
-  // Hardcoded for demo/dev purposes for now, normally would come from route param
-  projectId = '00000000-0000-0000-0000-000000000000';
+  private workContextService = inject(WorkContextService);
+  // Use the ID from the context, or fall back to empty string if none selected
+  // The map component should handle empty/null IDs gracefully or we show a placeholder
+  projectId = this.workContextService.selectedWorkId() || '';
 
   onTowerFilterChange(event: Event, mapComponent: MapboxMapComponent) {
     const select = event.target as HTMLSelectElement;

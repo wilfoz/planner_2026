@@ -31,5 +31,10 @@ export class ListTaskQueryDto {
   @IsOptional()
   @IsString()
   filter?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  work_id?: string;
 }
 

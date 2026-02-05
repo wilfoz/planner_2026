@@ -68,8 +68,8 @@ export class ProductionsFormComponent implements OnInit {
         this.productionForm.patchValue({
           status: p.status,
           comments: p.comments || '',
-          start_time: p.start_time || '',
-          final_time: p.final_time || '',
+          start_time: this.formatDate(p.start_time),
+          final_time: this.formatDate(p.final_time),
           task_id: p.task_id,
           work_id: p.work_id
         });
@@ -77,6 +77,17 @@ export class ProductionsFormComponent implements OnInit {
       },
       error: () => this.router.navigate(['/productions'])
     });
+  }
+
+  private formatDate(date: string | Date | undefined): string {
+    if (!date) return '';
+    try {
+      const d = new Date(date);
+      if (isNaN(d.getTime())) return '';
+      return d.toISOString().split('T')[0];
+    } catch {
+      return '';
+    }
   }
 
   onSubmit() {

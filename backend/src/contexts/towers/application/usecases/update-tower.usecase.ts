@@ -9,7 +9,7 @@ export class UpdateTowerUseCase {
   async execute(input: {
     id: string;
     code?: number;
-    tower?: string;
+    tower_number?: string;
     type?: string;
     coordinates?: Coordinates;
     distance?: number | null;
@@ -24,7 +24,7 @@ export class UpdateTowerUseCase {
   }): Promise<TowerOutput> {
     const updated = await this.towers.update(input.id, {
       ...(input.code !== undefined ? { code: input.code } : {}),
-      ...(input.tower !== undefined ? { tower_number: input.tower } : {}),
+      ...(input.tower_number !== undefined ? { tower_number: input.tower_number } : {}),
       ...(input.type !== undefined ? { type: input.type } : {}),
       ...(input.coordinates !== undefined ? { coordinates: input.coordinates } : {}),
       ...(input.distance !== undefined ? { distance: input.distance } : {}),

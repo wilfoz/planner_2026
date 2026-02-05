@@ -3,10 +3,12 @@ import { RouterLink } from '@angular/router';
 import { EquipmentService } from '../services/equipment.service';
 import { Equipment } from '../../../core/models/equipment.model';
 import { LucideAngularModule, Plus, Edit, Trash2, Eye, Truck } from 'lucide-angular';
+import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
+import { PaginationMeta } from '../../../core/models/collection.model';
 
 @Component({
   selector: 'app-equipments-list',
-  imports: [RouterLink, LucideAngularModule],
+  imports: [RouterLink, LucideAngularModule, PaginationComponent],
   templateUrl: './equipments-list.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -14,6 +16,9 @@ export class EquipmentsListComponent {
   private equipmentService = inject(EquipmentService);
 
   equipments = signal<Equipment[]>([]);
+  meta = signal<PaginationMeta | undefined>(undefined);
+  isLoading = signal(false);
+
   readonly PlusIcon = Plus;
   readonly EditIcon = Edit;
   readonly TrashIcon = Trash2;
@@ -24,8 +29,20 @@ export class EquipmentsListComponent {
     this.loadEquipments();
   }
 
-  loadEquipments() {
-    this.equipmentService.getAll().subscribe(data => this.equipments.set(data));
+  loadEquipments(page: number = 1) {
+    this.isLoading.set(true);
+    this.equipmentService.getAll({ page, per_page: 10 }).subscribe({
+      next: (response) => {
+        this.equipments.set(response.data);
+        this.meta.set(response.meta);
+        this.isLoading.set(false);
+      },
+      error: () => this.isLoading.set(false)
+    });
+  }
+
+  onPageChange(page: number) {
+    this.loadEquipments(page);
   }
 
   deleteEquipment(id: string) {

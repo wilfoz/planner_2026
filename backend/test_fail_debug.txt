@@ -1,0 +1,46 @@
+
+> lt-planner@1.0.0 test:e2e
+> dotenv -e .env.test -- jest -c jest.e2e.config.js
+
+warn The configuration property `package.json#prisma` is deprecated and will be removed in Prisma 7. Please migrate to a Prisma config file (e.g., `prisma.config.ts`).
+For more information, see: https://pris.ly/prisma-config
+
+warn The configuration property `package.json#prisma` is deprecated and will be removed in Prisma 7. Please migrate to a Prisma config file (e.g., `prisma.config.ts`).
+For more information, see: https://pris.ly/prisma-config
+
+warn The configuration property `package.json#prisma` is deprecated and will be removed in Prisma 7. Please migrate to a Prisma config file (e.g., `prisma.config.ts`).
+For more information, see: https://pris.ly/prisma-config
+
+Environment variables loaded from .env
+Environment variables loaded from .env
+Environment variables loaded from .env
+Prisma schema loaded from src\shared\infrastructure\database\prisma\schema.prisma
+Datasource "db": PostgreSQL database "lt-db", schema "test" at "127.0.0.1:5432"
+Prisma schema loaded from src\shared\infrastructure\database\prisma\schema.prisma
+Prisma schema loaded from src\shared\infrastructure\database\prisma\schema.prisma
+Datasource "db": PostgreSQL database "lt-db", schema "test" at "127.0.0.1:5432"
+Datasource "db": PostgreSQL database "lt-db", schema "test" at "127.0.0.1:5432"
+
+1 migration found in prisma/migrations
+
+
+1 migration found in prisma/migrations
+
+
+1 migration found in prisma/migrations
+
+
+No pending migrations to apply.
+
+No pending migrations to apply.
+
+No pending migrations to apply.
+PASS test/towers.e2e-spec.ts (20.851 s)
+PASS test/productions.e2e-spec.ts (20.875 s)
+PASS test/users.e2e-spec.ts (21.246 s)
+
+Test Suites: 3 passed, 3 total
+Tests:       3 passed, 3 total
+Snapshots:   0 total
+Time:        22.807 s, estimated 25 s
+Ran all test suites.

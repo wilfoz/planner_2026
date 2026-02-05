@@ -9,10 +9,10 @@ export class UpdateTowerDto {
   @IsInt()
   code?: number;
 
-  @ApiPropertyOptional({ name: 'tower' })
+  @ApiPropertyOptional({ name: 'tower_number' })
   @IsOptional()
   @IsString()
-  tower?: string;
+  tower_number?: string;
 
   @ApiPropertyOptional()
   @IsOptional()

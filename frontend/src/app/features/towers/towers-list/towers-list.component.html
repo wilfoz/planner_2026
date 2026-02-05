@@ -1,18 +1,14 @@
 <div class="px-4 sm:px-6 lg:px-8 py-8">
-  <div class="sm:flex sm:items-center">
-    <div class="sm:flex-auto">
-      <h1 class="text-xl font-semibold text-white">Torres</h1>
-      <p class="mt-2 text-sm text-gray-400">Lista de todas as torres da linha de transmissão.</p>
-    </div>
-    <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none flex items-center gap-3">
+  <app-page-header title="Torres" [breadcrumbs]="breadcrumbs">
+    <div class="flex items-center gap-3">
       <input type="file" #fileInput (change)="importTowers($event)" accept=".xlsx, .xls" class="hidden">
-      
+
       <button type="button" (click)="fileInput.click()" [disabled]="isImporting()"
         class="inline-flex items-center justify-center rounded-md border border-gray-600 bg-[#27272a] px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-[#18181b] sm:w-auto transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
         @if (isImporting()) {
-          <span class="animate-spin mr-2 h-4 w-4 border-2 border-current border-t-transparent rounded-full"></span>
+        <span class="animate-spin mr-2 h-4 w-4 border-2 border-current border-t-transparent rounded-full"></span>
         } @else {
-          <lucide-icon [img]="UploadIcon" class="mr-2 h-4 w-4"></lucide-icon>
+        <lucide-icon [img]="UploadIcon" class="mr-2 h-4 w-4"></lucide-icon>
         }
         {{ isImporting() ? 'Importando...' : 'Importar Excel' }}
       </button>
@@ -23,7 +19,7 @@
         Adicionar
       </a>
     </div>
-  </div>
+  </app-page-header>
   <div class="mt-8 flex flex-col">
     <div class="-my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8">
       <div class="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
@@ -75,5 +71,10 @@
         </div>
       </div>
     </div>
+  </div>
+
+  <div class="mt-4">
+    <app-pagination [meta]="meta()" [loading]="isLoading()" (pageChange)="onPageChange($event)">
+    </app-pagination>
   </div>
 </div>

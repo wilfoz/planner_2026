@@ -8,7 +8,7 @@ export class CreateTowerUseCase {
 
   async execute(input: {
     code: number;
-    tower: string;
+    tower_number: string;
     type: string;
     coordinates: Coordinates;
     distance?: number;
@@ -24,7 +24,7 @@ export class CreateTowerUseCase {
   }): Promise<TowerOutput> {
     const created = await this.towers.create({
       code: input.code,
-      tower_number: input.tower,
+      tower_number: input.tower_number,
       type: input.type,
       coordinates: input.coordinates,
       distance: input.distance ?? null,

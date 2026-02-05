@@ -8,8 +8,10 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { Roles } from 'nest-keycloak-connect';
 
 import { CreateTowerUseCase } from '@/contexts/towers/application/usecases/create-tower.usecase';
 import { DeleteTowerUseCase } from '@/contexts/towers/application/usecases/delete-tower.usecase';
@@ -22,8 +24,10 @@ import { UpdateTowerDto } from '@/contexts/towers/infrastructure/dto/update-towe
 import { TowerPresenter } from '@/contexts/towers/infrastructure/presenters/tower.presenter';
 import { FoundationPresenter } from '@/contexts/foundations/infrastructure/presenters/foundation.presenter';
 import { CollectionPresenter } from '@/shared/presenters/collection.presenter';
+import { TowerAccessGuard } from '@/shared/infrastructure/auth/guards/tower-access.guard';
 
 @ApiTags('Towers')
+@ApiBearerAuth()
 @Controller('tower')
 export class TowersController {
   constructor(
@@ -32,9 +36,11 @@ export class TowersController {
     private readonly getTower: GetTowerUseCase,
     private readonly updateTower: UpdateTowerUseCase,
     private readonly deleteTower: DeleteTowerUseCase,
-  ) {}
+  ) { }
 
   @Post()
+  @Roles({ roles: ['ADMIN', 'admin', 'realm:ADMIN', 'realm:admin', 'MANAGER', 'manager', 'realm:MANAGER', 'realm:manager', 'USER', 'user', 'realm:USER', 'realm:user'] })
+  @UseGuards(TowerAccessGuard)
   async create(@Body() dto: CreateTowerDto) {
     const output = await this.createTower.execute(dto);
     return new TowerPresenter({
@@ -44,6 +50,9 @@ export class TowersController {
   }
 
   @Get()
+  @Roles({ roles: ['ADMIN', 'admin', 'realm:ADMIN', 'realm:admin', 'MANAGER', 'manager', 'realm:MANAGER', 'realm:manager', 'USER', 'user', 'realm:USER', 'realm:user'] })
+  // For List, guard logic is lenient if no work_id. 
+  // Should ideally enforce filtering in UseCase similar to Works.
   async list(@Query() query: ListTowersQueryDto) {
     const result = await this.listTowers.execute(query);
     return new CollectionPresenter({
@@ -59,6 +68,8 @@ export class TowersController {
   }
 
   @Get(':id')
+  @Roles({ roles: ['ADMIN', 'admin', 'realm:ADMIN', 'realm:admin', 'MANAGER', 'manager', 'realm:MANAGER', 'realm:manager', 'USER', 'user', 'realm:USER', 'realm:user'] })
+  @UseGuards(TowerAccessGuard)
   async getById(@Param('id') id: string) {
     const output = await this.getTower.execute({ id });
     return new TowerPresenter({
@@ -68,6 +79,8 @@ export class TowersController {
   }
 
   @Put(':id')
+  @Roles({ roles: ['ADMIN', 'admin', 'realm:ADMIN', 'realm:admin', 'MANAGER', 'manager', 'realm:MANAGER', 'realm:manager', 'USER', 'user', 'realm:USER', 'realm:user'] })
+  @UseGuards(TowerAccessGuard)
   async update(@Param('id') id: string, @Body() dto: UpdateTowerDto) {
     const output = await this.updateTower.execute({ id, ...dto });
     return new TowerPresenter({
@@ -77,6 +90,8 @@ export class TowersController {
   }
 
   @Delete(':id')
+  @Roles({ roles: ['ADMIN', 'admin', 'realm:ADMIN', 'realm:admin', 'MANAGER', 'manager', 'realm:MANAGER', 'realm:manager', 'USER', 'user', 'realm:USER', 'realm:user'] })
+  @UseGuards(TowerAccessGuard)
   @HttpCode(204)
   async remove(@Param('id') id: string) {
     await this.deleteTower.execute({ id });

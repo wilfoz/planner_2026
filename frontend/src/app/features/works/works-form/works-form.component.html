@@ -6,7 +6,7 @@
         }}</p>
     </div>
     <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none flex gap-3">
-      <a routerLink="/works"
+      <a routerLink="/"
         class="inline-flex items-center justify-center rounded-md border border-[#3f3f46] bg-[#27272a] px-4 py-2 text-sm font-medium text-gray-300 shadow-sm hover:bg-[#3f3f46] transition-colors">
         Cancelar
       </a>
@@ -26,6 +26,12 @@
             <div class="col-span-12 md:col-span-6">
               <label for="name" class="block text-sm font-medium text-gray-300">Nome da Obra *</label>
               <input type="text" formControlName="name" id="name"
+                class="mt-1 block w-full rounded-md border-0 bg-[#3f3f46] text-white ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-indigo-500 sm:text-sm py-2 px-3">
+            </div>
+
+            <div class="col-span-12 md:col-span-6">
+              <label for="contractor" class="block text-sm font-medium text-gray-300">Empreiteira</label>
+              <input type="text" formControlName="contractor" id="contractor" placeholder="Nome da empresa contratada"
                 class="mt-1 block w-full rounded-md border-0 bg-[#3f3f46] text-white ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-indigo-500 sm:text-sm py-2 px-3">
             </div>
 
@@ -49,8 +55,11 @@
 
             <div class="col-span-12 sm:col-span-6 md:col-span-3">
               <label for="circuits" class="block text-sm font-medium text-gray-300">Circuitos</label>
-              <input type="number" formControlName="circuits" id="circuits"
+              <select formControlName="circuits" id="circuits"
                 class="mt-1 block w-full rounded-md border-0 bg-[#3f3f46] text-white ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-indigo-500 sm:text-sm py-2 px-3">
+                <option [ngValue]="1">1</option>
+                <option [ngValue]="2">2</option>
+              </select>
             </div>
 
             <div class="col-span-12 sm:col-span-6 md:col-span-3">
@@ -60,15 +69,32 @@
             </div>
 
             <div class="col-span-12 sm:col-span-6 md:col-span-3">
+              <label for="number_of_conductor_cables" class="block text-sm font-medium text-gray-300">Cabos
+                Condutores</label>
+              <input type="number" formControlName="number_of_conductor_cables" id="number_of_conductor_cables"
+                class="mt-1 block w-full rounded-md border-0 bg-[#3f3f46] text-white ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-indigo-500 sm:text-sm py-2 px-3">
+            </div>
+
+            <div class="col-span-12 sm:col-span-6 md:col-span-3">
               <label for="startDate" class="block text-sm font-medium text-gray-300">Data Início</label>
-              <input type="date" formControlName="startDate" id="startDate"
+              <input type="date" formControlName="start_date" id="startDate"
                 class="mt-1 block w-full rounded-md border-0 bg-[#3f3f46] text-white ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-indigo-500 sm:text-sm py-2 px-3">
             </div>
 
             <div class="col-span-12 sm:col-span-6 md:col-span-3">
               <label for="endDate" class="block text-sm font-medium text-gray-300">Data Fim</label>
-              <input type="date" formControlName="endDate" id="endDate"
+              <input type="date" formControlName="end_date" id="endDate"
                 class="mt-1 block w-full rounded-md border-0 bg-[#3f3f46] text-white ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-indigo-500 sm:text-sm py-2 px-3">
+            </div>
+
+            <div class="col-span-12 sm:col-span-12">
+              <label for="states" class="block text-sm font-medium text-gray-300">Estados</label>
+              <select multiple formControlName="states" id="states"
+                class="mt-1 block w-full rounded-md border-0 bg-[#3f3f46] text-white ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-indigo-500 sm:text-sm py-2 px-3 h-32">
+                <option *ngFor="let state of BRAZILIAN_STATES" [value]="state.value">{{ state.label }} ({{ state.value
+                  }})</option>
+              </select>
+              <p class="mt-1 text-xs text-gray-400">Segure Ctrl (Windows) ou Cmd (Mac) para selecionar múltiplos.</p>
             </div>
           </div>
         </div>

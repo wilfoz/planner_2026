@@ -9,7 +9,8 @@ import {
   Put,
   Query,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { AuthenticatedUser, Roles } from 'nest-keycloak-connect';
 
 import { CreateTaskUseCase } from '@/contexts/task/application/usecases/create-task.usecase';
 import { DeleteTaskUseCase } from '@/contexts/task/application/usecases/delete-task.usecase';
@@ -23,7 +24,15 @@ import { TaskPresenter } from '@/contexts/task/infrastructure/presenters/task.pr
 import { CollectionPresenter } from '@/shared/presenters/collection.presenter';
 
 @ApiTags('Task')
+@ApiBearerAuth()
 @Controller('task')
+@Roles({
+  roles: [
+    'ADMIN', 'admin', 'realm:ADMIN', 'realm:admin',
+    'MANAGER', 'manager', 'realm:MANAGER', 'realm:manager',
+    'USER', 'user', 'realm:USER', 'realm:user'
+  ]
+})
 export class TaskController {
   constructor(
     private readonly createTask: CreateTaskUseCase,
@@ -31,7 +40,7 @@ export class TaskController {
     private readonly getTask: GetTaskUseCase,
     private readonly updateTask: UpdateTaskUseCase,
     private readonly deleteTask: DeleteTaskUseCase,
-  ) {}
+  ) { }
 
   @Post()
   async create(@Body() dto: CreateTaskDto) {

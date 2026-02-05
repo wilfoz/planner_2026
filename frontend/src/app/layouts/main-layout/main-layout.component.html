@@ -18,18 +18,13 @@
         </div>
         <div class="mt-5 h-0 flex-1 overflow-y-auto">
           <nav class="space-y-1 px-2">
-            <a routerLink="/" routerLinkActive="bg-slate-800 text-white" [routerLinkActiveOptions]="{exact: true}"
+            <a routerLink="/dashboard" routerLinkActive="bg-slate-800 text-white"
               class="text-slate-300 hover:bg-slate-800 hover:text-white group flex items-center px-2 py-2 text-base font-medium rounded-md">
               <lucide-icon [img]="DashboardIcon"
                 class="mr-4 h-6 w-6 flex-shrink-0 text-slate-400 group-hover:text-slate-300"></lucide-icon>
               Dashboard
             </a>
-            <a routerLink="/works" routerLinkActive="bg-slate-800 text-white"
-              class="text-slate-300 hover:bg-slate-800 hover:text-white group flex items-center px-2 py-2 text-base font-medium rounded-md">
-              <lucide-icon [img]="WorksIcon"
-                class="mr-4 h-6 w-6 flex-shrink-0 text-slate-400 group-hover:text-slate-300"></lucide-icon>
-              Obras
-            </a>
+
             <a routerLink="/employees" routerLinkActive="bg-slate-800 text-white"
               class="text-slate-300 hover:bg-slate-800 hover:text-white group flex items-center px-2 py-2 text-base font-medium rounded-md">
               <lucide-icon [img]="EmployeesIcon"
@@ -72,6 +67,12 @@
                 class="mr-4 h-6 w-6 flex-shrink-0 text-slate-400 group-hover:text-slate-300"></lucide-icon>
               Produções
             </a>
+            <a routerLink="/reports/rdpp" routerLinkActive="bg-slate-800 text-white"
+              class="text-slate-300 hover:bg-slate-800 hover:text-white group flex items-center px-2 py-2 text-base font-medium rounded-md">
+              <lucide-icon [img]="ReportsIcon"
+                class="mr-4 h-6 w-6 flex-shrink-0 text-slate-400 group-hover:text-slate-300"></lucide-icon>
+              Relatórios: RDPP
+            </a>
           </nav>
         </div>
       </div>
@@ -87,18 +88,13 @@
       </div>
       <div class="flex flex-1 flex-col overflow-y-auto">
         <nav class="flex-1 space-y-1 px-2 py-4">
-          <a routerLink="/" routerLinkActive="bg-slate-800 text-white" [routerLinkActiveOptions]="{exact: true}"
+          <a routerLink="/dashboard" routerLinkActive="bg-slate-800 text-white"
             class="text-slate-300 hover:bg-slate-800 hover:text-white group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors">
             <lucide-icon [img]="DashboardIcon"
               class="mr-3 h-5 w-5 flex-shrink-0 text-slate-400 group-hover:text-slate-300"></lucide-icon>
             Dashboard
           </a>
-          <a routerLink="/works" routerLinkActive="bg-slate-800 text-white"
-            class="text-slate-300 hover:bg-slate-800 hover:text-white group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors">
-            <lucide-icon [img]="WorksIcon"
-              class="mr-3 h-5 w-5 flex-shrink-0 text-slate-400 group-hover:text-slate-300"></lucide-icon>
-            Obras
-          </a>
+
 
           <div class="mt-8">
             <h3 class="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Recursos</h3>
@@ -156,6 +152,18 @@
                 <lucide-icon [img]="ProductionsIcon"
                   class="mr-3 h-5 w-5 flex-shrink-0 text-slate-400 group-hover:text-slate-300"></lucide-icon>
                 Produções
+              </a>
+            </div>
+          </div>
+
+          <div class="mt-8">
+            <h3 class="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Relatórios</h3>
+            <div class="mt-1 space-y-1">
+              <a routerLink="/reports/rdpp" routerLinkActive="bg-slate-800 text-white"
+                class="text-slate-300 hover:bg-slate-800 hover:text-white group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors">
+                <lucide-icon [img]="ReportsIcon"
+                  class="mr-3 h-5 w-5 flex-shrink-0 text-slate-400 group-hover:text-slate-300"></lucide-icon>
+                RDPP
               </a>
             </div>
           </div>

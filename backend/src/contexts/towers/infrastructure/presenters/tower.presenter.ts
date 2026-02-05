@@ -13,9 +13,9 @@ export class TowerPresenter {
   @Expose()
   code!: number;
 
-  @ApiProperty({ name: 'tower' })
+  @ApiProperty({ name: 'tower_number' })
   @Expose()
-  tower!: string;
+  tower_number!: string;
 
   @ApiProperty()
   @Expose()
@@ -50,16 +50,21 @@ export class TowerPresenter {
   @Expose()
   created_at!: Date;
 
+  @ApiProperty({ name: 'work_id' })
+  @Expose()
+  work_id!: string;
+
   constructor(input: {
     id: string;
     code: number;
-    tower: string;
+    tower_number: string;
     type: string;
     coordinates: unknown;
     distance?: number | null;
     height?: number | null;
     weight?: number | null;
     embargo?: string | null;
+    work_id: string;
     foundations: FoundationPresenter[];
     created_at: Date;
   }) {

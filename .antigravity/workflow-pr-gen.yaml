@@ -1,0 +1,17 @@
+name: "Generate Perfect PR"
+description: "Gera descrição de PR baseada em git diff."
+agents:
+  - id: pr-writer
+    name: "PR Bot"
+    model: "gemini-2.0-pro-exp"
+    skills: ["git-diff", "github-cli"]
+    system_prompt: "Escreva um PR semântico (Conventional Commits). Liste mudanças técnicas e breaking changes. Referencie Design Docs de Docs/ que esta implementação segue."
+pipeline:
+  trigger: manual
+  steps:
+    - id: analyze
+      agent: pr-writer
+      action: "Analisar git diff main...HEAD e gerar texto Markdown."
+    - id: create
+      agent: pr-writer
+      action: "Salvar como PR_DRAFT.md"

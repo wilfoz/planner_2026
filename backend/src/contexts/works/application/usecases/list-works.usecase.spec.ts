@@ -29,6 +29,7 @@ describe('ListWorksUseCase', () => {
         start_date: mockDate,
         end_date: null,
         createdAt: mockDate,
+        states: [],
       }),
       new Work({
         id: 'work-2',
@@ -38,6 +39,7 @@ describe('ListWorksUseCase', () => {
         start_date: mockDate,
         end_date: mockDate,
         createdAt: mockDate,
+        states: [],
       }),
     ];
 

@@ -13,6 +13,9 @@ export class MapMapperService {
     return towers.map(tower => ({
       id: tower.id,
       name: tower.tower_number, // User requested Tower.name but entity has tower_number/name? Checking core model... Core has 'tower_number'. Request says 'Tower.name'. Assuming mapping tower_number to name implies name. Wait, let's check core model.
+      code: tower.code, // Added code
+      tower_number: tower.tower_number, // Added tower_number
+      type: tower.type, // Added type
       lat: (tower.coordinates as any).lat,
       lng: (tower.coordinates as any).lng,
       altitude: (tower.coordinates as any).altitude,

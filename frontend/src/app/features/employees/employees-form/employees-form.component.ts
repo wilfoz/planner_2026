@@ -5,6 +5,8 @@ import { EmployeeService } from '../services/employee.service';
 import { TeamService } from '../../teams/services/team.service';
 import { Team } from '../../../core/models/team.model';
 import { LucideAngularModule, Save, ArrowLeft } from 'lucide-angular';
+import { ToastService } from '../../../shared/components/toast/toast.service';
+import { LoadingService } from '../../../shared/services/loading.service';
 
 @Component({
   selector: 'app-employees-form',
@@ -18,6 +20,8 @@ export class EmployeesFormComponent implements OnInit {
   private teamService = inject(TeamService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
+  private toastService = inject(ToastService);
+  private loadingService = inject(LoadingService);
 
   employeeId = signal<string | null>(null);
   isEditMode = signal(false);
@@ -53,7 +57,7 @@ export class EmployeesFormComponent implements OnInit {
   }
 
   loadEmployee(id: string) {
-    this.isLoading.set(true);
+    this.loadingService.start();
     this.employeeService.getById(id).subscribe({
       next: (employee) => {
         this.employeeForm.patchValue({
@@ -64,16 +68,20 @@ export class EmployeesFormComponent implements OnInit {
           status: employee.status,
           team_id: employee.team_id || ''
         });
-        this.isLoading.set(false);
+        this.loadingService.stop();
       },
-      error: () => this.router.navigate(['/employees'])
+      error: () => {
+        this.loadingService.stop();
+        this.toastService.error('Erro ao carregar funcionário.');
+        this.router.navigate(['/employees']);
+      }
     });
   }
 
   onSubmit() {
     if (this.employeeForm.invalid) return;
 
-    this.isLoading.set(true);
+    this.loadingService.start();
     const formValue = this.employeeForm.value;
     const dto: any = {
       ...formValue,
@@ -85,8 +93,15 @@ export class EmployeesFormComponent implements OnInit {
       : this.employeeService.create(dto);
 
     request$.subscribe({
-      next: () => this.router.navigate(['/employees']),
-      error: () => this.isLoading.set(false)
+      next: () => {
+        this.loadingService.stop();
+        this.toastService.success(this.isEditMode() ? 'Funcionário atualizado!' : 'Funcionário criado com sucesso!');
+        this.router.navigate(['/employees']);
+      },
+      error: (err) => {
+        this.loadingService.stop();
+        this.toastService.error(err.message || 'Erro ao salvar funcionário.');
+      }
     });
   }
 }

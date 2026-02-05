@@ -23,7 +23,7 @@ describe('UpdateTowerUseCase', () => {
     const input = {
       id: 'tower-id-123',
       code: 5,
-      tower: 'T-005',
+      tower_number: 'T-005',
       type: 'anchor',
       coordinates: { lat: -23.60, lng: -46.70, altitude: 50 },
       distance: 200,
@@ -77,7 +77,7 @@ describe('UpdateTowerUseCase', () => {
     });
 
     expect(result.code).toBe(5);
-    expect(result.tower).toBe('T-005');
+    expect(result.tower_number).toBe('T-005');
     expect(result.type).toBe('anchor');
     expect(result.deflection).toBe(0);
   });
