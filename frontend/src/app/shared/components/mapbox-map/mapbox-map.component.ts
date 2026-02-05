@@ -207,10 +207,31 @@ export class MapboxMapComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // --- New features ---
 
+  // --- End New features ---
+
+  // Tower Menu State
+  readonly activeTowerMenu = signal<{ tower: TowerMap, x: number, y: number } | null>(null);
+
+  handleLabelClick(event: { tower: TowerMap, x: number, y: number }): void {
+    this.activeTowerMenu.set(event);
+  }
+
+  closeMenu(): void {
+    this.activeTowerMenu.set(null);
+  }
+
+  // Override handleMapClick to auto-close menu if clicking elsewhere
   handleMapClick(e: mapboxgl.MapMouseEvent): void {
+    // If menu is open, close it
+    if (this.activeTowerMenu()) {
+      this.closeMenu();
+      return;
+    }
+
     const pickingIndex = this.pickingCableIndex();
     if (pickingIndex === null) return;
 
+    // ... rest of original handleMapClick logic
     const map = this.mapInstance();
     if (!map) return;
 
@@ -277,8 +298,6 @@ export class MapboxMapComponent implements OnInit, AfterViewInit, OnDestroy {
       map.getCanvas().style.cursor = '';
     }
   }
-
-  // --- End New features ---
 
   private setupTerrain(map: Map): void {
     map.addSource('mapbox-dem', {

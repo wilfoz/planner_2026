@@ -222,6 +222,7 @@ services:
       - KEYCLOAK_REALM=lt-budget-realm
       - KEYCLOAK_CLIENT_ID=lt-budget-angular
       - API_URL=http://localhost:3001
+      - NODE_OPTIONS=--max-old-space-size=6144
     ports:
       - "4200:4200"
     volumes:

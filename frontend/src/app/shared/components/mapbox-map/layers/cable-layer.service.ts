@@ -1,9 +1,8 @@
 import { Injectable, inject } from '@angular/core';
 import { PathLayer } from '@deck.gl/layers';
-import { TowerMap, Span, CableSettings } from '../models';
+import { TowerMap, Span, CableSettings, TowerLayerOptions } from '../models';
 import { CatenaryCalculatorService, Point3D } from '../services/catenary-calculator.service';
 import { CableConfigurationService, CableDefinition } from '../services/cable-configuration.service';
-import { TowerLayerOptions } from './tower-3d-layer.service';
 import { TowerPhysicsService } from '../services/tower-physics.service';
 
 interface CableData {
@@ -55,14 +54,20 @@ export class CableLayerService {
         const terrainAlt1 = getElev(startTower.lng, startTower.lat);
         const terrainAlt2 = getElev(endTower.lng, endTower.lat);
 
-        // vRatio = 1.0 (Top), vOffset = -cableDef.offsetY (Distance DOWN from top)
+        // Reference height for scaling (must match Tower3DLayerService)
+        const REF_HEIGHT = 30;
 
+        // Calculate scale factors
+        const scale1 = (startTower.height || REF_HEIGHT) / REF_HEIGHT;
+        const scale2 = (endTower.height || REF_HEIGHT) / REF_HEIGHT;
+
+        // Apply scaling to offsets
         const startPos = this.physics.calculateAnchorPosition(
           startTower,
           bearing1,
-          cableDef.offsetX,
+          cableDef.offsetX * scale1,
           1.0, // Top
-          -cableDef.offsetY, // Negative offset from top
+          -cableDef.offsetY * scale1, // Negative offset from top (scaled)
           towerVerticalOffset,
           terrainAlt1
         );
@@ -70,9 +75,9 @@ export class CableLayerService {
         const endPos = this.physics.calculateAnchorPosition(
           endTower,
           bearing2,
-          cableDef.offsetX,
+          cableDef.offsetX * scale2,
           1.0,
-          -cableDef.offsetY,
+          -cableDef.offsetY * scale2,
           towerVerticalOffset,
           terrainAlt2
         );
@@ -122,16 +127,16 @@ export class CableLayerService {
     const subConductorsPerPhase = work.number_of_conductor_cables || 1;
 
     // Phase colors: Red, Green, Blue
-    const phaseColors = ['#FF0000', '#00FF00', '#0000FF'];
+    const phaseColors = ['#8A8584', '#8F8F8F', '#D4D4D2'];
 
     // Sub-conductor spacing
     const subCableSpacing = 0.45;
     const subCableOffsets = this.generateSubCablePattern(subConductorsPerPhase, subCableSpacing);
 
     // Default reference distances from TOP
-    const topPhaseDist = 4.5;
-    const midPhaseDist = 9.0;
-    const botPhaseDist = 13.5;
+    const topPhaseDist = 0.0;
+    const midPhaseDist = 2.5;
+    const botPhaseDist = 6.0;
 
     // Double Circuit (Vertical)
     if (circuits === 2) {
@@ -186,7 +191,7 @@ export class CableLayerService {
 
     // Lightning rod cables (ground wires)
     for (let i = 0; i < lightningCount; i++) {
-      let xOffset = 0;
+      let xOffset = -2;
       if (lightningCount > 1) {
         const spread = 4.0;
         xOffset = (i - 0.5) * spread * 2;
@@ -196,8 +201,8 @@ export class CableLayerService {
         id: `l${i}`,
         type: 'lightning',
         offsetX: xOffset,
-        offsetY: 0, // At the very top
-        color: '#FFFF00',
+        offsetY: -2.0, // At the very top
+        color: '#fdfd14ff',
         width: 2
       });
     }

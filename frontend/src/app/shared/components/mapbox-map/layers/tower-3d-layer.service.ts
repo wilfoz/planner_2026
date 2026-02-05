@@ -1,15 +1,8 @@
 import { Injectable, inject } from '@angular/core';
 import { ScenegraphLayer } from '@deck.gl/mesh-layers';
 import { ScatterplotLayer } from '@deck.gl/layers';
-import { CableSettings, TowerMap } from '../models';
+import { CableSettings, TowerMap, TowerLayerOptions } from '../models';
 import { TowerPhysicsService } from '../services/tower-physics.service';
-
-export interface TowerLayerOptions {
-  towerVerticalOffset: number;
-  terrainRevision?: number;
-  getTerrainElevation?: (lng: number, lat: number) => number;
-  settings?: CableSettings | null;
-}
 
 const DEFAULT_MODEL_URL = '/assets/models/towers/scene.gltf';
 

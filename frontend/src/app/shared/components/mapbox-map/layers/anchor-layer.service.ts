@@ -1,8 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { ScatterplotLayer } from '@deck.gl/layers';
-import { TowerMap, CableSettings } from '../models';
+import { TowerMap, CableSettings, TowerLayerOptions } from '../models';
 import { CatenaryCalculatorService } from '../services/catenary-calculator.service';
-import { TowerLayerOptions } from './tower-3d-layer.service';
 import { TowerPhysicsService } from '../services/tower-physics.service';
 
 @Injectable({ providedIn: 'root' })

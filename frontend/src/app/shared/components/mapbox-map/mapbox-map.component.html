@@ -4,8 +4,56 @@
 
   <!-- DeckGL Overlay Directive - manages 3D layers -->
   <ng-container appDeckLayer [mapInstance]="mapInstanceValue" [towers]="towersValue" [spans]="spansValue"
-    [cableSettings]="cableSettingsValue" [show3D]="show3DValue" [work]="currentWork()">
+    [cableSettings]="cableSettingsValue" [show3D]="show3DValue" [work]="currentWork()"
+    (labelClick)="handleLabelClick($event)">
   </ng-container>
+
+  <!-- Tower Details Popup Menu -->
+  @if (activeTowerMenu()) {
+  <div
+    class="absolute z-50 w-64 bg-zinc-900/95 backdrop-blur-md rounded-xl border border-white/20 p-4 shadow-2xl animate-in fade-in zoom-in-95 duration-200"
+    [style.left.px]="activeTowerMenu()!.x" [style.top.px]="activeTowerMenu()!.y">
+    
+    <div class="flex items-center justify-between mb-3 border-b border-white/10 pb-2">
+      <h3 class="text-sm font-bold text-white">{{ activeTowerMenu()!.tower.name }}</h3>
+      <button (click)="closeMenu()" class="p-1 hover:bg-white/10 rounded-full transition-colors text-white/60 hover:text-white">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <div class="space-y-2 text-xs">
+      <div class="grid grid-cols-2 gap-2">
+        <span class="text-white/50">Número:</span>
+        <span class="text-white font-mono text-right">{{ activeTowerMenu()!.tower.tower_number }}</span>
+        
+        <span class="text-white/50">Tipo:</span>
+        <span class="text-white text-right">{{ activeTowerMenu()!.tower.type }}</span>
+        
+        <span class="text-white/50">Estrutura:</span>
+        <span class="text-white text-right">{{ activeTowerMenu()!.tower.structureType }}</span>
+        
+        <span class="text-white/50">Altura:</span>
+        <span class="text-white font-mono text-right">{{ activeTowerMenu()!.tower.height }}m</span>
+        
+        <span class="text-white/50">Altitude:</span>
+        <span class="text-white font-mono text-right">{{ activeTowerMenu()!.tower.altitude | number:'1.2-2' }}m</span>
+        
+        <span class="text-white/50">Deflexão:</span>
+        <span class="text-white font-mono text-right">{{ activeTowerMenu()!.tower.deflection }}°</span>
+      </div>
+      
+      <div class="pt-2 mt-2 border-t border-white/10">
+        <div class="flex justify-between text-[10px] text-white/40 mb-1">Coordenadas</div>
+        <div class="font-mono text-[10px] text-white/80 flex justify-between">
+          <span>{{ activeTowerMenu()!.tower.lat | number:'1.5-5' }}</span>
+          <span>{{ activeTowerMenu()!.tower.lng | number:'1.5-5' }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  }
 
 
   <!-- HUD Overlay -->
